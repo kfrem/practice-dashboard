@@ -148,6 +148,12 @@ footer{border-top:1px solid var(--border);padding:20px 28px;text-align:center;fo
       <h2 id="docTitle">Engagement Letter</h2>
       <p class="sub">Please read this document carefully before signing below.</p>
       <div class="letter-box" id="letterContent"></div>
+      <div id="firmSigSection" style="display:none;border-top:1px solid var(--border);padding:16px 0 4px;margin-top:16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Authorised and sent by</div>
+        <img id="firmSigImg" src="" alt="Firm signature" style="max-height:64px;max-width:220px;display:block;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:700;color:var(--navy)"><?= htmlspecialchars(FR_FIRM_NAME) ?></div>
+        <div style="font-size:12px;color:var(--muted)"><?= htmlspecialchars(FR_FIRM_EMAIL) ?> &nbsp;·&nbsp; <?= htmlspecialchars(FR_FIRM_PHONE) ?></div>
+      </div>
       <br>
       <button class="btn btn-primary" onclick="goStep2()">I have read this document — Continue →</button>
     </div>
@@ -220,7 +226,7 @@ footer{border-top:1px solid var(--border);padding:20px 28px;text-align:center;fo
 
 <script>
 const TOKEN = new URLSearchParams(location.search).get('token') || '';
-let clientData = null, sigMode = 'draw', sigData = null, docText = '';
+let clientData = null, sigMode = 'draw', sigData = null, docText = '', firmSig = '';
 
 // Canvas
 const canvas = document.getElementById('sigCanvas');
@@ -266,20 +272,46 @@ async function getIP() {
 
 function buildLetter(c) {
   const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const svcParts = (c.service||'').split('\n').filter(s=>s.trim());
+  const serviceBullets = svcParts.length ? svcParts.map(s=>'• '+s).join('\n') : '• Services to be confirmed';
+  const svcSummary = svcParts.join(', ') || 'Accountancy Services';
+  const clientBlock = [c.name, c.company||'', c.type].filter(Boolean).join('\n');
+  const firmName    = <?= json_encode(FR_FIRM_NAME) ?>;
+  const firmAddr    = <?= json_encode(FR_FIRM_ADDRESS) ?>;
+  const firmEmail   = <?= json_encode(FR_FIRM_EMAIL) ?>;
+  const firmPhone   = <?= json_encode(FR_FIRM_PHONE) ?>;
+  const firmWeb     = <?= json_encode(FR_FIRM_WEBSITE) ?>;
+  const firmIco     = <?= json_encode(FR_ICO_NUMBER) ?>;
+  const feeLine = c.fee
+    ? `\n\nFEES\nOur agreed fee for the above services is: ${c.fee}\nInvoices are payable within 30 days of issue.`
+    : '\n\nFEES\nOur fees will be agreed and confirmed separately in writing. Invoices are payable within 30 days of issue.';
   return `CLIENT ENGAGEMENT LETTER
+────────────────────────────────────────────────────────────────────
 
-Date: ${today}
+${firmName}
+${firmAddr}
+Tel:     ${firmPhone}
+Email:   ${firmEmail}
+Web:     ${firmWeb}
+ICO Reg: ${firmIco}
 
-To:      ${c.name}
-Company: ${c.company || 'N/A'} (${c.type})
+                                                        ${today}
+
+────────────────────────────────────────────────────────────────────
+
+${clientBlock}
+
+────────────────────────────────────────────────────────────────────
 
 Dear ${c.name.split(' ')[0]},
 
-Thank you for choosing The Practice. We are pleased to confirm our appointment as your accountants. This letter sets out the basis on which we will act for you.
+Re: Letter of Engagement — ${svcSummary}
+
+Thank you for choosing ${firmName}. We are pleased to confirm our appointment as your accountants. This letter sets out the basis on which we will act for you.
 
 SERVICES
 We will provide the following services:
-• ${c.service}
+${serviceBullets}
 
 Any additional services requested will be confirmed in a separate letter of engagement.
 
@@ -322,21 +354,23 @@ Please sign below to confirm your acceptance of these terms.
 
 Yours sincerely,
 
-The Practice
-A Finaccord Professional Services Programme
-${<?= json_encode(FR_FIRM_EMAIL) ?>} | ${<?= json_encode(FR_FIRM_PHONE) ?>}
-${<?= json_encode(FR_FIRM_WEBSITE) ?>}`;
+
+___________________________
+${firmName}
+${firmEmail} | ${firmPhone}
+${firmWeb}`;
 }
 
 async function buildPDF(c, hash, signedAt, ip, method) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit:'mm', format:'a4' });
 
+  const svcLine = (c.service||'').split('\n')[0] || 'Engagement Letter';
   doc.setFillColor(26,53,88); doc.rect(0,0,210,26,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(201,168,76);
-  doc.text('The Practice', 14, 12);
+  doc.text(<?= json_encode(FR_FIRM_NAME) ?>, 14, 12);
   doc.setFontSize(9); doc.setTextColor(148,163,184);
-  doc.text('Electronic Signature Audit Report — ' + c.service, 14, 20);
+  doc.text('Electronic Signature Audit Report — ' + svcLine, 14, 20);
   doc.setTextColor(100,116,139);
   doc.text(new Date().toLocaleString('en-GB'), 148, 20);
 
@@ -345,6 +379,7 @@ async function buildPDF(c, hash, signedAt, ip, method) {
   doc.setDrawColor(201,168,76); doc.setLineWidth(0.4); doc.line(14,43,196,43);
 
   const rows = [['Client',c.name],['Company',c.company||'—'],['Entity',c.type],
+    ['Services',(c.service||'').replace(/\n/g,', ')],
     ['Signed At',signedAt],['IP Address',ip],['Method',method==='draw'?'Hand drawn':'Typed name']];
   doc.setFont('helvetica','normal'); doc.setFontSize(10);
   let y = 52;
@@ -352,6 +387,33 @@ async function buildPDF(c, hash, signedAt, ip, method) {
     doc.setTextColor(100,116,139); doc.text(l+':',14,y);
     doc.setTextColor(15,34,56); doc.text(String(v),60,y); y+=8;
   });
+
+  // FIRM SIGNATURE
+  y+=4; doc.setDrawColor(200,200,200); doc.line(14,y,196,y); y+=8;
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(30,61,102);
+  doc.text('FIRM AUTHORISATION', 14, y); y+=6;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  doc.text('Engagement letter authorised and sent by:', 14, y); y+=5;
+  if (firmSig) {
+    try { doc.addImage(firmSig, 'PNG', 14, y, 48, 18); y+=22; } catch(e) { y+=4; }
+  }
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(15,34,56);
+  doc.text(<?= json_encode(FR_FIRM_NAME) ?>, 14, y); y+=5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(100,116,139);
+  doc.text(<?= json_encode(FR_FIRM_EMAIL . ' | ' . FR_FIRM_PHONE) ?>, 14, y); y+=8;
+
+  // CLIENT SIGNATURE
+  doc.setDrawColor(200,200,200); doc.line(14,y,196,y); y+=8;
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(30,61,102);
+  doc.text('CLIENT SIGNATURE', 14, y); y+=6;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100,116,139);
+  doc.text('Signed by ' + c.name + ' on ' + signedAt + ':', 14, y); y+=5;
+  if (method === 'draw' && sigData && sigData.startsWith('data:')) {
+    try { doc.addImage(sigData, 'PNG', 14, y, 48, 18); y+=22; } catch(e) { y+=4; }
+  } else if (method === 'type' && sigData) {
+    doc.setFont('times','italic'); doc.setFontSize(20); doc.setTextColor(15,34,56);
+    doc.text(sigData, 14, y+10); y+=16;
+  }
 
   y+=4; doc.setDrawColor(200,200,200); doc.line(14,y,196,y); y+=8;
   doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(30,61,102);
@@ -459,8 +521,16 @@ async function init() {
       ? clientData.custom_letter
       : buildLetter(clientData);
     document.getElementById('letterContent').textContent = docText;
-    document.getElementById('docTitle').textContent = clientData.service + ' — Engagement Letter';
+    // Title: show first service only (keep it concise)
+    const svcTitle = (clientData.service||'').split('\n')[0] || 'Engagement Letter';
+    document.getElementById('docTitle').textContent = svcTitle + ' — Engagement Letter';
     document.getElementById('clientNameDisplay').textContent = clientData.name;
+    // Show firm signature if saved
+    firmSig = data.client.firm_sig || '';
+    if (firmSig) {
+      document.getElementById('firmSigImg').src = firmSig;
+      document.getElementById('firmSigSection').style.display = 'block';
+    }
     document.getElementById('loading').style.display = 'none';
     document.getElementById('signForm').style.display = 'block';
   } catch(e) {

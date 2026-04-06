@@ -184,6 +184,18 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
 .svc-tag{display:inline-flex;align-items:center;gap:5px;background:var(--navy);color:#fff;border-radius:3px;padding:3px 8px;font-size:11px;font-weight:600}
 .svc-tag-x{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:14px;line-height:1;padding:0;font-family:inherit}
 .svc-tag-x:hover{color:#fff}
+
+/* FIRM SIGNATURE SECTION */
+.firm-sig-section{border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.fsig-tabs{display:flex;border-bottom:1px solid var(--border)}
+.fsig-tab{flex:1;padding:8px;background:var(--cream);border:none;font-family:'Segoe UI',Georgia,sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;border-right:1px solid var(--border)}
+.fsig-tab:last-child{border-right:none}
+.fsig-tab.active{background:#fff;color:var(--navy)}
+.fsig-panel{padding:12px}
+.fsig-preview-box{min-height:72px;display:flex;align-items:center;justify-content:center;background:#fafaf8;border:1px solid var(--border);border-radius:4px;padding:10px}
+.btn-save-sig{background:var(--navy);color:#fff;border:none;border-radius:4px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Segoe UI',Georgia,sans-serif;margin-top:8px}
+.btn-save-sig:hover{background:var(--navy-dark)}
+.sig-saved-ok{font-size:12px;color:var(--success);font-weight:600;margin-left:8px;display:none}
 </style>
 </head>
 <body>
@@ -424,6 +436,37 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
           <textarea class="letter-editor" id="letterEditor"></textarea>
           <p style="font-size:11px;color:var(--muted);margin-top:5px">You can edit any part of this letter. The client will sign exactly what you see here.</p>
         </div>
+        <div class="fg" style="margin-top:4px">
+          <label>Your Firm Signature <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">(appears on the letter the client sees)</span></label>
+          <div class="firm-sig-section">
+            <div class="fsig-tabs">
+              <button type="button" class="fsig-tab active" id="fsigTabSaved" onclick="switchFSigTab('saved')">Saved Signature</button>
+              <button type="button" class="fsig-tab" id="fsigTabDraw" onclick="switchFSigTab('draw')">Draw New</button>
+              <button type="button" class="fsig-tab" id="fsigTabUpload" onclick="switchFSigTab('upload')">Upload Image</button>
+            </div>
+            <div class="fsig-panel" id="fsigPanelSaved">
+              <div class="fsig-preview-box">
+                <span id="fsigNoSig" style="font-size:12px;color:var(--muted)">No signature saved yet — use Draw or Upload to add one.</span>
+                <img id="fsigPreview" src="" alt="Firm signature" style="max-height:70px;max-width:100%;display:none">
+              </div>
+            </div>
+            <div class="fsig-panel" id="fsigPanelDraw" style="display:none">
+              <div style="position:relative;border:1px solid var(--border);border-radius:4px;background:#fafaf8">
+                <canvas id="fsigCanvas" style="display:block;width:100%;height:110px;cursor:crosshair;touch-action:none"></canvas>
+                <button type="button" onclick="clearFSig()" style="position:absolute;top:6px;right:8px;background:#fff;border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;color:var(--muted);cursor:pointer">Clear</button>
+              </div>
+              <button type="button" class="btn-save-sig" onclick="saveFirmSig('draw')">💾 Save &amp; Use This Signature</button>
+              <span class="sig-saved-ok" id="drawSavedOk">✓ Saved</span>
+            </div>
+            <div class="fsig-panel" id="fsigPanelUpload" style="display:none">
+              <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Upload a PNG or JPG of your signature (white or transparent background works best).</p>
+              <input type="file" id="fsigFile" accept="image/png,image/jpeg" onchange="loadFSigFile(this)" style="font-size:12px;margin-bottom:8px;display:block">
+              <img id="fsigUploadPreview" src="" alt="" style="max-height:70px;display:none;border:1px solid var(--border);border-radius:4px;padding:4px;margin-bottom:8px">
+              <button type="button" class="btn-save-sig" onclick="saveFirmSig('upload')">💾 Save &amp; Use This Signature</button>
+              <span class="sig-saved-ok" id="uploadSavedOk">✓ Saved</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- STEP 2: SENT CONFIRMATION -->
@@ -562,6 +605,12 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
 <div class="toast" id="toast"></div>
 
 <script>
+const FIRM_NAME    = <?= json_encode(FR_FIRM_NAME) ?>;
+const FIRM_ADDR    = <?= json_encode(FR_FIRM_ADDRESS) ?>;
+const FIRM_EMAIL   = <?= json_encode(FR_FIRM_EMAIL) ?>;
+const FIRM_PHONE   = <?= json_encode(FR_FIRM_PHONE) ?>;
+const FIRM_WEBSITE = <?= json_encode(FR_FIRM_WEBSITE) ?>;
+const FIRM_ICO     = <?= json_encode(FR_ICO_NUMBER) ?>;
 let clients = [], curLinkId = '', curAmlId = '', curNotesId = '', curTab = 'all';
 
 async function api(action, body={}) {
@@ -833,16 +882,32 @@ function buildDefaultLetter(c) {
   const feeLine = c.fee ? `\n\nFEES\nOur agreed fee for the above services is: ${c.fee}\n` : '\n\nFEES\nOur fees will be agreed and confirmed separately in writing.\n';
   const svcParts = (c.service||'').split('\n').filter(s=>s.trim());
   const serviceBullets = svcParts.length ? svcParts.map(s=>'• '+s).join('\n') : '• Services to be confirmed';
+  const svcSummary = svcParts.length ? svcParts.join(', ') : 'Accountancy Services';
+  const clientBlock = [c.name, c.company||'', c.type].filter(Boolean).join('\n');
   return `CLIENT ENGAGEMENT LETTER
+────────────────────────────────────────────────────────────────────
 
-Date: ${today}
+${FIRM_NAME}
+${FIRM_ADDR}
+Tel:     ${FIRM_PHONE}
+Email:   ${FIRM_EMAIL}
+Web:     ${FIRM_WEBSITE}
+ICO Reg: ${FIRM_ICO}
 
-To:      ${c.name}
-Company: ${c.company||'N/A'} (${c.type})
+                                                        ${today}
+
+────────────────────────────────────────────────────────────────────
+
+${clientBlock}
+[Client Address — please complete before sending]
+
+────────────────────────────────────────────────────────────────────
 
 Dear ${c.name.split(' ')[0]},
 
-Thank you for choosing The Practice. We are pleased to confirm our appointment as your accountants. This letter sets out the basis on which we will act for you.
+Re: Letter of Engagement — ${svcSummary}
+
+Thank you for choosing ${FIRM_NAME}. We are pleased to confirm our appointment as your accountants. This letter sets out the basis on which we will act for you.
 
 SERVICES
 We will provide the following services:
@@ -861,16 +926,74 @@ MAKING TAX DIGITAL (MTD)
 Where applicable, we will assist you in meeting your MTD obligations. You remain responsible for the accuracy of all information submitted to HMRC.
 
 DATA PROTECTION
-The Practice processes your personal data as Data Controller in accordance with UK GDPR and the Data Protection Act 2018. ICO Registration: ZC112776.
+${FIRM_NAME} processes your personal data as Data Controller in accordance with UK GDPR and the Data Protection Act 2018. ICO Registration: ${FIRM_ICO}.
 
 GOVERNING LAW
 This engagement is governed by the laws of England and Wales.
 
 Yours sincerely,
 
-The Practice — A Finaccord Professional Services Programme
-info@kafs-ltd.com | +44 7939 823988
-practice.finaccord.pro`;
+
+___________________________
+${FIRM_NAME}
+${FIRM_EMAIL} | ${FIRM_PHONE}
+${FIRM_WEBSITE}`;
+}
+
+// ── Firm Signature ────────────────────────────────
+let savedFirmSig = '', fsigCtx = null, fsigDrawing = false, fsigLx = 0, fsigLy = 0, fsigUploadData = '';
+
+function switchFSigTab(tab) {
+  ['Saved','Draw','Upload'].forEach(t => {
+    document.getElementById('fsigTab'+t).classList.toggle('active', t.toLowerCase()===tab);
+    document.getElementById('fsigPanel'+t).style.display = t.toLowerCase()===tab ? 'block' : 'none';
+  });
+  if (tab === 'draw') setTimeout(initFSigCanvas, 50);
+}
+function initFSigCanvas() {
+  const canvas = document.getElementById('fsigCanvas');
+  if (!canvas || fsigCtx) return;
+  const r = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = r.width * dpr; canvas.height = 110 * dpr;
+  canvas.style.width = r.width + 'px'; canvas.style.height = '110px';
+  fsigCtx = canvas.getContext('2d');
+  fsigCtx.scale(dpr, dpr);
+  fsigCtx.strokeStyle = '#0f2238'; fsigCtx.lineWidth = 2.2; fsigCtx.lineCap = 'round'; fsigCtx.lineJoin = 'round';
+  canvas.onmousedown = e => { fsigDrawing=true; const r=canvas.getBoundingClientRect(); fsigLx=e.clientX-r.left; fsigLy=e.clientY-r.top; };
+  canvas.onmousemove = e => { if(!fsigDrawing)return; const r=canvas.getBoundingClientRect(); const x=e.clientX-r.left,y=e.clientY-r.top; fsigCtx.beginPath(); fsigCtx.moveTo(fsigLx,fsigLy); fsigCtx.lineTo(x,y); fsigCtx.stroke(); fsigLx=x; fsigLy=y; };
+  canvas.onmouseup = canvas.onmouseleave = () => fsigDrawing = false;
+}
+function clearFSig() {
+  if (fsigCtx) { const c=document.getElementById('fsigCanvas'); fsigCtx.clearRect(0,0,c.width,c.height); }
+}
+function loadFSigFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    fsigUploadData = ev.target.result;
+    const prev = document.getElementById('fsigUploadPreview');
+    prev.src = fsigUploadData; prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+async function saveFirmSig(source) {
+  const sigData = source === 'draw'
+    ? document.getElementById('fsigCanvas').toDataURL('image/png')
+    : fsigUploadData;
+  if (!sigData || sigData === 'data:,') { toast('Nothing to save — please draw or upload first'); return; }
+  const d = await api('save_firm_sig', { sig: sigData });
+  if (d.success) {
+    savedFirmSig = sigData;
+    document.getElementById('fsigPreview').src = sigData;
+    document.getElementById('fsigPreview').style.display = 'block';
+    document.getElementById('fsigNoSig').style.display = 'none';
+    const okId = source === 'draw' ? 'drawSavedOk' : 'uploadSavedOk';
+    const ok = document.getElementById(okId);
+    ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
+    switchFSigTab('saved');
+    toast('Firm signature saved');
+  } else { toast('Save failed — ' + (d.error || 'unknown error')); }
 }
 
 function openLink(id) {
@@ -891,6 +1014,16 @@ function openLink(id) {
   document.getElementById('linkFoot').style.display = 'flex';
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('sendBtn').textContent = '📧 Save Letter & Send →';
+  // Load firm signature
+  switchFSigTab('saved');
+  fsigCtx = null; // reset so canvas re-inits on next Draw tab open
+  api('get_firm_sig', {}).then(d => {
+    savedFirmSig = d.sig || '';
+    const prev = document.getElementById('fsigPreview');
+    const none = document.getElementById('fsigNoSig');
+    if (savedFirmSig) { prev.src = savedFirmSig; prev.style.display='block'; none.style.display='none'; }
+    else { prev.style.display='none'; none.style.display='block'; }
+  });
   openM('linkModal');
 }
 

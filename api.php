@@ -227,11 +227,14 @@ switch ($action) {
 
         // Keep same token if resending, generate new one if first time
         $token = $clients[$id]['sign_token'] ?: bin2hex(random_bytes(32));
-        $clients[$id]['sign_token']     = $token;
-        $clients[$id]['status']         = 'sent';
-        $clients[$id]['sent_at']        = date('c');
-        $clients[$id]['deadline_at']    = date('c', time() + ($deadlineHours * 3600));
-        $clients[$id]['deadline_hours'] = $deadlineHours;
+        $clients[$id]['sign_token']       = $token;
+        $clients[$id]['status']           = 'sent';
+        $clients[$id]['sent_at']          = date('c');
+        $clients[$id]['deadline_at']      = date('c', time() + ($deadlineHours * 3600));
+        $clients[$id]['deadline_hours']   = $deadlineHours;
+        $clients[$id]['sent_by_ip']       = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $letterContent                    = $clients[$id]['custom_letter'] ?? '';
+        $clients[$id]['letter_sent_hash'] = hash('sha256', $letterContent);
         save_clients($clients);
 
         $c    = $clients[$id];
@@ -320,6 +323,8 @@ switch ($action) {
         foreach ($clients as $c) {
             if ($c['sign_token'] === $token) {
                 if ($c['status'] === 'signed') error('This document has already been signed');
+                $firmSigPath = FR_DATA_DIR . 'firm_sig.b64';
+                $firmSig     = file_exists($firmSigPath) ? trim(file_get_contents($firmSigPath)) : '';
                 respond(['success' => true, 'client' => [
                     'id'            => $c['id'],
                     'name'          => $c['name'],
@@ -328,6 +333,7 @@ switch ($action) {
                     'service'       => $c['service'],
                     'fee'           => $c['fee'] ?? '',
                     'custom_letter' => $c['custom_letter'] ?? '',
+                    'firm_sig'      => $firmSig,
                 ]]);
             }
         }
@@ -554,6 +560,24 @@ switch ($action) {
         unset($clients[$id]);
         save_clients($clients);
         respond(['success' => true]);
+        break;
+
+    // SAVE FIRM SIGNATURE
+    case 'save_firm_sig':
+        require_auth();
+        $sig = $input['sig'] ?? '';
+        if (!$sig || !preg_match('/^data:image\/(png|jpeg|jpg);base64,/', $sig)) {
+            error('Invalid signature — must be a PNG or JPG image');
+        }
+        file_put_contents(FR_DATA_DIR . 'firm_sig.b64', $sig);
+        respond(['success' => true]);
+        break;
+
+    // GET FIRM SIGNATURE
+    case 'get_firm_sig':
+        require_auth();
+        $path = FR_DATA_DIR . 'firm_sig.b64';
+        respond(['success' => true, 'sig' => file_exists($path) ? trim(file_get_contents($path)) : '']);
         break;
 
     default:
