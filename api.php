@@ -562,6 +562,225 @@ switch ($action) {
         respond(['success' => true]);
         break;
 
+    // ── LETTERHEAD ──────────────────────────────────────────────────
+
+    case 'get_letterhead':
+        require_auth();
+        $path = FR_DATA_DIR . 'letterhead.json';
+        $defaults = [
+            'logo'         => '',
+            'tagline'      => 'Professional Accountancy Services',
+            'brand_colour' => '#1a3558',
+            'accent_colour'=> '#c9a84c',
+            'footer_text'  => 'Registered in England & Wales | ICO Registration ' . FR_ICO_NUMBER,
+            'disclaimer'   => 'This communication is confidential and intended solely for the named recipient(s). If you have received this in error, please notify us immediately and delete it.',
+            'social_linkedin' => '',
+            'social_twitter'  => '',
+        ];
+        $lh = file_exists($path) ? json_decode(file_get_contents($path), true) : [];
+        respond(['success' => true, 'letterhead' => array_merge($defaults, $lh ?: [])]);
+        break;
+
+    case 'save_letterhead':
+        require_auth();
+        $allowed = ['logo','tagline','brand_colour','accent_colour','footer_text','disclaimer','social_linkedin','social_twitter'];
+        $data = [];
+        foreach ($allowed as $k) {
+            if (isset($input[$k])) $data[$k] = $input[$k];
+        }
+        file_put_contents(FR_DATA_DIR . 'letterhead.json', json_encode($data, JSON_PRETTY_PRINT));
+        respond(['success' => true]);
+        break;
+
+    // ── CORRESPONDENCE / LETTERS ────────────────────────────────────
+
+    case 'get_letters':
+        require_auth();
+        $path = FR_DATA_DIR . 'letters.json';
+        $letters = file_exists($path) ? json_decode(file_get_contents($path), true) : [];
+        respond(['success' => true, 'letters' => array_values($letters ?: [])]);
+        break;
+
+    case 'send_letter': {
+        require_auth();
+        $subject    = clean($input['subject'] ?? '');
+        $body       = $input['body'] ?? '';
+        $recipName  = clean($input['recipient_name'] ?? '');
+        $recipEmail = trim($input['recipient_email'] ?? '');
+        $recipType  = clean($input['recipient_type'] ?? 'client');
+        $category   = clean($input['category'] ?? 'General');
+        $templateId = clean($input['template_id'] ?? '');
+        $clientId   = clean($input['linked_client_id'] ?? '');
+        $requireAck = !empty($input['require_acknowledgement']);
+
+        if (!$subject || !$body || !$recipName || !filter_var($recipEmail, FILTER_VALIDATE_EMAIL)) {
+            error('Subject, body, recipient name and valid email are required');
+        }
+
+        $lpath   = FR_DATA_DIR . 'letters.json';
+        $letters = file_exists($lpath) ? (json_decode(file_get_contents($lpath), true) ?: []) : [];
+
+        $id    = 'l_' . bin2hex(random_bytes(6));
+        $token = bin2hex(random_bytes(32));
+
+        $lhPath = FR_DATA_DIR . 'letterhead.json';
+        $lh     = file_exists($lhPath) ? (json_decode(file_get_contents($lhPath), true) ?: []) : [];
+        $firmSigPath = FR_DATA_DIR . 'firm_sig.b64';
+        $firmSig     = file_exists($firmSigPath) ? trim(file_get_contents($firmSigPath)) : '';
+
+        $letters[$id] = [
+            'id'                    => $id,
+            'template_id'           => $templateId,
+            'category'              => $category,
+            'subject'               => $subject,
+            'recipient_name'        => $recipName,
+            'recipient_email'       => $recipEmail,
+            'recipient_type'        => $recipType,
+            'linked_client_id'      => $clientId,
+            'body'                  => $body,
+            'status'                => 'sent',
+            'token'                 => $token,
+            'require_acknowledgement'=> $requireAck,
+            'sent_at'               => date('c'),
+            'read_at'               => null,
+            'acknowledged_at'       => null,
+            'sent_by_ip'            => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            'letter_hash'           => hash('sha256', $body . $recipEmail . date('c')),
+            'created_at'            => date('c'),
+        ];
+
+        $fp = fopen($lpath, 'c+'); flock($fp, LOCK_EX);
+        ftruncate($fp, 0); rewind($fp);
+        fwrite($fp, json_encode($letters, JSON_PRETTY_PRINT));
+        flock($fp, LOCK_UN); fclose($fp);
+
+        // Send email
+        $viewLink  = FR_BASE_URL . '/letter_view.php?token=' . $token;
+        $brandCol  = $lh['brand_colour'] ?? '#1a3558';
+        $accentCol = $lh['accent_colour'] ?? '#c9a84c';
+        $ackLine   = $requireAck
+            ? "<div style='text-align:center;margin:20px 0'><a href='{$viewLink}#acknowledge' style='background:{$brandCol};color:{$accentCol};padding:12px 28px;border-radius:5px;text-decoration:none;font-weight:bold;font-size:14px;display:inline-block'>View &amp; Acknowledge →</a></div>"
+            : "<div style='text-align:center;margin:20px 0'><a href='{$viewLink}' style='background:{$brandCol};color:{$accentCol};padding:12px 28px;border-radius:5px;text-decoration:none;font-weight:bold;font-size:14px;display:inline-block'>View Letter →</a></div>";
+
+        $emailBody = "<p>Dear <strong>{$recipName}</strong>,</p>"
+            . "<p>Please find correspondence from <strong>" . FR_FIRM_NAME . "</strong> below.</p>"
+            . $ackLine
+            . "<p style='font-size:12px;color:#666;'>If you cannot click the button, copy this link into your browser:<br>{$viewLink}</p>";
+
+        $footer = FR_FIRM_NAME . " | " . FR_FIRM_ADDRESS . " | ICO: " . FR_ICO_NUMBER;
+        $html   = email_html($subject, $emailBody, $footer);
+        $sent   = send_email($recipEmail, $subject . ' — ' . FR_FIRM_NAME, $html);
+
+        respond(['success' => true, 'sent' => $sent, 'id' => $id, 'link' => $viewLink]);
+        break;
+    }
+
+    case 'get_letter_by_token': {
+        $token = clean($input['token'] ?? '');
+        if (!$token) error('Invalid token');
+        $lpath   = FR_DATA_DIR . 'letters.json';
+        $letters = file_exists($lpath) ? (json_decode(file_get_contents($lpath), true) ?: []) : [];
+        foreach ($letters as $l) {
+            if ($l['token'] === $token) {
+                $lhPath = FR_DATA_DIR . 'letterhead.json';
+                $lh     = file_exists($lhPath) ? (json_decode(file_get_contents($lhPath), true) ?: []) : [];
+                $firmSigPath = FR_DATA_DIR . 'firm_sig.b64';
+                $firmSig     = file_exists($firmSigPath) ? trim(file_get_contents($firmSigPath)) : '';
+                respond(['success' => true, 'letter' => $l, 'letterhead' => $lh, 'firm_sig' => $firmSig]);
+            }
+        }
+        error('Letter not found', 404);
+        break;
+    }
+
+    case 'mark_letter_read': {
+        $token = clean($input['token'] ?? '');
+        if (!$token) error('Invalid token');
+        $lpath   = FR_DATA_DIR . 'letters.json';
+        $letters = file_exists($lpath) ? (json_decode(file_get_contents($lpath), true) ?: []) : [];
+        foreach ($letters as $id => $l) {
+            if ($l['token'] === $token && !$l['read_at']) {
+                $letters[$id]['read_at'] = date('c');
+                $letters[$id]['status']  = 'read';
+                $fp = fopen($lpath, 'c+'); flock($fp, LOCK_EX);
+                ftruncate($fp, 0); rewind($fp);
+                fwrite($fp, json_encode($letters, JSON_PRETTY_PRINT));
+                flock($fp, LOCK_UN); fclose($fp);
+                respond(['success' => true]);
+            }
+        }
+        respond(['success' => true]); // already read or not found — silent ok
+        break;
+    }
+
+    case 'acknowledge_letter': {
+        $token = clean($input['token'] ?? '');
+        if (!$token) error('Invalid token');
+        $lpath   = FR_DATA_DIR . 'letters.json';
+        $letters = file_exists($lpath) ? (json_decode(file_get_contents($lpath), true) ?: []) : [];
+        foreach ($letters as $id => $l) {
+            if ($l['token'] === $token) {
+                $letters[$id]['acknowledged_at'] = date('c');
+                $letters[$id]['status']          = 'acknowledged';
+                if (!$letters[$id]['read_at']) $letters[$id]['read_at'] = date('c');
+                $fp = fopen($lpath, 'c+'); flock($fp, LOCK_EX);
+                ftruncate($fp, 0); rewind($fp);
+                fwrite($fp, json_encode($letters, JSON_PRETTY_PRINT));
+                flock($fp, LOCK_UN); fclose($fp);
+                respond(['success' => true]);
+            }
+        }
+        error('Letter not found', 404);
+        break;
+    }
+
+    case 'delete_letter':
+        require_auth();
+        $id = clean($input['id'] ?? '');
+        $lpath = FR_DATA_DIR . 'letters.json';
+        $letters = file_exists($lpath) ? (json_decode(file_get_contents($lpath), true) ?: []) : [];
+        unset($letters[$id]);
+        file_put_contents($lpath, json_encode($letters, JSON_PRETTY_PRINT));
+        respond(['success' => true]);
+        break;
+
+    case 'get_custom_templates':
+        require_auth();
+        $path = FR_DATA_DIR . 'custom_templates.json';
+        $tmpls = file_exists($path) ? (json_decode(file_get_contents($path), true) ?: []) : [];
+        respond(['success' => true, 'templates' => array_values($tmpls)]);
+        break;
+
+    case 'save_custom_template': {
+        require_auth();
+        $tId   = clean($input['id'] ?? '') ?: 'ct_' . bin2hex(random_bytes(5));
+        $path  = FR_DATA_DIR . 'custom_templates.json';
+        $tmpls = file_exists($path) ? (json_decode(file_get_contents($path), true) ?: []) : [];
+        $tmpls[$tId] = [
+            'id'         => $tId,
+            'name'       => clean($input['name'] ?? 'Custom Template'),
+            'category'   => clean($input['category'] ?? 'Custom'),
+            'subject'    => clean($input['subject'] ?? ''),
+            'body'       => $input['body'] ?? '',
+            'updated_at' => date('c'),
+            'created_at' => $tmpls[$tId]['created_at'] ?? date('c'),
+        ];
+        file_put_contents($path, json_encode($tmpls, JSON_PRETTY_PRINT));
+        respond(['success' => true, 'id' => $tId]);
+        break;
+    }
+
+    case 'delete_custom_template': {
+        require_auth();
+        $tId  = clean($input['id'] ?? '');
+        $path = FR_DATA_DIR . 'custom_templates.json';
+        $tmpls = file_exists($path) ? (json_decode(file_get_contents($path), true) ?: []) : [];
+        unset($tmpls[$tId]);
+        file_put_contents($path, json_encode($tmpls, JSON_PRETTY_PRINT));
+        respond(['success' => true]);
+        break;
+    }
+
     // SAVE FIRM SIGNATURE
     case 'save_firm_sig':
         require_auth();

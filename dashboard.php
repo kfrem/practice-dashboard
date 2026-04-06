@@ -225,6 +225,7 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
       <a href="resources.html">Free Resources</a>
       <a href="pricing.html#partnership" class="partner">★ Partner Programme</a>
       <a href="dashboard.php" class="active">Client Dashboard</a>
+      <a href="letters.php">✉ Correspondence</a>
     </div>
     <div class="nav-right">
       <button class="logout-btn" onclick="doLogout()">Log out</button>
