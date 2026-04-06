@@ -169,6 +169,21 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
 
 @media(max-width:900px){.stats{grid-template-columns:1fr 1fr}.nav-links{display:none}.main{padding:20px 16px 70px}.mstats{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.fg-row{grid-template-columns:1fr}.mstats{grid-template-columns:1fr 1fr}}
+
+/* SERVICE PICKER */
+.svc-picker{border:1px solid var(--border);border-radius:4px;background:var(--cream);overflow:hidden}
+.svc-presets{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:10px 12px 6px}
+.svc-cb{display:flex;align-items:center;gap:7px;font-size:12px;color:#374151;cursor:pointer;padding:4px 0;font-weight:500;text-transform:none;letter-spacing:0}
+.svc-cb input[type=checkbox]{accent-color:var(--navy);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.svc-custom-row{display:flex;gap:8px;padding:8px 12px;border-top:1px solid var(--border);background:#fff}
+.svc-custom-row input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-family:'Segoe UI',Georgia,sans-serif;font-size:12px;outline:none;background:#fff;color:var(--text)}
+.svc-custom-row input:focus{border-color:var(--navy)}
+.btn-add-svc{background:var(--navy);color:#fff;border:none;border-radius:4px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Segoe UI',Georgia,sans-serif}
+.btn-add-svc:hover{background:var(--navy-dark)}
+.svc-tags{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border-top:1px solid var(--border);min-height:34px;background:#fff}
+.svc-tag{display:inline-flex;align-items:center;gap:5px;background:var(--navy);color:#fff;border-radius:3px;padding:3px 8px;font-size:11px;font-weight:600}
+.svc-tag-x{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:14px;line-height:1;padding:0;font-family:inherit}
+.svc-tag-x:hover{color:#fff}
 </style>
 </head>
 <body>
@@ -343,17 +358,29 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
           </select>
         </div>
       </div>
-      <div class="fg-row">
-        <div class="fg"><label>Service</label>
-          <select id="addService">
-            <option>Self Assessment Tax Return</option>
-            <option>Company Accounts &amp; Corporation Tax</option>
-            <option>VAT Returns</option><option>Bookkeeping</option><option>Payroll</option>
-            <option>Making Tax Digital (MTD) Support</option>
-            <option>Management Accounts</option><option>Full Accountancy Package</option>
-          </select>
+      <div class="fg">
+        <label>Services <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">(tick all that apply — add custom below)</span></label>
+        <div class="svc-picker">
+          <div class="svc-presets">
+            <label class="svc-cb"><input type="checkbox" name="svc" value="Self Assessment Tax Return"> Self Assessment Tax Return</label>
+            <label class="svc-cb"><input type="checkbox" name="svc" value="Company Accounts &amp; Corporation Tax"> Company Accounts &amp; Corp Tax</label>
+            <label class="svc-cb"><input type="checkbox" name="svc" value="VAT Returns"> VAT Returns</label>
+            <label class="svc-cb"><input type="checkbox" name="svc" value="Bookkeeping"> Bookkeeping</label>
+            <label class="svc-cb"><input type="checkbox" name="svc" value="Payroll"> Payroll</label>
+            <label class="svc-cb"><input type="checkbox" name="svc" value="Making Tax Digital (MTD) Support"> MTD Support</label>
+            <label class="svc-cb"><input type="checkbox" name="svc" value="Management Accounts"> Management Accounts</label>
+            <label class="svc-cb"><input type="checkbox" name="svc" value="Full Accountancy Package"> Full Accountancy Package</label>
+          </div>
+          <div class="svc-custom-row">
+            <input type="text" id="addCustomSvc" placeholder="Add a custom service not listed above…" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSvc()}">
+            <button type="button" class="btn-add-svc" onclick="addCustomSvc()">+ Add</button>
+          </div>
+          <div id="addSvcTags" class="svc-tags"></div>
         </div>
+      </div>
+      <div class="fg-row">
         <div class="fg"><label>Phone</label><input type="tel" id="addPhone" placeholder="07700 900000"></div>
+        <div class="fg"></div>
       </div>
     </div>
     <div class="m-foot">
@@ -680,7 +707,7 @@ function renderTable() {
       <div class="c-info">${e(c.email)}${c.company?' · '+e(c.company):''}${c.fee?' · <strong>'+e(c.fee)+'</strong>':''}</div>
     </td>
     <td style="font-size:12px">${e(c.type)}</td>
-    <td style="font-size:12px">${e(c.service)}</td>
+    <td style="font-size:12px">${renderServices(c.service)}</td>
     <td>${sigBadge(c)}</td>
     <td>${deadlineBadge(c)}</td>
     <td>${amlBadge(c.aml_status)}</td>
@@ -749,8 +776,38 @@ function openM(id)  { document.getElementById(id).classList.add('open'); }
 function closeM(id) { document.getElementById(id).classList.remove('open'); }
 
 // ── Add Client ──────────────────────────────────
+let customSvcs = [];
+
+function addCustomSvc() {
+  const inp = document.getElementById('addCustomSvc');
+  const val = inp.value.trim();
+  if (!val) return;
+  if (!customSvcs.includes(val)) { customSvcs.push(val); renderSvcTags(); }
+  inp.value = '';
+}
+function renderSvcTags() {
+  document.getElementById('addSvcTags').innerHTML = customSvcs.map((s,i) =>
+    `<span class="svc-tag">${e(s)}<button class="svc-tag-x" onclick="customSvcs.splice(${i},1);renderSvcTags()">×</button></span>`
+  ).join('');
+}
+function getSelectedServices() {
+  const checked = [...document.querySelectorAll('#addModal input[name="svc"]:checked')].map(el => el.value);
+  return [...checked, ...customSvcs];
+}
+function renderServices(svc) {
+  if (!svc) return '—';
+  const parts = svc.split('\n').filter(s => s.trim());
+  if (!parts.length) return '—';
+  if (parts.length === 1) return e(parts[0]);
+  return e(parts[0]) + `<span style="color:var(--muted);font-size:11px"> +${parts.length-1} more</span>`;
+}
+
 function openAddClient() {
   ['addName','addEmail','addCompany','addPhone'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#addModal input[name="svc"]').forEach(cb=>cb.checked=false);
+  customSvcs = [];
+  renderSvcTags();
+  document.getElementById('addCustomSvc').value = '';
   document.getElementById('addAlert').innerHTML='';
   openM('addModal');
 }
@@ -758,10 +815,12 @@ async function addClient() {
   const name=document.getElementById('addName').value.trim();
   const email=document.getElementById('addEmail').value.trim();
   if (!name||!email) { document.getElementById('addAlert').innerHTML='<div class="alert a-err">Name and email are required.</div>'; return; }
+  const svcs = getSelectedServices();
+  if (!svcs.length) { document.getElementById('addAlert').innerHTML='<div class="alert a-err">Please select at least one service.</div>'; return; }
   const d = await api('add_client',{name,email,
     company:document.getElementById('addCompany').value.trim(),
     type:document.getElementById('addType').value,
-    service:document.getElementById('addService').value,
+    service:svcs.join('\n'),
     phone:document.getElementById('addPhone').value.trim()
   });
   if (d.success) { clients.unshift(d.client); renderAll(); closeM('addModal'); toast('Client added'); }
@@ -771,7 +830,9 @@ async function addClient() {
 // ── Send Link with letter editor ─────────────────
 function buildDefaultLetter(c) {
   const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  const feeLine = c.fee ? `\n\nFEES\nOur agreed fee for the above service is: ${c.fee}\n` : '\n\nFEES\nOur fees will be agreed and confirmed separately in writing.\n';
+  const feeLine = c.fee ? `\n\nFEES\nOur agreed fee for the above services is: ${c.fee}\n` : '\n\nFEES\nOur fees will be agreed and confirmed separately in writing.\n';
+  const svcParts = (c.service||'').split('\n').filter(s=>s.trim());
+  const serviceBullets = svcParts.length ? svcParts.map(s=>'• '+s).join('\n') : '• Services to be confirmed';
   return `CLIENT ENGAGEMENT LETTER
 
 Date: ${today}
@@ -785,7 +846,7 @@ Thank you for choosing The Practice. We are pleased to confirm our appointment a
 
 SERVICES
 We will provide the following services:
-• ${c.service}
+${serviceBullets}
 ${feeLine}
 OUR RESPONSIBILITIES
 We will carry out the agreed services with reasonable skill, care and diligence, maintain the confidentiality of your affairs and comply with UK GDPR, and communicate clearly on all matters affecting you.
@@ -1066,7 +1127,7 @@ function renderArchive() {
     .sort((a,b) => new Date(b.signed_at) - new Date(a.signed_at))
     .map(c => `<tr>
     <td><div class="c-name">${e(c.name)}</div><div class="c-info">${e(c.email)}${c.company?' · '+e(c.company):''}</div></td>
-    <td style="font-size:12px">${e(c.service)}</td>
+    <td style="font-size:12px">${renderServices(c.service)}</td>
     <td style="font-size:12px">${new Date(c.signed_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</td>
     <td><span class="badge b-signed">${c.sig_method==='draw'?'✍️ Drawn':'Aa Typed'}</span></td>
     <td style="font-size:11px;color:var(--muted)">${e(c.signed_ip||'—')}</td>
