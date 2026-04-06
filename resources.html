@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Free Resources for UK Accounting Practices | The Practice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Georgia,sans-serif;background:#f8f7f4;color:#1a1a2e;min-height:100vh}
+:root{--navy:#1a3558;--navy-dark:#0f2238;--gold:#c9a84c;--gold-dark:#a07830;--cream:#f8f7f4;--border:#ddd8cf;--muted:#64748b}
+a{text-decoration:none;color:inherit}
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:16px 28px;background:#fff;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.3px}.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:22px;font-size:13px}
+.nav-links a{color:#374151;transition:color .2s}.nav-links a:hover{color:var(--navy)}
+.nav-links a.active{color:var(--navy);font-weight:600}
+.nav-links a.partner{color:var(--gold);font-weight:600}
+.nav-cta{font-size:13px;font-weight:700;background:var(--navy);color:#fff;padding:9px 20px;border-radius:4px}
+/* HERO */
+.hero{background:linear-gradient(180deg,#eef1f7 0%,#fff 100%);padding:56px 28px 44px;text-align:center}
+.hero-badge{display:inline-block;background:#e8edf5;color:var(--navy);font-size:12px;font-weight:600;padding:5px 16px;border-radius:20px;margin-bottom:16px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #c8d2e0}
+.hero h1{font-size:34px;font-weight:800;color:var(--navy-dark);margin-bottom:10px;letter-spacing:-.3px}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:16px;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.7}
+/* TABS */
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:20px 24px 0;max-width:1060px;margin:0 auto}
+.tab{padding:9px 20px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:#374151;transition:all .2s}
+.tab:hover{border-color:var(--navy);color:var(--navy)}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+/* WRAP */
+.wrap{max-width:1060px;margin:0 auto;padding:32px 24px}
+.section{display:none}.section.active{display:block}
+.sec-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.sec-header h2{font-size:22px;font-weight:800;color:var(--navy-dark);letter-spacing:-.2px}
+.sec-header p{font-size:13px;color:var(--muted);margin-top:4px}
+.sec-header a{font-size:13px;font-weight:600;color:var(--navy)}
+/* CARDS GRID */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;margin-bottom:28px}
+.card{background:#fff;border:1px solid var(--border);border-radius:9px;padding:22px;transition:transform .2s;border-top:3px solid var(--navy)}
+.card:hover{transform:translateY(-2px)}
+.card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.card-icon{font-size:26px;flex-shrink:0}
+.card-title{font-size:14px;font-weight:700;color:var(--navy-dark);margin-bottom:2px}
+.card-meta{font-size:11px;color:var(--muted)}
+.card p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.card-link{font-size:13px;font-weight:600;color:var(--navy);display:inline-flex;align-items:center;gap:4px}
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:7px}
+.tag-free{background:#e8edf5;color:var(--navy)}
+.tag-new{background:#fefce8;color:#78350f}
+.tag-hmrc{background:#fff7ed;color:#9a3412}
+/* DEADLINE CALENDAR */
+.deadline-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:28px}
+.dl-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:18px;position:relative;overflow:hidden}
+.dl-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.dl-card.urgent::before{background:#c0392b}
+.dl-card.soon::before{background:var(--gold-dark)}
+.dl-card.upcoming::before{background:#2d6a4f}
+.dl-card.past::before{background:#d1d5db}
+.dl-month{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.urgent .dl-month{color:#c0392b}.soon .dl-month{color:var(--gold-dark)}.upcoming .dl-month{color:#2d6a4f}.past .dl-month{color:#94a3b8}
+.dl-date{font-size:22px;font-weight:800;color:var(--navy-dark);margin-bottom:5px}
+.past .dl-date{color:#94a3b8}
+.dl-title{font-size:13px;font-weight:700;color:var(--navy-dark);margin-bottom:3px}
+.past .dl-title{color:#94a3b8}
+.dl-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.dl-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:7px}
+.urgent .dl-badge{background:#fef2f2;color:#c0392b}
+.soon .dl-badge{background:#fffbeb;color:var(--gold-dark)}
+.upcoming .dl-badge{background:#f0fdf4;color:#2d6a4f}
+.past .dl-badge{background:#f1f5f9;color:#94a3b8}
+/* MTD TIMELINE */
+.mtd-timeline{display:flex;flex-direction:column;gap:0;position:relative;margin-bottom:28px}
+.mtd-timeline::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:2px;background:var(--border)}
+.mtd-item{display:flex;gap:20px;padding:0 0 26px;position:relative}
+.mtd-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;z-index:1;border:3px solid #fff}
+.mtd-dot.done{background:#2d6a4f}
+.mtd-dot.current{background:var(--navy);outline:2px solid var(--gold)}
+.mtd-dot.next{background:var(--gold-dark)}
+.mtd-dot.future{background:#e2e8f0}
+.mtd-content{flex:1;padding-top:7px}
+.mtd-date{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.done .mtd-date{color:#2d6a4f}.current .mtd-date{color:var(--navy)}.next .mtd-date{color:var(--gold-dark)}.future .mtd-date{color:#94a3b8}
+.mtd-title{font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:5px}
+.future .mtd-title{color:#94a3b8}
+.mtd-desc{font-size:13px;color:var(--muted);line-height:1.6}
+.mtd-status{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;margin-top:7px}
+.done .mtd-status{background:#f0fdf4;color:#2d6a4f}
+.current .mtd-status{background:#eef1f7;color:var(--navy)}
+.next .mtd-status{background:#fffbeb;color:var(--gold-dark)}
+.future .mtd-status{background:#f1f5f9;color:#64748b}
+/* UPDATES */
+.updates-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.update-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:18px;display:flex;gap:14px}
+.update-date{background:var(--cream);border-radius:7px;padding:7px 10px;text-align:center;flex-shrink:0;min-width:50px;border:1px solid var(--border)}
+.update-date .day{font-size:18px;font-weight:800;color:var(--navy-dark);display:block}
+.update-date .mo{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.update-body h3{font-size:14px;font-weight:700;color:var(--navy-dark);margin-bottom:5px}
+.update-body p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:7px}
+.update-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.update-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#e8edf5;color:var(--navy)}
+.update-link{font-size:13px;font-weight:600;color:var(--navy)}
+/* AML CHECKLIST */
+.checklist{background:#fff;border:1px solid var(--border);border-radius:10px;padding:28px;margin-bottom:28px}
+.checklist h2{font-size:18px;font-weight:800;color:var(--navy-dark);margin-bottom:5px}
+.checklist .sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6}
+.cl-section{margin-bottom:18px}
+.cl-section h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #f1f5f9}
+.cl-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:7px;font-size:13px;color:#374151;line-height:1.5}
+.cl-item input{margin-top:2px;flex-shrink:0;width:15px;height:15px;accent-color:var(--navy)}
+.print-btn{background:var(--navy);color:#fff;padding:10px 22px;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+/* NEWSLETTER */
+.newsletter-wrap{background:var(--navy-dark);border-radius:12px;padding:40px;margin-bottom:24px;color:#fff}
+.newsletter-wrap h2{font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-.2px}
+.newsletter-wrap p{font-size:14px;color:#94a3b8;margin-bottom:16px;max-width:460px;line-height:1.7}
+.nl-checklist{display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.nl-checklist span{font-size:13px;color:#94a3b8;display:flex;align-items:center;gap:7px}
+.nl-checklist span::before{content:"✓";color:var(--gold);font-weight:700}
+.nl-form{display:flex;gap:10px;flex-wrap:wrap}
+.nl-form input{flex:1;min-width:200px;padding:11px 16px;border-radius:6px;border:none;font-size:14px;background:#1e3d66;color:#fff;font-family:inherit}
+.nl-form input::placeholder{color:#64748b}
+.nl-form input:focus{outline:2px solid var(--gold)}
+.nl-form button{padding:11px 22px;background:var(--gold);color:var(--navy-dark);border:none;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer}
+.nl-form button:hover{background:var(--gold-dark)}
+#nl-confirm{display:none;margin-top:10px;font-size:13px;color:var(--gold);font-weight:600}
+/* EDITION CARDS */
+.edition-card{background:#fff;border:1px solid var(--border);border-radius:9px;padding:22px;cursor:pointer;transition:all .2s;border-left:4px solid var(--navy)}
+.edition-card:hover{border-color:var(--gold);transform:translateY(-1px)}
+.edition-card h3{font-size:14px;font-weight:700;color:var(--navy-dark);margin-bottom:6px}
+.edition-card p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.edition-card .read{font-size:13px;font-weight:600;color:var(--navy)}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,20,40,.6);z-index:300;overflow-y:auto;padding:40px 20px}
+.modal-box{background:#fff;border-radius:12px;max-width:720px;margin:0 auto;padding:40px;position:relative}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
+/* NOTICE BOXES */
+.notice{border-radius:8px;padding:14px 18px;font-size:13px;line-height:1.6;margin-bottom:16px}
+.notice-blue{background:#eef1f7;border:1px solid #c8d2e0;color:var(--navy)}
+.notice-gold{background:#fffbeb;border:1px solid #fde68a;color:#78350f}
+.notice-green{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+/* CTA BAR */
+.cta-bar{background:var(--navy);border-radius:10px;padding:32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.cta-bar h2{font-size:18px;font-weight:800;color:#fff;margin-bottom:4px}
+.cta-bar p{font-size:13px;color:#94a3b8}
+.btn-gold{background:var(--gold);color:var(--navy-dark);font-size:14px;font-weight:700;padding:11px 26px;border-radius:6px;text-decoration:none;display:inline-block}
+/* FOOTER */
+footer{background:var(--navy-dark);padding:24px;text-align:center;margin-top:32px}
+footer .main-footer{font-size:13px;color:#475569;margin-bottom:6px}
+footer strong{color:#94a3b8}
+footer .legal{font-size:11px;color:#334155;margin-top:5px}
+@media print{nav,.tabs,.print-btn,.cta-bar,footer{display:none!important}}
+@media(max-width:680px){.nav-links{display:none}.newsletter-wrap{padding:24px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">The <span>Practice</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="roi.html">ROI Calculator</a>
+    <a href="scorecard.html">Practice Scorecard</a>
+    <a href="portal.html">Client Portal Demo</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="resources.html" class="active">Free Resources</a>
+    <a href="pricing.html#partnership" class="partner">★ Partner Programme</a>
+        <a href="dashboard.php">Client Dashboard</a>
+  </div>
+  <a href="booking.html" class="nav-cta">Book Free Consultation</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">No registration required · Always free</div>
+  <h1>Resources for UK<br><span>Accounting Practices</span></h1>
+  <p>HMRC updates, the tax deadline calendar, MTD tracker, compliance checklists, and professional guides — maintained and updated by our team of Chartered Accountants.</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('hmrc')">HMRC Updates</div>
+  <div class="tab" onclick="showTab('deadlines')">Deadline Calendar</div>
+  <div class="tab" onclick="showTab('mtd')">MTD Tracker</div>
+  <div class="tab" onclick="showTab('guides')">Free Guides</div>
+  <div class="tab" onclick="showTab('aml')">AML Checklist</div>
+  <div class="tab" onclick="showTab('newsletter')">Briefing Newsletter</div>
+</div>
+
+<div class="wrap">
+
+  <!-- HMRC UPDATES -->
+  <div class="section active" id="sec-hmrc">
+    <div class="sec-header">
+      <div><h2>Latest HMRC &amp; Companies House Updates</h2><p>Regulatory changes affecting UK accounting practices — maintained by our team</p></div>
+      <a href="https://www.gov.uk/government/organisations/hm-revenue-customs" target="_blank" style="font-size:13px;font-weight:600;color:var(--navy)">View all on GOV.UK →</a>
+    </div>
+    <div class="updates-list">
+      <div class="update-item">
+        <div class="update-date"><span class="day">06</span><span class="mo">Apr 26</span></div>
+        <div class="update-body">
+          <div class="update-tags"><span class="update-tag">MTD</span><span class="update-tag">Action required</span></div>
+          <h3>MTD for Income Tax Self Assessment — Phase 1 now live</h3>
+          <p>Self-employed individuals and landlords with income over £50,000 must now use MTD-compatible software and submit quarterly updates. Paper self assessment has ceased for this group.</p>
+          <a href="https://www.gov.uk/guidance/use-making-tax-digital-for-income-tax" target="_blank" class="update-link">Read HMRC guidance →</a>
+        </div>
+      </div>
+      <div class="update-item">
+        <div class="update-date"><span class="day">Jan</span><span class="mo">26</span></div>
+        <div class="update-body">
+          <div class="update-tags"><span class="update-tag">Companies House</span><span class="update-tag">AML</span></div>
+          <h3>Identity verification mandatory for new incorporations</h3>
+          <p>Directors, PSCs, and those filing on behalf of companies must now verify their identity with Companies House for new incorporations. Existing officers have a transition period running through late 2026.</p>
+          <a href="https://www.gov.uk/guidance/identity-verification-for-companies-house" target="_blank" class="update-link">Read Companies House guidance →</a>
+        </div>
+      </div>
+      <div class="update-item">
+        <div class="update-date"><span class="day">Apr</span><span class="mo">26</span></div>
+        <div class="update-body">
+          <div class="update-tags"><span class="update-tag">Payroll</span><span class="update-tag">Employment</span></div>
+          <h3>National Living Wage rises to £12.21/hour</h3>
+          <p>The NLW increases to £12.21 per hour for workers aged 21 and over from 6 April 2026. Employer National Insurance threshold changes also take effect this month — all payroll software must be updated before the first April payroll run.</p>
+          <a href="https://www.gov.uk/national-minimum-wage-rates" target="_blank" class="update-link">View current rates →</a>
+        </div>
+      </div>
+      <div class="update-item">
+        <div class="update-date"><span class="day">Apr</span><span class="mo">27</span></div>
+        <div class="update-body">
+          <div class="update-tags"><span class="update-tag">MTD</span><span class="update-tag">Plan now</span></div>
+          <h3>MTD for Income Tax — Phase 2 extends to £30,000+ (April 2027)</h3>
+          <p>Practices should now identify all self-employed clients and landlords with income between £30,000 and £50,000. This group must be enrolled by April 2027. Beginning the conversation now avoids the pressure that affected Phase 1 preparation.</p>
+          <a href="https://www.gov.uk/guidance/check-when-to-sign-up-for-making-tax-digital-for-income-tax" target="_blank" class="update-link">HMRC MTD timeline →</a>
+        </div>
+      </div>
+      <div class="update-item">
+        <div class="update-date"><span class="day">2026</span><span class="mo">ongoing</span></div>
+        <div class="update-body">
+          <div class="update-tags"><span class="update-tag">AML</span><span class="update-tag">Compliance</span></div>
+          <h3>HMRC AML supervision — intensifying across the accountancy sector</h3>
+          <p>Practices must maintain a written firm-wide risk assessment, individual client risk ratings, documented CDD and EDD records, PEP and sanctions screening evidence, and records of ongoing monitoring. HMRC's supervision visits have increased significantly in frequency.</p>
+          <a href="https://www.gov.uk/guidance/money-laundering-regulations-accountancy-sector-guidance" target="_blank" class="update-link">HMRC AML guidance →</a>
+        </div>
+      </div>
+    </div>
+    <div class="notice notice-blue"><strong>Receive these updates directly:</strong> Subscribe to The Practice Briefing — our monthly newsletter for UK accounting practice owners. <a href="#" onclick="showTab('newsletter');return false;" style="font-weight:700;text-decoration:underline;color:var(--navy)">Subscribe free →</a></div>
+  </div>
+
+  <!-- DEADLINES -->
+  <div class="section" id="sec-deadlines">
+    <div class="sec-header"><div><h2>2025/26 Tax Deadline Calendar</h2><p>Key filing and payment deadlines for UK accounting practices</p></div></div>
+    <div class="deadline-grid">
+      <div class="dl-card past"><div class="dl-month">January 2026</div><div class="dl-date">31 Jan</div><div class="dl-title">Self Assessment online deadline</div><div class="dl-desc">SA returns for 2024/25 + balancing payment + first 2025/26 payment on account.</div><div class="dl-badge">Passed</div></div>
+      <div class="dl-card past"><div class="dl-month">February 2026</div><div class="dl-date">19 Feb</div><div class="dl-title">PAYE/NIC due (paper)</div><div class="dl-desc">PAYE, NIC, CIS and student loan deductions for month ending 5 February 2026.</div><div class="dl-badge">Passed</div></div>
+      <div class="dl-card past"><div class="dl-month">March 2026</div><div class="dl-date">31 Mar</div><div class="dl-title">Corporation Tax — Dec year ends</div><div class="dl-desc">Corporation tax due for companies with 31 December 2025 year end.</div><div class="dl-badge">Passed</div></div>
+      <div class="dl-card urgent"><div class="dl-month">April 2026</div><div class="dl-date">5 Apr</div><div class="dl-title">End of 2025/26 tax year</div><div class="dl-desc">Final opportunity to use 2025/26 allowances: ISA, pension annual allowance, CGT exempt amount.</div><div class="dl-badge">This month</div></div>
+      <div class="dl-card urgent"><div class="dl-month">April 2026</div><div class="dl-date">19 Apr</div><div class="dl-title">Final PAYE — 2025/26 year</div><div class="dl-desc">PAYE, NIC and CIS deductions for the final month of the 2025/26 tax year.</div><div class="dl-badge">This month</div></div>
+      <div class="dl-card soon"><div class="dl-month">May 2026</div><div class="dl-date">31 May</div><div class="dl-title">P60 issued to all employees</div><div class="dl-desc">Employees must receive their P60 for 2025/26 by 31 May. P11D expenses and benefits returns due 6 July.</div><div class="dl-badge">Next month</div></div>
+      <div class="dl-card soon"><div class="dl-month">June 2026</div><div class="dl-date">30 Jun</div><div class="dl-title">Corporation Tax — Mar year ends</div><div class="dl-desc">Nine-month payment deadline for companies with 31 March 2026 year end.</div><div class="dl-badge">2 months</div></div>
+      <div class="dl-card upcoming"><div class="dl-month">July 2026</div><div class="dl-date">6 Jul</div><div class="dl-title">P11D expenses &amp; benefits</div><div class="dl-desc">Submit P11D forms for all employees with taxable benefits in kind for the 2025/26 tax year.</div><div class="dl-badge">3 months</div></div>
+      <div class="dl-card upcoming"><div class="dl-month">July 2026</div><div class="dl-date">31 Jul</div><div class="dl-title">Second payment on account</div><div class="dl-desc">Second self assessment payment on account for the 2025/26 tax year.</div><div class="dl-badge">3 months</div></div>
+      <div class="dl-card upcoming"><div class="dl-month">October 2026</div><div class="dl-date">31 Oct</div><div class="dl-title">Paper SA return deadline</div><div class="dl-desc">Paper self assessment return for 2025/26. Online deadline remains 31 January 2027.</div><div class="dl-badge">7 months</div></div>
+      <div class="dl-card upcoming"><div class="dl-month">January 2027</div><div class="dl-date">31 Jan</div><div class="dl-title">Online SA return + payment</div><div class="dl-desc">Online SA return for 2025/26. Balancing payment + first 2026/27 payment on account.</div><div class="dl-badge">10 months</div></div>
+    </div>
+    <div class="notice notice-gold"><strong>Note:</strong> Dates shown are standard deadlines. Always verify with HMRC as dates shift when they fall on weekends or bank holidays. Corporation tax payment dates vary by company accounting period end.</div>
+  </div>
+
+  <!-- MTD TRACKER -->
+  <div class="section" id="sec-mtd">
+    <div class="sec-header"><div><h2>Making Tax Digital — Full Timeline</h2><p>Where we are and what your practice needs to plan for next</p></div></div>
+    <div class="mtd-timeline">
+      <div class="mtd-item done"><div class="mtd-dot done">✓</div><div class="mtd-content"><div class="mtd-date done">April 2019</div><div class="mtd-title">MTD for VAT — businesses above the VAT threshold</div><div class="mtd-desc">Mandatory for VAT-registered businesses with taxable turnover above £85,000. Digital records and MTD-compatible software required.</div><div class="mtd-status done">Complete</div></div></div>
+      <div class="mtd-item done"><div class="mtd-dot done">✓</div><div class="mtd-content"><div class="mtd-date done">April 2022</div><div class="mtd-title">MTD for VAT — all VAT-registered businesses</div><div class="mtd-desc">Extended to all VAT-registered businesses regardless of turnover, including those voluntarily registered below the threshold.</div><div class="mtd-status done">Complete — mandatory for all</div></div></div>
+      <div class="mtd-item current"><div class="mtd-dot current">▶</div><div class="mtd-content"><div class="mtd-date current">April 2026 — Now live</div><div class="mtd-title">MTD for Income Tax — Phase 1 (income over £50,000)</div><div class="mtd-desc">Self-employed individuals and landlords with gross income over £50,000 must now maintain digital records and submit quarterly updates to HMRC using MTD-compatible software. Paper self assessment has ceased for this group.</div><div class="mtd-status current">Live — clients must be enrolled now</div></div></div>
+      <div class="mtd-item next"><div class="mtd-dot next">!</div><div class="mtd-content"><div class="mtd-date next">April 2027 — Plan now</div><div class="mtd-title">MTD for Income Tax — Phase 2 (income over £30,000)</div><div class="mtd-desc">Extends to self-employed individuals and landlords with income over £30,000. This group is significantly larger than Phase 1. Practices should identify all affected clients now and begin migration planning. Leaving this until 2027 will create significant workload pressure.</div><div class="mtd-status next">12 months — identify clients now</div></div></div>
+      <div class="mtd-item future"><div class="mtd-dot future">○</div><div class="mtd-content"><div class="mtd-date future">April 2028 — Confirmed in principle</div><div class="mtd-title">MTD for Income Tax — Phase 3 (income over £20,000)</div><div class="mtd-desc">Further extension to individuals with income over £20,000. Date confirmed in principle by HMRC subject to review. General partnerships also expected to be mandated in a future phase — no date confirmed.</div><div class="mtd-status future">Monitor HMRC announcements</div></div></div>
+      <div class="mtd-item future"><div class="mtd-dot future">○</div><div class="mtd-content"><div class="mtd-date future">Date not yet confirmed</div><div class="mtd-title">MTD for Corporation Tax</div><div class="mtd-desc">MTD for Corporation Tax is under active development by HMRC. A pilot programme has run and is under review. No mandatory date has been confirmed. Practices should monitor HMRC's Making Tax Digital for Corporation Tax consultation pages.</div><div class="mtd-status future">No mandatory date set</div></div></div>
+    </div>
+    <div class="notice notice-blue"><strong>We can automate your MTD client migration process.</strong> A structured communication and document collection workflow for identifying, notifying, and tracking your affected clients — built and maintained by our team. <a href="booking.html" style="font-weight:700;text-decoration:underline;color:var(--navy)">Book a free consultation →</a></div>
+  </div>
+
+  <!-- FREE GUIDES -->
+  <div class="section" id="sec-guides">
+    <div class="sec-header"><div><h2>Free Guides &amp; Practice Resources</h2><p>Practical materials for UK accounting practice owners — no registration required</p></div></div>
+    <div class="cards">
+      <div class="card"><div class="card-top"><div class="card-icon">📊</div><div><div class="card-title">How Much Is Manual Admin Costing Your Practice?</div><div class="card-meta">Interactive calculator</div></div></div><span class="tag tag-free">Free to use</span><p>A step-by-step calculation to quantify exactly what your practice spends on manual onboarding, document chasing, and compliance admin — expressed in staff hours and annual cost.</p><a href="roi.html" class="card-link">Use the calculator →</a></div>
+      <div class="card"><div class="card-top"><div class="card-icon">✅</div><div><div class="card-title">AML/KYC Compliance Checklist</div><div class="card-meta">Printable · Compliance edition</div></div></div><span class="tag tag-free">Free to use</span><p>A complete AML compliance checklist covering customer due diligence, enhanced due diligence, PEP screening, source of funds, and ongoing monitoring — ready for every new client engagement.</p><a href="#" onclick="showTab('aml');return false;" class="card-link">View &amp; print →</a></div>
+      <div class="card"><div class="card-top"><div class="card-icon">🔍</div><div><div class="card-title">Practice Automation Scorecard</div><div class="card-meta">10-question assessment</div></div></div><span class="tag tag-free">Free to use</span><p>Score your practice's operational readiness out of 50. Identifies your top three automation priorities with specific, actionable recommendations from our team.</p><a href="scorecard.html" class="card-link">Take the scorecard →</a></div>
+      <div class="card"><div class="card-top"><div class="card-icon">📅</div><div><div class="card-title">Five Workflows Every Practice Should Have Before 2027</div><div class="card-meta">Professional guide</div></div></div><span class="tag tag-new">New</span><p>The five highest-impact operational improvements for UK accounting practices — ranked by time saved, ease of implementation, and measurable return. Includes before-and-after workflow comparisons.</p><a href="booking.html" class="card-link">Discuss with our team →</a></div>
+      <div class="card"><div class="card-top"><div class="card-icon">🏦</div><div><div class="card-title">MTD Client Communication Template</div><div class="card-meta">Letter template</div></div></div><span class="tag tag-hmrc">HMRC related</span><p>A professionally drafted letter to inform affected clients of their MTD for ITSA obligations, what is required of them, and how your practice will support them through the transition.</p><a href="booking.html" class="card-link">Request this template →</a></div>
+      <div class="card"><div class="card-top"><div class="card-icon">💰</div><div><div class="card-title">Creating New Revenue Streams in Your Practice</div><div class="card-meta">Strategy guide · 2026</div></div></div><span class="tag tag-new">New</span><p>How UK accounting practices are adding meaningful new income by offering financial modelling, advisory services, and technology-enabled services to their existing client base — without additional headcount.</p><a href="pricing.html#partnership" class="card-link">See our Partner Programme →</a></div>
+    </div>
+  </div>
+
+  <!-- AML CHECKLIST -->
+  <div class="section" id="sec-aml">
+    <div class="checklist">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+        <div><h2>AML/KYC Client Onboarding Checklist</h2><p class="sub">For use with every new client engagement. Complete each item and retain a copy on the client file.</p></div>
+        <button class="print-btn" onclick="window.print()">🖨️ Print checklist</button>
+      </div>
+      <div class="cl-section"><h3>1. Customer Due Diligence</h3>
+        <div class="cl-item"><input type="checkbox"><label>Full legal name verified against government-issued photo ID</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Date of birth confirmed</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Current residential address verified — utility bill or bank statement dated within three months</label></div>
+        <div class="cl-item"><input type="checkbox"><label>National Insurance number collected where applicable</label></div>
+        <div class="cl-item"><input type="checkbox"><label>For companies: Certificate of Incorporation obtained</label></div>
+        <div class="cl-item"><input type="checkbox"><label>For companies: Confirmation of registered office address</label></div>
+        <div class="cl-item"><input type="checkbox"><label>For companies: Full list of directors verified</label></div>
+        <div class="cl-item"><input type="checkbox"><label>For companies: Persons with Significant Control identified and verified</label></div>
+      </div>
+      <div class="cl-section"><h3>2. Risk Assessment</h3>
+        <div class="cl-item"><input type="checkbox"><label>Client risk rating assigned and documented — Low, Medium, or High</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Nature of business and services assessed for money laundering and terrorist financing risk</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Geographic risk assessed — domestic, international, or high-risk jurisdictions</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Source of funds established and documented</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Source of wealth established for higher-risk clients</label></div>
+      </div>
+      <div class="cl-section"><h3>3. PEP &amp; Sanctions Screening</h3>
+        <div class="cl-item"><input type="checkbox"><label>Client screened against Politically Exposed Person lists</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Client screened against UK and international sanctions lists — OFSI, UN, EU</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Adverse media check completed</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Screening results recorded with date and source</label></div>
+      </div>
+      <div class="cl-section"><h3>4. Enhanced Due Diligence — High-risk clients only</h3>
+        <div class="cl-item"><input type="checkbox"><label>Additional identity documentation obtained</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Enhanced source of funds and wealth documentation gathered</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Senior management approval obtained before engagement commences</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Enhanced ongoing monitoring procedures established</label></div>
+      </div>
+      <div class="cl-section"><h3>5. Documentation &amp; File Completion</h3>
+        <div class="cl-item"><input type="checkbox"><label>All CDD documents copied and filed securely</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Engagement letter signed by client and retained on file</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Client risk assessment record created</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Date of onboarding completion recorded</label></div>
+        <div class="cl-item"><input type="checkbox"><label>Next review date set — annually for standard clients, six-monthly for high-risk</label></div>
+      </div>
+      <div class="notice notice-blue" style="margin-top:12px"><strong>This entire checklist can be completed and filed automatically</strong> through our client onboarding system — no manual ticking, full audit trail, compliant record-keeping. <a href="booking.html" style="font-weight:700;text-decoration:underline;color:var(--navy)">See a demonstration →</a></div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="section" id="sec-newsletter">
+    <div class="sec-header"><div><h2>The Practice Briefing</h2><p>Monthly professional digest for UK accounting practice owners</p></div></div>
+    <div class="newsletter-wrap">
+      <h2>Stay informed. Stay ahead.</h2>
+      <p>Monthly email covering regulatory updates, deadline reminders, MTD developments, and one practical improvement idea for your practice — written by Chartered Accountants, not content teams.</p>
+      <div class="nl-checklist">
+        <span>HMRC and Companies House regulatory updates</span>
+        <span>Monthly filing deadline reminders</span>
+        <span>MTD preparation guidance for your client base</span>
+        <span>One practical practice improvement each month</span>
+        <span>No marketing. No third parties. Unsubscribe any time.</span>
+      </div>
+      <div class="nl-form">
+        <input type="email" id="nl-email" placeholder="your@practicemail.co.uk">
+        <button onclick="subNL()">Subscribe — it's free</button>
+      </div>
+      <div id="nl-confirm">✓ Thank you — your first edition will arrive shortly.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+      <div class="edition-card" onclick="showEd('mar26')">
+        <h3>March 2026 — MTD Phase 1 is live</h3>
+        <p>MTD Phase 1 mandatory action guide. Companies House identity verification update. April payroll deadlines and NLW rate confirmed.</p>
+        <span class="read">Read full edition →</span>
+      </div>
+      <div class="edition-card" onclick="showEd('feb26')">
+        <h3>February 2026 — Post Self Assessment</h3>
+        <p>Self Assessment season debrief. Five practice improvements before April. Spring Budget preview and what to monitor for practices.</p>
+        <span class="read">Read full edition →</span>
+      </div>
+      <div class="edition-card" onclick="showEd('jan26')">
+        <h3>January 2026 — Deadline Preparation</h3>
+        <p>Practical 31 January action checklist. Identifying MTD Phase 1 clients. HMRC AML supervision — what must be in place.</p>
+        <span class="read">Read full edition →</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-bar" style="margin-top:32px">
+    <div><h2>Ready to automate what we write about?</h2><p>Book a free 30-minute consultation with our team — no pitch, just a practical conversation.</p></div>
+    <a href="booking.html" class="btn-gold">Book free consultation →</a>
+  </div>
+
+</div>
+
+<!-- NEWSLETTER MODAL -->
+<div class="modal-overlay" id="ed-overlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeEd()">✕</button>
+    <div id="ed-content"></div>
+  </div>
+</div>
+
+<footer>
+  <p class="main-footer"><strong>The Practice</strong> · practice.finaccord.pro · info@kafs-ltd.com · Strictly confidential · GDPR compliant · UK-hosted</p>
+  <p class="legal">The Practice is a trading name of KAFS Group Ltd · Registered in England &amp; Wales · Company No. 06762730 · © 2026 All rights reserved</p>
+</footer>
+
+<script>
+function showTab(id){
+  const ids=['hmrc','deadlines','mtd','guides','aml','newsletter'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',ids[i]===id));
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='sec-'+id));
+  window.scrollTo({top:document.querySelector('.tabs').offsetTop-70,behavior:'smooth'});
+}
+function subNL(){
+  const e=document.getElementById('nl-email').value.trim();
+  if(!e||!e.includes('@')){alert('Please enter a valid email address.');return;}
+  document.getElementById('nl-confirm').style.display='block';
+  document.getElementById('nl-email').value='';
+}
+const eds={
+  mar26:`<p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">The Practice Briefing · March 2026</p>
+  <h2 style="font-size:22px;font-weight:800;color:var(--navy-dark);margin-bottom:20px;border-bottom:2px solid var(--navy);padding-bottom:14px">MTD Phase 1 is live. Here is what every practice must act on now.</h2>
+  <p style="font-size:15px;color:#374151;line-height:1.8;margin-bottom:18px">Making Tax Digital for Income Tax entered mandatory operation on 6 April 2026 for self-employed individuals and landlords with gross income over £50,000. If your practice has not already enrolled every affected client, this is your most urgent action this month.</p>
+  <h3 style="font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Three things to act on this week</h3>
+  <p style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:16px">First, run your client list against the £50,000 threshold using 2024/25 income figures. Any client above this level who is not yet enrolled in MTD-compatible software is at risk of penalties. Second, confirm that each affected client is actively submitting quarterly updates — enrolment alone is not sufficient. Third, document your practice's MTD migration process so new clients joining mid-year are handled consistently.</p>
+  <h3 style="font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Companies House identity verification</h3>
+  <p style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:16px">Mandatory for new incorporations from January 2026. Existing officers have a transition window through late 2026. Practices filing confirmation statements on behalf of clients will need verified identity on record. Begin collecting documentation now.</p>
+  <h3 style="font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px">April payroll — confirmed figures</h3>
+  <p style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:16px">National Living Wage rises to £12.21/hour for workers aged 21 and over from 6 April. Employer National Insurance secondary threshold also changes. All payroll software must be updated before the first April payroll run.</p>
+  <div style="background:#eef1f7;border-radius:7px;padding:14px;font-size:13px;color:var(--navy);margin-top:8px"><strong>Next edition:</strong> MTD Phase 2 preparation — a client identification and communication checklist for the 30,000–50,000 income band.</div>`,
+  feb26:`<p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">The Practice Briefing · February 2026</p>
+  <h2 style="font-size:22px;font-weight:800;color:var(--navy-dark);margin-bottom:20px;border-bottom:2px solid var(--navy);padding-bottom:14px">Self Assessment is over. Here is what to improve before you do it again.</h2>
+  <p style="font-size:15px;color:#374151;line-height:1.8;margin-bottom:18px">The 31 January deadline has passed. Before your team moves on entirely, this is exactly the right moment to identify recurring problems while the experience is still fresh. Practices that improve year on year are not those that work harder — they are those that fix the same three or four issues systematically.</p>
+  <h3 style="font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Five questions worth asking your team this week</h3>
+  <p style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:16px">Which clients caused the most last-minute problems and why? How many hours did the team spend chasing documents in January? Were there any AML or engagement letter gaps discovered under deadline pressure? How many clients still needed manual intervention that a better process would have prevented? And — which tasks took the longest that a well-designed workflow could have shortened?</p>
+  <h3 style="font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Five improvements to make before April</h3>
+  <p style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:16px">Standardise your document request process. Create a single AML checklist followed identically by every staff member. Move engagement letters to digital signature. Build an early-warning system for clients who are historically slow. Draft a new client onboarding checklist covering everything from first contact to ready-to-work file.</p>
+  <div style="background:#eef1f7;border-radius:7px;padding:14px;font-size:13px;color:var(--navy);margin-top:8px"><strong>Next edition:</strong> MTD Phase 1 goes live. A full action checklist for practice owners.</div>`,
+  jan26:`<p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">The Practice Briefing · January 2026</p>
+  <h2 style="font-size:22px;font-weight:800;color:var(--navy-dark);margin-bottom:20px;border-bottom:2px solid var(--navy);padding-bottom:14px">31 January is three weeks away. Here is what matters most.</h2>
+  <p style="font-size:15px;color:#374151;line-height:1.8;margin-bottom:18px">January is the month that exposes every weakness in a practice's processes. Document management, client communication, staff capacity, and compliance rigour all come under pressure simultaneously. This edition focuses on the practical steps that make the next three weeks manageable.</p>
+  <h3 style="font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px">Your 31 January action checklist</h3>
+  <p style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:16px">Run a full outstanding list now — every client whose return is not complete. Categorise them: missing documents, missing information, awaiting client review, or queued for submission. Each category needs a different action. Clients with missing documents should receive a clear deadline letter today rather than another gentle reminder. Clients who have not responded to three or more requests should be contacted by telephone this week.</p>
+  <h3 style="font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px">MTD Phase 1 — identifying your affected clients now</h3>
+  <p style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:16px">From 6 April 2026 — just three months away — every self-employed client and landlord with income over £50,000 must be enrolled in MTD-compatible software. Pull your client list, identify every individual above the threshold, and begin the conversation now. Clients who leave this until March will create significant pressure on your team.</p>
+  <h3 style="font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px">HMRC AML supervision — what your practice must have in place</h3>
+  <p style="font-size:14px;color:#374151;line-height:1.8;margin-bottom:16px">A compliant practice needs: a written firm-wide risk assessment, individual client risk ratings, documented CDD and EDD records, PEP and sanctions screening evidence, and records of ongoing monitoring. If any of these are missing or inconsistent across your client base, January is a reasonable time to begin correcting this while processes are under active review.</p>
+  <div style="background:#eef1f7;border-radius:7px;padding:14px;font-size:13px;color:var(--navy);margin-top:8px"><strong>Next edition:</strong> Self Assessment season debrief and five practice improvements to make before April.</div>`
+};
+function showEd(id){
+  document.getElementById('ed-content').innerHTML=eds[id];
+  document.getElementById('ed-overlay').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function closeEd(){
+  document.getElementById('ed-overlay').style.display='none';
+  document.body.style.overflow='';
+}
+</script>
+</body>
+</html>

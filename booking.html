@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Book a Consultation | The Practice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Georgia,sans-serif;background:#f8f7f4;color:#1a1a2e;min-height:100vh}
+:root{--navy:#1a3558;--navy-dark:#0f2238;--navy-mid:#1e3d66;--gold:#c9a84c;--gold-dark:#a07830;--cream:#f8f7f4;--border:#ddd8cf;--muted:#64748b}
+a{text-decoration:none;color:inherit}
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:16px 28px;background:#fff;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.3px}
+.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:24px;font-size:13px}
+.nav-links a{color:#374151;transition:color .2s}.nav-links a:hover{color:var(--navy)}
+.nav-links a.active{color:var(--navy);font-weight:600}
+.nav-links a.partner{color:var(--gold);font-weight:600}
+.nav-cta{font-size:13px;font-weight:700;background:var(--navy);color:#fff;padding:9px 20px;border-radius:4px}
+/* HERO */
+.hero{padding:64px 28px 56px;text-align:center;background:linear-gradient(180deg,#eef1f7 0%,#fff 100%)}
+.hero-badge{display:inline-block;background:#e8edf5;color:var(--navy);font-size:12px;font-weight:600;padding:5px 16px;border-radius:20px;margin-bottom:18px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #c8d2e0}
+.hero h1{font-size:38px;font-weight:800;line-height:1.1;color:var(--navy-dark);margin-bottom:14px;letter-spacing:-.4px}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:17px;color:var(--muted);max-width:540px;margin:0 auto;line-height:1.7}
+/* TRUST BAR */
+.trust-bar{background:var(--navy-dark);padding:16px 28px;display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
+.trust-item{font-size:13px;color:#64748b;display:flex;align-items:center;gap:7px}
+.trust-item strong{color:#e8d5a0}
+/* MAIN */
+.main{max-width:1060px;margin:0 auto;padding:48px 24px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:32px}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid var(--gold)}
+.card-header h2{font-size:17px;font-weight:700;color:var(--navy-dark)}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:24px;padding-left:44px;line-height:1.6}
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cal-month{font-size:15px;font-weight:700;color:var(--navy-dark)}
+.cal-arrow{width:32px;height:32px;border:1px solid var(--border);border-radius:5px;background:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:#374151;transition:all .2s}
+.cal-arrow:hover{background:#eef1f7;border-color:var(--navy)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dow{text-align:center;font-size:10px;font-weight:700;color:#94a3b8;padding:6px 0;text-transform:uppercase;letter-spacing:.5px}
+.cal-day{text-align:center;padding:9px 4px;border-radius:6px;font-size:13px;cursor:pointer;color:#374151;border:1px solid transparent;transition:all .2s;user-select:none}
+.cal-day:hover:not(.empty):not(.past){background:#eef1f7;border-color:#c8d2e0}
+.cal-day.today{border:2px solid var(--gold);font-weight:700;color:var(--navy-dark)}
+.cal-day.selected{background:var(--navy-dark);color:#fff;font-weight:700}
+.cal-day.past,.cal-day.empty{color:#e2e8f0;cursor:default;pointer-events:none}
+.cal-day.weekend:not(.selected):not(.past){color:#cbd5e1}
+/* SLOTS */
+.slots-wrap{margin-top:20px;border-top:1px solid #f1f5f9;padding-top:18px}
+.slots-label{font-size:13px;font-weight:600;color:#374151;margin-bottom:10px}
+.slots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.slot{padding:9px;border:1px solid var(--border);border-radius:6px;text-align:center;font-size:13px;color:#374151;cursor:pointer;transition:all .2s;background:#fff}
+.slot:hover{border-color:var(--navy);background:#eef1f7;color:var(--navy)}
+.slot.selected{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600}
+/* DETAILS */
+.placeholder-box{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:20px;display:flex;align-items:flex-start;gap:12px;color:var(--muted);font-size:13px;line-height:1.6}
+.details-form{display:none}
+.form-group{margin-bottom:15px}
+label{display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+input,select,textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:6px;font-size:14px;color:#1a1a2e;background:#fff;font-family:inherit;transition:border .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,53,88,.08)}
+textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.slot-banner{background:#eef1f7;border:1px solid #c8d2e0;border-radius:7px;padding:11px 16px;font-size:13px;color:var(--navy);font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.btn-book{width:100%;padding:13px;background:var(--navy);color:#fff;font-size:15px;font-weight:700;border:none;border-radius:6px;cursor:pointer;transition:all .2s;margin-top:4px;letter-spacing:.3px}
+.btn-book:hover{background:var(--navy-dark)}
+/* SUCCESS */
+.success-box{display:none;text-align:center;padding:16px 0}
+.success-icon{font-size:52px;margin-bottom:16px}
+.success-box h3{font-size:22px;font-weight:800;color:var(--navy-dark);margin-bottom:10px}
+.success-box p{font-size:14px;color:var(--muted);line-height:1.7}
+.s-slot{display:inline-block;background:#eef1f7;color:var(--navy);font-weight:700;padding:8px 20px;border-radius:5px;margin:12px 0;font-size:14px;border:1px solid #c8d2e0}
+/* FOOTER */
+footer{background:var(--navy-dark);padding:28px 24px;text-align:center;margin-top:40px}
+footer .main-footer{font-size:13px;color:#475569;margin-bottom:8px}
+footer strong{color:#94a3b8}
+footer .legal{font-size:11px;color:#334155;margin-top:6px}
+@media(max-width:720px){
+  .main{grid-template-columns:1fr}
+  .hero h1{font-size:28px}
+  .nav-links{display:none}
+  .trust-bar{gap:16px;padding:14px 20px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">The <span>Practice</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="roi.html">ROI Calculator</a>
+    <a href="scorecard.html">Practice Scorecard</a>
+    <a href="portal.html">Client Portal Demo</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="resources.html">Free Resources</a>
+    <a href="pricing.html#partnership" class="partner">★ Partner Programme</a>
+        <a href="dashboard.php">Client Dashboard</a>
+  </div>
+  <a href="booking.html" class="nav-cta active">Book Free Consultation</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Free · No obligation · 30 minutes</div>
+  <h1>Book Your Free<br><span>Practice Consultation</span></h1>
+  <p>30 minutes with a member of our team — Chartered Accountants and technology specialists who understand your practice from the inside.</p>
+</div>
+
+<div class="trust-bar">
+  <div class="trust-item"><strong>Chartered Accountants</strong> &amp; Technology Specialists</div>
+  <div class="trust-item"><strong>80 Years</strong> Combined Professional Experience</div>
+  <div class="trust-item"><strong>Practitioners</strong> Serving Practitioners</div>
+  <div class="trust-item"><strong>Strictly</strong> Confidential — Always</div>
+</div>
+
+<div class="main">
+  <!-- STEP 1 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num">1</div>
+      <h2>Select Date &amp; Time</h2>
+    </div>
+    <div class="card-sub">Select a date to see available consultation slots.</div>
+    <div class="cal-nav">
+      <button class="cal-arrow" onclick="changeMonth(-1)">&#8249;</button>
+      <div class="cal-month" id="cal-title"></div>
+      <button class="cal-arrow" onclick="changeMonth(1)">&#8250;</button>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-dow">Mon</div><div class="cal-dow">Tue</div><div class="cal-dow">Wed</div>
+      <div class="cal-dow">Thu</div><div class="cal-dow">Fri</div><div class="cal-dow">Sat</div><div class="cal-dow">Sun</div>
+    </div>
+    <div class="cal-grid" id="cal-days"></div>
+    <div class="slots-wrap" id="slots-wrap" style="display:none">
+      <div class="slots-label" id="slots-label"></div>
+      <div class="slots-grid" id="slots-grid"></div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num">2</div>
+      <h2>Your Details</h2>
+    </div>
+    <div class="card-sub" id="details-sub">Please select a date and time to continue.</div>
+
+    <div class="placeholder-box" id="placeholder">
+      <span style="font-size:20px;flex-shrink:0">📅</span>
+      <span>Please select a date and available time to continue. You will need: your name, practice name, contact email, and a brief note on what you would like to discuss.</span>
+    </div>
+
+    <div class="details-form" id="details-form">
+      <div class="slot-banner">📅 <span id="slot-summary"></span></div>
+      <div class="form-row">
+        <div class="form-group"><label>First name *</label><input type="text" placeholder="Sarah" /></div>
+        <div class="form-group"><label>Last name *</label><input type="text" placeholder="Thompson" /></div>
+      </div>
+      <div class="form-group"><label>Practice / firm name *</label><input type="text" id="f-firm" placeholder="Thompson &amp; Co Accountants" /></div>
+      <div class="form-group"><label>Email address *</label><input type="email" id="f-email" placeholder="sarah@thompsonco.co.uk" /></div>
+      <div class="form-group"><label>Phone number</label><input type="tel" placeholder="07700 900000" /></div>
+      <div class="form-group">
+        <label>Practice size</label>
+        <select>
+          <option value="">Please select</option>
+          <option>Sole practitioner</option>
+          <option>2–5 staff</option>
+          <option>6–10 staff</option>
+          <option>11–15 staff</option>
+          <option>15+ staff</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>What would you like to discuss? *</label>
+        <textarea placeholder="e.g. automating our client onboarding, the Partner Programme, financial modelling services, or just an initial conversation about what is possible..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>How did you hear about us?</label>
+        <select>
+          <option value="">Please select</option>
+          <option>LinkedIn</option>
+          <option>Referral from a colleague</option>
+          <option>Google search</option>
+          <option>ICAEW / ACCA network</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <button class="btn-book" onclick="submitBooking()">Confirm consultation →</button>
+    </div>
+
+    <div class="success-box" id="success-box">
+      <div class="success-icon">🎉</div>
+      <h3>Your consultation is confirmed</h3>
+      <div class="s-slot" id="s-slot"></div>
+      <p>A confirmation will be sent to <strong id="s-email"></strong> within 24 hours with a secure video call link.<br><br>We look forward to speaking with you. If you need to change the time, simply reply to the confirmation email.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div style="display:flex;justify-content:center;gap:14px;margin-bottom:10px;flex-wrap:wrap">
+    <a href="wa.php" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:7px 16px;border-radius:20px;background:#25D366;color:#fff;text-decoration:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <a href="tg.php" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:7px 16px;border-radius:20px;background:#229ED9;color:#fff;text-decoration:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+      Telegram
+    </a>
+  </div>
+  <p class="main-footer"><strong>The Practice</strong> · practice.finaccord.pro · info@kafs-ltd.com · Strictly confidential · GDPR compliant · UK-hosted</p>
+  <p class="legal">KAFS Group Ltd · Co. No. 06762730 · England &amp; Wales · © 2026</p>
+</footer>
+
+<style>
+.cw{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.co{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s;opacity:0;pointer-events:none;transform:translateY(10px)}
+.co.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.c-opt{display:flex;align-items:center;gap:9px;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.15);transition:transform .2s;white-space:nowrap}
+.c-opt:hover{transform:scale(1.04)}
+.c-opt.wa{background:#25D366;color:#fff}.c-opt.tg{background:#229ED9;color:#fff}
+.c-opt svg{width:17px;height:17px;fill:#fff;flex-shrink:0}
+.ct{width:54px;height:54px;border-radius:50%;background:var(--navy);border:2px solid var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(0,0,0,.2);transition:all .3s;color:#fff;font-size:22px}
+.ct:hover{background:var(--navy-dark);transform:scale(1.06)}
+.ct .io{display:block}.ct .ic{display:none;font-size:16px}
+.ct.active .io{display:none}.ct.active .ic{display:block}
+</style>
+<div class="cw" id="cw">
+  <div class="co" id="co">
+    <a href="wa.php" class="c-opt wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp us</a>
+    <a href="tg.php" class="c-opt tg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</a>
+  </div>
+  <div class="ct" id="ct" onclick="toggleW()"><span class="io">💬</span><span class="ic">✕</span></div>
+</div>
+<script>
+function toggleW(){document.getElementById('ct').classList.toggle('active');document.getElementById('co').classList.toggle('open');}
+document.addEventListener('click',function(e){const w=document.getElementById('cw');if(w&&!w.contains(e.target)){document.getElementById('ct').classList.remove('active');document.getElementById('co').classList.remove('open');}});
+</script>
+
+<script>
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const today=new Date(); today.setHours(0,0,0,0);
+let viewYear=today.getFullYear(), viewMonth=today.getMonth();
+let selDate=null, selSlot=null;
+
+function pad(n){return n<10?'0'+n:n}
+function getSlots(date){
+  if(date.getDay()===0||date.getDay()===6) return [];
+  const s=[];
+  for(let h=9;h<=20;h++){s.push(pad(h)+':00');s.push(pad(h)+':30');}
+  return s.filter(t=>{const[hh,mm]=t.split(':').map(Number);return hh<20||(hh===20&&mm<=30);});
+}
+function renderCal(){
+  document.getElementById('cal-title').textContent=MONTHS[viewMonth]+' '+viewYear;
+  const grid=document.getElementById('cal-days'); grid.innerHTML='';
+  const first=new Date(viewYear,viewMonth,1);
+  let startDow=first.getDay()-1; if(startDow<0) startDow=6;
+  const dim=new Date(viewYear,viewMonth+1,0).getDate();
+  for(let i=0;i<startDow;i++){const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);}
+  for(let d=1;d<=dim;d++){
+    const date=new Date(viewYear,viewMonth,d), dow=date.getDay();
+    const el=document.createElement('div');
+    let cls='cal-day';
+    if(date<today) cls+=' past';
+    if(date.getTime()===today.getTime()) cls+=' today';
+    if(dow===0||dow===6) cls+=' weekend';
+    if(selDate&&date.getTime()===selDate.getTime()) cls+=' selected';
+    el.className=cls; el.textContent=d;
+    if(date>=today) el.onclick=()=>selectDate(date);
+    grid.appendChild(el);
+  }
+}
+function selectDate(date){
+  selDate=date; selSlot=null; renderCal();
+  const slots=getSlots(date);
+  const wrap=document.getElementById('slots-wrap');
+  if(!slots.length){wrap.style.display='none';return;}
+  document.getElementById('slots-label').textContent='Available times — '+date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  const sg=document.getElementById('slots-grid'); sg.innerHTML='';
+  slots.forEach(s=>{
+    const el=document.createElement('div'); el.className='slot'; el.textContent=s;
+    el.onclick=()=>selectSlot(s,el); sg.appendChild(el);
+  });
+  wrap.style.display='block'; hideForm();
+}
+function selectSlot(slot,el){
+  selSlot=slot;
+  document.querySelectorAll('.slot').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  const ds=selDate.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('slot-summary').textContent=ds+' at '+slot+' · 30 minutes · Free Practice Consultation';
+  document.getElementById('placeholder').style.display='none';
+  document.getElementById('details-form').style.display='block';
+  document.getElementById('success-box').style.display='none';
+  document.getElementById('details-sub').textContent='Complete your details to confirm.';
+}
+function hideForm(){
+  document.getElementById('placeholder').style.display='flex';
+  document.getElementById('details-form').style.display='none';
+  document.getElementById('details-sub').textContent='Please select a date and time to continue.';
+}
+function changeMonth(dir){
+  viewMonth+=dir;
+  if(viewMonth>11){viewMonth=0;viewYear++;}
+  if(viewMonth<0){viewMonth=11;viewYear--;}
+  renderCal();
+  document.getElementById('slots-wrap').style.display='none';
+  hideForm();
+}
+function submitBooking(){
+  const email=document.getElementById('f-email').value.trim();
+  const firm=document.getElementById('f-firm').value.trim();
+  if(!email||!firm){alert('Please complete all required fields.');return;}
+  const ds=selDate.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('s-slot').textContent=ds+' at '+selSlot;
+  document.getElementById('s-email').textContent=email;
+  document.getElementById('details-form').style.display='none';
+  document.getElementById('success-box').style.display='block';
+}
+renderCal();
+</script>
+</body>
+</html>

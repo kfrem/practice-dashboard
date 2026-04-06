@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Practice Automation Scorecard | The Practice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Georgia,sans-serif;background:#f8f7f4;color:#1a1a2e;min-height:100vh}
+:root{--navy:#1a3558;--navy-dark:#0f2238;--gold:#c9a84c;--gold-dark:#a07830;--cream:#f8f7f4;--border:#ddd8cf;--muted:#64748b;--green:#2d6a4f}
+a{text-decoration:none;color:inherit}
+nav{border-bottom:1px solid var(--border);padding:16px 28px;background:#fff;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:20px;font-weight:800;color:var(--navy)}.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:22px;font-size:13px}
+.nav-links a{color:#374151}.nav-links a:hover{color:var(--navy)}
+.nav-links a.active{color:var(--navy);font-weight:600}
+.nav-links a.partner{color:var(--gold);font-weight:600}
+.nav-cta{font-size:13px;font-weight:700;background:var(--navy);color:#fff;padding:9px 20px;border-radius:4px}
+.page-body{padding:40px 16px}
+.wrap{max-width:740px;margin:0 auto}
+.header{text-align:center;margin-bottom:32px}
+.header h1{font-size:30px;font-weight:800;color:var(--navy-dark);margin-bottom:8px;letter-spacing:-.3px}
+.header p{font-size:15px;color:var(--muted);line-height:1.6}
+.prog-wrap{background:#e2e8f0;border-radius:10px;height:6px;margin-bottom:6px}
+.prog-bar{height:6px;background:var(--gold);border-radius:10px;transition:width .4s}
+.prog-lbl{font-size:11px;color:var(--muted);text-align:right;margin-bottom:20px}
+.q-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:28px;border-top:3px solid var(--navy)}
+.q-num{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.q-text{font-size:18px;font-weight:700;color:var(--navy-dark);margin-bottom:4px;line-height:1.3}
+.q-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.options{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all .2s;font-size:14px;color:#374151;background:#fff}
+.opt:hover{border-color:var(--navy);background:#eef1f7}
+.opt.selected{border-color:var(--navy);background:#eef1f7;color:var(--navy);font-weight:600}
+.opt-score{width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#94a3b8;flex-shrink:0;transition:all .2s}
+.opt.selected .opt-score{background:var(--navy);color:#fff}
+.nav-btns{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.btn-next{background:var(--navy);color:#fff;padding:11px 26px;border:none;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-next:hover{background:var(--navy-dark)}
+.btn-next:disabled{background:#cbd5e1;cursor:not-allowed}
+.btn-back{background:#fff;color:var(--muted);border:1px solid var(--border);padding:11px 22px;border-radius:6px;font-size:14px;cursor:pointer}
+/* RESULTS */
+.score-circle{width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 18px;border:5px solid var(--navy)}
+.score-num{font-size:36px;font-weight:800;color:var(--navy-dark)}
+.score-out{font-size:13px;color:var(--muted)}
+.score-label{font-size:22px;font-weight:800;margin-bottom:8px;text-align:center}
+.score-desc{font-size:14px;color:var(--muted);text-align:center;max-width:500px;margin:0 auto 24px;line-height:1.7}
+.breakdown{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.bk-card{background:#fff;border:1px solid var(--border);border-radius:9px;padding:14px}
+.bk-area{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
+.bk-score{font-size:18px;font-weight:800;color:var(--navy-dark)}
+.bk-bar-bg{height:4px;background:#f1f5f9;border-radius:2px;margin-top:6px}
+.bk-bar-fill{height:4px;border-radius:2px;transition:width .6s}
+.recs{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px;margin-bottom:18px;border-top:3px solid var(--navy)}
+.recs h3{font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:14px}
+.rec{display:flex;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.rec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.rec-priority{width:36px;height:20px;border-radius:4px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.p-HIGH{background:#fef2f2;color:#c0392b}.p-MED{background:#fffbeb;color:#78350f}.p-LOW{background:#f0fdf4;color:var(--green)}
+.rec-text{font-size:13px;color:#374151;line-height:1.5}
+.cta-box{background:var(--navy-dark);border-radius:10px;padding:26px;text-align:center;color:#fff}
+.cta-box h3{font-size:19px;font-weight:800;margin-bottom:8px}
+.cta-box p{font-size:14px;color:#94a3b8;margin-bottom:18px}
+.cta-box a{display:inline-block;background:var(--gold);color:var(--navy-dark);padding:11px 28px;border-radius:5px;font-size:14px;font-weight:700}
+/* FOOTER */
+footer{background:var(--navy-dark);padding:24px;text-align:center;margin-top:40px}
+.footer-contact{display:flex;justify-content:center;gap:14px;margin-bottom:10px;flex-wrap:wrap}
+.footer-contact a{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:7px 16px;border-radius:20px;text-decoration:none}
+.f-wa{background:#25D366;color:#fff}.f-tg{background:#229ED9;color:#fff}
+.footer-contact svg{width:14px;height:14px;fill:#fff}
+footer .mf{font-size:13px;color:#475569}
+footer strong{color:#94a3b8}
+footer .legal{font-size:11px;color:#334155;margin-top:5px}
+/* WIDGET */
+.cw{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.co{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s;opacity:0;pointer-events:none;transform:translateY(10px)}
+.co.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.c-opt{display:flex;align-items:center;gap:9px;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.15);transition:transform .2s;white-space:nowrap}
+.c-opt:hover{transform:scale(1.04)}
+.c-opt.wa{background:#25D366;color:#fff}.c-opt.tg{background:#229ED9;color:#fff}
+.c-opt svg{width:17px;height:17px;fill:#fff;flex-shrink:0}
+.ct{width:54px;height:54px;border-radius:50%;background:var(--navy);border:2px solid var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(0,0,0,.2);transition:all .3s;color:#fff;font-size:22px}
+.ct:hover{background:var(--navy-dark);transform:scale(1.06)}
+.ct .io{display:block}.ct .ic{display:none;font-size:16px}
+.ct.active .io{display:none}.ct.active .ic{display:block}
+@media(max-width:680px){.breakdown{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">The <span>Practice</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="roi.html">ROI Calculator</a>
+    <a href="scorecard.html" class="active">Practice Scorecard</a>
+    <a href="portal.html">Live Demos</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="resources.html">Free Resources</a>
+    <a href="pricing.html#partnership" class="partner">★ Partner Programme</a>
+        <a href="dashboard.php">Client Dashboard</a>
+  </div>
+  <a href="booking.html" class="nav-cta">Book Free Consultation</a>
+</nav>
+
+<div class="page-body">
+<div class="wrap">
+  <div class="header">
+    <h1>Practice Automation Scorecard</h1>
+    <p>10 questions · 3 minutes · Discover exactly where your practice is losing time and what to prioritise first.</p>
+  </div>
+  <div id="quiz">
+    <div class="prog-wrap"><div class="prog-bar" id="progress" style="width:10%"></div></div>
+    <div class="prog-lbl" id="prog-label">Question 1 of 10</div>
+  </div>
+  <div id="results"></div>
+</div>
+</div>
+
+<footer>
+  <div class="footer-contact">
+    <a href="wa.php" class="f-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a>
+    <a href="tg.php" class="f-tg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</a>
+  </div>
+  <p class="mf"><strong>The Practice</strong> · practice.finaccord.pro · info@kafs-ltd.com · Strictly confidential · GDPR compliant · UK-hosted</p>
+  <p class="legal">KAFS Group Ltd · Co. No. 06762730 · England &amp; Wales · © 2026</p>
+</footer>
+
+<div class="cw" id="cw">
+  <div class="co" id="co">
+    <a href="wa.php" class="c-opt wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp us</a>
+    <a href="tg.php" class="c-opt tg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</a>
+  </div>
+  <div class="ct" id="ct" onclick="toggleW()"><span class="io">💬</span><span class="ic">✕</span></div>
+</div>
+
+<script>
+const questions=[
+  {area:"Onboarding",text:"How do you collect information from new clients?",sub:"",opts:[{t:"Paper forms or Word documents sent by email",s:1},{t:"Basic online form or shared Google Form",s:2},{t:"Client portal with some automation",s:3},{t:"Fully automated smart intake with conditional logic",s:5}]},
+  {area:"Document collection",text:"How do clients submit identity and compliance documents?",sub:"",opts:[{t:"WhatsApp, email attachments, or physically",s:1},{t:"Shared folder link (Dropbox / Google Drive)",s:2},{t:"Client portal with manual tracking",s:3},{t:"Automated portal with reminders and status tracking",s:5}]},
+  {area:"Document chasing",text:"How do you chase clients for missing documents?",sub:"",opts:[{t:"Manual emails or phone calls each time",s:1},{t:"Templated email we copy and paste",s:2},{t:"Some automated reminders but not fully",s:3},{t:"Fully automated reminder sequences",s:5}]},
+  {area:"AML compliance",text:"How do you complete AML/KYC compliance checks?",sub:"",opts:[{t:"Paper checklist or spreadsheet, filled in manually",s:1},{t:"Digital checklist but completed manually",s:2},{t:"Partly automated with some manual steps",s:3},{t:"Fully automated with complete audit trail",s:5}]},
+  {area:"Engagement letters",text:"How do you generate and get engagement letters signed?",sub:"",opts:[{t:"Word template, printed, signed and scanned back",s:1},{t:"Word template emailed, client returns signed copy",s:2},{t:"E-signature tool but letters created manually",s:3},{t:"Auto-generated letters sent for e-signature automatically",s:5}]},
+  {area:"Deadline management",text:"How do you track filing deadlines and recurring tasks?",sub:"",opts:[{t:"Spreadsheet, whiteboard, or memory",s:1},{t:"Shared calendar or basic task list",s:2},{t:"Practice management software with manual input",s:3},{t:"Automated task creation and deadline tracking",s:5}]},
+  {area:"Client communication",text:"How do clients know the status of their work?",sub:"",opts:[{t:"They contact us to ask — we respond manually",s:1},{t:"We send occasional updates by email",s:2},{t:"Client portal shows some status information",s:3},{t:"Automated milestone updates sent to clients",s:5}]},
+  {area:"New enquiries",text:"How do you capture and follow up on new enquiries?",sub:"",opts:[{t:"Email inbox or phone — no formal system",s:1},{t:"Simple spreadsheet or CRM with manual entry",s:2},{t:"CRM with some follow-up reminders",s:3},{t:"Automated capture, qualification and follow-up",s:5}]},
+  {area:"Proposals",text:"How do you create and send fee proposals?",sub:"",opts:[{t:"Word or email, written from scratch each time",s:1},{t:"Templated document sent manually",s:2},{t:"Template with some automation",s:3},{t:"Auto-generated branded proposals with e-signature",s:5}]},
+  {area:"Reporting",text:"How do you track your practice's work in progress and capacity?",sub:"",opts:[{t:"No formal system — managed by memory or conversation",s:1},{t:"Spreadsheet updated manually",s:2},{t:"Practice management software",s:3},{t:"Live dashboard updated automatically",s:5}]}
+];
+let current=0,answers=[];
+function render(){
+  const q=questions[current];
+  const existing=answers[current];
+  const pct=Math.round(((current+1)/questions.length)*100);
+  document.getElementById('progress').style.width=pct+'%';
+  document.getElementById('prog-label').textContent='Question '+(current+1)+' of '+questions.length;
+  let old=document.querySelector('.q-card');
+  if(old)old.remove();
+  const div=document.createElement('div');
+  div.className='q-card';
+  div.innerHTML=`<div class="q-num">Question ${current+1} · ${q.area}</div>
+    <div class="q-text">${q.text}</div>
+    ${q.sub?`<div class="q-sub">${q.sub}</div>`:''}
+    <div class="options" id="opts">
+      ${q.opts.map((o,i)=>`<div class="opt${existing===i?' selected':''}" onclick="select(${i})" data-i="${i}">
+        <div class="opt-score">${o.s}</div><span>${o.t}</span></div>`).join('')}
+    </div>
+    <div class="nav-btns">
+      ${current>0?'<button class="btn-back" onclick="back()">← Back</button>':'<span></span>'}
+      <button class="btn-next" id="next-btn" onclick="next()" ${existing===undefined?'disabled':''}>
+        ${current===questions.length-1?'See my results →':'Next →'}</button>
+    </div>`;
+  document.getElementById('quiz').appendChild(div);
+}
+function select(i){
+  answers[current]=i;
+  document.querySelectorAll('.opt').forEach((o,idx)=>o.classList.toggle('selected',idx===i));
+  document.getElementById('next-btn').disabled=false;
+}
+function next(){if(answers[current]===undefined)return;if(current<questions.length-1){current++;render();}else showResults();}
+function back(){if(current>0){current--;render();}}
+function showResults(){
+  document.getElementById('quiz').style.display='none';
+  const total=answers.reduce((sum,a,i)=>sum+questions[i].opts[a].s,0);
+  const max=questions.length*5;
+  const pct=Math.round((total/max)*100);
+  let label,desc,col;
+  if(pct<=40){label="Significant Automation Opportunity";desc="Your practice is running largely on manual processes. The time savings available are substantial — and the improvements are straightforward to implement.";col="#c0392b";}
+  else if(pct<=65){label="Partial Automation";desc="You have some tools in place but critical workflows remain manual. Document chasing, AML compliance, or onboarding likely have gaps costing your practice significant time each week.";col="#a07830";}
+  else if(pct<=85){label="Good Foundation";desc="Your practice has made solid progress. Targeted improvements in 2–3 areas could reclaim 5–10 additional hours per week and meaningfully improve your client experience.";col="#0d9488";}
+  else{label="Advanced Practice";desc="Your practice is well ahead of most firms. Our retainer service could help you maintain and expand your systems as your practice and regulations evolve.";col="#1a3558";}
+  const areas=questions.map((q,i)=>({area:q.area,score:q.opts[answers[i]].s,max:5}));
+  const low=areas.filter(a=>a.score<=2).sort((a,b)=>a.score-b.score);
+  const recMap={
+    "Onboarding":{p:"HIGH",t:"Replace manual onboarding with a smart intake portal. Typically saves 2–4 hours per new client from day one."},
+    "Document collection":{p:"HIGH",t:"Implement automated document collection with a branded client portal and intelligent reminders."},
+    "Document chasing":{p:"HIGH",t:"Automated reminder sequences eliminate all manual chasing — your team stops sending the same email repeatedly."},
+    "AML compliance":{p:"HIGH",t:"A structured AML/KYC workflow with full audit trail reduces compliance risk and passes HMRC supervision checks."},
+    "Engagement letters":{p:"MED",t:"Auto-generate engagement letters and send for e-signature automatically at the point of onboarding."},
+    "Deadline management":{p:"MED",t:"Automated task creation and deadline tracking prevents missed filings at busy periods."},
+    "Client communication":{p:"MED",t:"Automated milestone updates significantly reduce inbound calls from clients asking for status updates."},
+    "New enquiries":{p:"MED",t:"Capture every enquiry automatically and set up a structured follow-up sequence so no lead goes cold."},
+    "Proposals":{p:"LOW",t:"Proposal automation generates branded quotes in minutes and collects e-signatures — no more Word templates."},
+    "Reporting":{p:"LOW",t:"A live practice dashboard showing WIP, capacity, and deadlines removes the need for manual tracking."}
+  };
+  const recs=low.slice(0,4).map(a=>recMap[a.area]||{p:"MED",t:"Automating this area will reclaim meaningful time for your team."});
+  const bdHtml=areas.map(a=>`<div class="bk-card"><div class="bk-area">${a.area}</div><div class="bk-score">${a.score}/5</div>
+    <div class="bk-bar-bg"><div class="bk-bar-fill" style="width:${(a.score/5)*100}%;background:${a.score<=2?'#c0392b':a.score===3?'#a07830':'#2d6a4f'}"></div></div></div>`).join('');
+  const recsHtml=recs.length?recs.map(r=>`<div class="rec"><div class="rec-priority p-${r.p}">${r.p}</div><div class="rec-text">${r.t}</div></div>`).join(''):'<div class="rec-text">Your practice is well-automated. Speak with us about our retainer service to maintain and grow your systems.</div>';
+  document.getElementById('results').innerHTML=`
+    <div style="text-align:center;margin-bottom:24px">
+      <div class="score-circle" style="border-color:${col}">
+        <span class="score-num" style="color:${col}">${total}</span>
+        <span class="score-out">out of ${max}</span>
+      </div>
+      <div class="score-label" style="color:${col}">${label}</div>
+      <div class="score-desc">${desc}</div>
+    </div>
+    <div class="breakdown">${bdHtml}</div>
+    <div class="recs"><h3>Your top priorities</h3>${recsHtml}</div>
+    <div class="cta-box">
+      <h3>Book your free Practice Consultation</h3>
+      <p>Based on your score, a 30-minute consultation will map exactly where your practice is losing time — and give you a costed plan to address it. Free, no obligation.</p>
+      <a href="booking.html">Book my free consultation →</a>
+    </div>`;
+  document.getElementById('results').style.display='block';
+}
+function toggleW(){document.getElementById('ct').classList.toggle('active');document.getElementById('co').classList.toggle('open');}
+document.addEventListener('click',function(e){const w=document.getElementById('cw');if(w&&!w.contains(e.target)){document.getElementById('ct').classList.remove('active');document.getElementById('co').classList.remove('open');}});
+render();
+</script>
+</body>
+</html>

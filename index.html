@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>The Practice — Workflow Automation for UK Accounting Firms</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Georgia,sans-serif;color:#1a1a2e;background:#fff;line-height:1.65}
+:root{--navy:#1a3558;--navy-dark:#0f2238;--navy-mid:#1e3d66;--gold:#c9a84c;--gold-light:#e8d5a0;--gold-dark:#a07830;--cream:#f8f7f4;--border:#ddd8cf;--text:#2c2c3e;--muted:#64748b}
+a{color:inherit;text-decoration:none}
+.btn{display:inline-block;padding:14px 30px;border-radius:5px;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;letter-spacing:.3px}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy-dark)}
+.btn-gold{background:var(--gold);color:#fff}.btn-gold:hover{background:var(--gold-dark)}
+.btn-outline{background:#fff;color:var(--navy);border:2px solid var(--navy)}.btn-outline:hover{background:var(--cream)}
+.btn-outline-gold{background:transparent;color:var(--gold);border:2px solid var(--gold)}.btn-outline-gold:hover{background:rgba(201,168,76,.1)}
+.container{max-width:1100px;margin:0 auto;padding:0 28px}
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;background:#fff;z-index:100}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:21px;font-weight:800;color:var(--navy);letter-spacing:-.3px}
+.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:26px;font-size:14px;color:var(--text)}
+.nav-links a{transition:color .2s}.nav-links a:hover{color:var(--navy)}
+.nav-links a.partner{color:var(--gold);font-weight:600}
+.nav-cta{font-size:14px;font-weight:700;background:var(--navy);color:#fff;padding:10px 22px;border-radius:4px}
+.nav-cta:hover{background:var(--navy-dark)}
+/* HERO */
+.hero{padding:84px 0 72px;text-align:center;background:linear-gradient(180deg,#eef1f7 0%,#fff 100%)}
+.hero-badge{display:inline-block;background:#e8edf5;color:var(--navy);font-size:12px;font-weight:600;padding:6px 16px;border-radius:20px;margin-bottom:22px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #c8d2e0}
+.hero h1{font-size:50px;font-weight:800;line-height:1.1;color:var(--navy-dark);margin-bottom:22px;max-width:760px;margin-left:auto;margin-right:auto;letter-spacing:-.5px}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:19px;color:var(--muted);max-width:620px;margin:0 auto 38px;line-height:1.7}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero-trust{margin-top:38px;font-size:13px;color:#64748b;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap}
+.hero-trust span{display:flex;align-items:center;gap:6px}
+.tick{color:#2d6a4f;font-weight:700}
+/* TRUST BAR */
+.trust-bar{background:var(--navy-dark);padding:20px 0}
+.trust-bar-inner{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.trust-item{font-size:13px;color:#94a3b8;display:flex;align-items:center;gap:8px}
+.trust-item strong{color:var(--gold-light)}
+/* STATS */
+.stats{background:var(--navy);padding:48px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1e3d66}
+.stat{background:var(--navy);padding:32px 24px;text-align:center}
+.stat-num{font-size:40px;font-weight:800;color:var(--gold);display:block}
+.stat-label{font-size:13px;color:#94a3b8;margin-top:4px;line-height:1.4}
+/* SECTIONS */
+.section{padding:76px 0}
+.section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.section h2{font-size:36px;font-weight:800;color:var(--navy-dark);margin-bottom:16px;line-height:1.2;letter-spacing:-.3px}
+.section p.lead{font-size:17px;color:var(--muted);max-width:580px;line-height:1.7}
+/* PAIN */
+.pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:44px}
+.pain-card{border:1px solid var(--border);border-radius:8px;padding:26px;background:#fff;border-top:3px solid var(--navy)}
+.pain-card .icon{font-size:26px;margin-bottom:12px}
+.pain-card h3{font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px}
+.pain-card p{font-size:13px;color:var(--muted);line-height:1.6}
+/* HOW */
+.how{background:var(--cream);padding:76px 0}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:48px}
+.step{text-align:center;padding:0 8px}
+.step-num{width:52px;height:52px;border-radius:50%;background:var(--navy);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:2px solid var(--gold)}
+.step h3{font-size:15px;font-weight:700;color:var(--navy-dark);margin-bottom:8px}
+.step p{font-size:13px;color:var(--muted);line-height:1.6}
+/* SERVICES */
+.services-section{padding:76px 0;background:#fff}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:44px}
+.svc-card{border:1px solid var(--border);border-radius:8px;padding:24px;background:var(--cream)}
+.svc-card h3{font-size:14px;font-weight:700;color:var(--navy-dark);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.svc-card p{font-size:13px;color:var(--muted);line-height:1.6}
+.svc-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#e8edf5;color:var(--navy);margin-bottom:8px}
+/* OFFER */
+.offer{padding:76px 0}
+.offer-box{background:var(--navy-dark);border-radius:12px;padding:52px;color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.offer-box h2{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:16px;letter-spacing:-.3px}
+.offer-box .gold{color:var(--gold)}
+.offer-box p{color:#94a3b8;font-size:16px;margin-bottom:24px;line-height:1.7}
+.offer-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.offer-list li{font-size:13px;color:#cbd5e1;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.offer-list li::before{content:"✓";color:var(--gold);font-weight:700;flex-shrink:0;margin-top:1px}
+/* PARTNERSHIP */
+.partnership{background:linear-gradient(135deg,var(--navy-dark) 0%,#1e1b4b 100%);padding:84px 0}
+.partner-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.partner-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.partner-badge{display:inline-block;background:var(--gold);color:var(--navy-dark);font-size:11px;font-weight:800;padding:5px 14px;border-radius:20px;margin-bottom:18px;letter-spacing:.5px;text-transform:uppercase}
+.partnership h2{font-size:38px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px;letter-spacing:-.3px}
+.partnership h2 span{color:var(--gold)}
+.partnership .lead{font-size:16px;color:#94a3b8;margin-bottom:28px;line-height:1.75}
+.partner-cards{display:flex;flex-direction:column;gap:16px}
+.partner-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:24px}
+.partner-card h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:8px}
+.partner-card p{font-size:13px;color:#94a3b8;line-height:1.6}
+.split-row{display:flex;gap:12px;margin-top:14px}
+.split-pill{flex:1;text-align:center;padding:12px;border-radius:7px}
+.split-pill.gold{background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.3)}
+.split-pill.blue{background:rgba(30,61,102,.4);border:1px solid rgba(30,61,102,.6)}
+.split-pill .pct{font-size:24px;font-weight:800;display:block}
+.split-pill.gold .pct{color:var(--gold)}
+.split-pill.blue .pct{color:#93c5fd}
+.split-pill .who{font-size:11px;color:#94a3b8;margin-top:2px}
+.profit-note{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:12px 16px;font-size:12px;color:#94a3b8;margin-top:12px;line-height:1.6}
+.profit-note strong{color:var(--gold)}
+/* GUARANTEE */
+.guarantee{padding:76px 0}
+.guarantee-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:48px;display:flex;gap:40px;align-items:flex-start}
+.g-icon{font-size:48px;flex-shrink:0}
+.guarantee-box h3{font-size:24px;font-weight:800;color:var(--navy-dark);margin-bottom:12px}
+.guarantee-box p{font-size:15px;color:var(--text);line-height:1.75}
+/* CTA */
+.cta-section{background:var(--navy);padding:76px 0;text-align:center;color:#fff}
+.cta-section h2{font-size:38px;font-weight:800;margin-bottom:16px;letter-spacing:-.3px}
+.cta-section p{font-size:18px;color:#94a3b8;margin-bottom:38px;max-width:560px;margin-left:auto;margin-right:auto;line-height:1.7}
+/* FOOTER */
+footer{background:var(--navy-dark);padding:40px 0;text-align:center}
+footer p{font-size:13px;color:#475569}
+footer strong{color:#94a3b8}
+@media(max-width:768px){
+  .hero h1{font-size:32px}.stats-grid{grid-template-columns:repeat(2,1fr)}
+  .offer-box{grid-template-columns:1fr;padding:32px}.partner-inner{grid-template-columns:1fr}
+  .guarantee-box{flex-direction:column;padding:28px}.nav-links{display:none}
+  .steps{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <div class="logo">The <span>Practice</span></div>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="roi.html">ROI Calculator</a>
+        <a href="scorecard.html">Practice Scorecard</a>
+        <a href="portal.html">Client Portal Demo</a>
+        <a href="resources.html">Free Resources</a>
+        <a href="pricing.html#partnership" class="partner">★ Partner Programme</a>
+        <a href="dashboard.php">Client Dashboard</a>
+      </div>
+      <a href="booking.html" class="nav-cta">Book Free Consultation</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">Designed by practitioners, built for practitioners</div>
+    <h1>Give Your Practice<br>the <span>Infrastructure</span><br>It Deserves</h1>
+    <p>A team of Chartered Accountants and technology specialists who understand what it takes to run a modern UK accounting practice — and build the systems to match.</p>
+    <div class="hero-btns">
+      <a href="booking.html" class="btn btn-primary">Book Free 30-Min Consultation</a>
+      <a href="pricing.html" class="btn btn-outline">View Packages</a>
+    </div>
+    <div class="hero-trust">
+      <span><span class="tick">✓</span> Fixed project fees, no surprises</span>
+      <span><span class="tick">✓</span> Live in 14 days or we continue free</span>
+      <span><span class="tick">✓</span> Simple monthly platform subscription</span>
+      <span><span class="tick">✓</span> Chartered accountants in your corner</span>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <div class="trust-item"><strong>Chartered Accountants</strong> &amp; Technology Specialists</div>
+    <div class="trust-item"><strong>80 Years</strong> Combined Professional Experience</div>
+    <div class="trust-item"><strong>Practitioners</strong> Serving Practitioners</div>
+    <div class="trust-item"><strong>Strictly</strong> Confidential — Always</div>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat"><span class="stat-num">15+</span><span class="stat-label">Hours lost weekly to manual admin in the average practice</span></div>
+      <div class="stat"><span class="stat-num">£35K+</span><span class="stat-label">Annual cost of a junior admin hire before overheads</span></div>
+      <div class="stat"><span class="stat-num">14</span><span class="stat-label">Working days to go live — guaranteed on every project</span></div>
+      <div class="stat"><span class="stat-num">70%</span><span class="stat-label">Profit share for practices in our Partner Programme</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section class="section">
+  <div class="container">
+    <div class="section-label">The Challenge</div>
+    <h2>Your team is excellent.<br>Your systems are holding them back.</h2>
+    <p class="lead">UK accounting firms lose thousands of hours every year to repetitive manual processes that add no professional value to your clients or your practice.</p>
+    <div class="pain-grid">
+      <div class="pain-card"><div class="icon">📋</div><h3>Manual client onboarding</h3><p>Email chains, Word forms, missing documents, and AML checklists done on paper. Every new client costs 3–5 hours of skilled staff time before a single billable minute begins.</p></div>
+      <div class="pain-card"><div class="icon">📧</div><h3>Endless document chasing</h3><p>Staff spending their mornings sending the same polite reminder for the fourth time. Meanwhile deadlines are approaching and your team's morale is being eroded.</p></div>
+      <div class="pain-card"><div class="icon">⚠️</div><h3>Inconsistent compliance</h3><p>AML checks completed differently by different staff. No reliable audit trail. Companies House changes creating new obligations. Your PI insurance quietly at risk.</p></div>
+      <div class="pain-card"><div class="icon">📊</div><h3>Underused advisory capacity</h3><p>Your qualified team is too busy administering to advise. Clients who could benefit from cash flow forecasting, management reports, or scenario planning never receive it.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="section-label">Our Process</div>
+    <h2>From consultation to fully operational in 14 days.</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h3>Free consultation</h3><p>30 minutes to map your current workflows and identify every hour being lost to manual processes.</p></div>
+      <div class="step"><div class="step-num">2</div><h3>Design &amp; build</h3><p>We design and configure your practice systems using proven tools — no guesswork, no generic templates.</p></div>
+      <div class="step"><div class="step-num">3</div><h3>Train &amp; test</h3><p>Live training sessions with your team, fully recorded. Real test runs before anything goes near a client.</p></div>
+      <div class="step"><div class="step-num">4</div><h3>Go live</h3><p>Your clients onboard themselves. Your team receives complete, compliant files — ready to work on from day one.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services-section">
+  <div class="container">
+    <div class="section-label">What We Build For Practices</div>
+    <h2>Twelve services that transform what your practice can offer.</h2>
+    <p class="lead">From eliminating onboarding admin to enabling your team to deliver CFO-level advisory — built and maintained by our specialists on your behalf.</p>
+    <div class="services-grid">
+      <div class="svc-card"><span class="svc-tag">Core</span><h3>🔄 Client Onboarding Systems</h3><p>Complete digital onboarding — smart intake forms, document collection, AML compliance, engagement letters and e-signatures. New clients fully onboarded in hours, not weeks.</p></div>
+      <div class="svc-card"><span class="svc-tag">Core</span><h3>📁 Document Collection &amp; Chasing</h3><p>Automated reminder sequences replace all manual chasing. Clients receive polite, timely prompts until every document is submitted. Your team never sends another chasing email.</p></div>
+      <div class="svc-card"><span class="svc-tag">Advisory</span><h3>💰 Cash Flow Forecasting</h3><p>Short and medium-term cash forecasting tools your team can use across multiple clients. Daily, weekly, and monthly views with scenario analysis and runway tracking.</p></div>
+      <div class="svc-card"><span class="svc-tag">Advisory</span><h3>📈 Rolling Budgets &amp; Reforecasts</h3><p>Monthly rolling forecast templates, budget-versus-actual packs, and reforecast workflows. Gives your practice a practical advisory product it can sell repeatedly.</p></div>
+      <div class="svc-card"><span class="svc-tag">Advisory</span><h3>🔀 Scenario Planning Models</h3><p>"Can we hire?" "What if sales drop 15%?" "Can we expand?" Turn client questions into numbers. Best-case, worst-case, and moderate scenarios built and maintained for your team.</p></div>
+      <div class="svc-card"><span class="svc-tag">Advisory</span><h3>📊 KPI Dashboards &amp; Management Reports</h3><p>Monthly review meetings transformed. Gross margin trends, net profit, cash conversion, debtor days, and forecast-versus-actual — presented professionally for every client.</p></div>
+      <div class="svc-card"><span class="svc-tag">Advisory</span><h3>📉 3-Way Forecasting</h3><p>P&amp;L, balance sheet, and cash flow linked together. Shows clients that profitable businesses can still face cash crises — and gives your practice a premium CFO-level offering.</p></div>
+      <div class="svc-card"><span class="svc-tag">Advisory</span><h3>🏦 Funding &amp; Lending Readiness</h3><p>Client-ready financial packs for loans, overdrafts, asset finance, and investor conversations — forecast assumptions, downside scenarios, debt servicing, and key ratios included.</p></div>
+      <div class="svc-card"><span class="svc-tag">Advisory</span><h3>📋 Board Packs &amp; Investor Reporting</h3><p>Structured board-style packs: headline KPIs, commentary, risks, actions, and forecast updates. Makes your practice look strategic and gives clients clearer decision support.</p></div>
+      <div class="svc-card"><span class="svc-tag">Practice</span><h3>⚙️ Deadline &amp; Task Management</h3><p>Every filing deadline, every recurring task — automatically assigned, tracked, and escalated. Nothing falls through the cracks at busy periods again.</p></div>
+      <div class="svc-card"><span class="svc-tag">Practice</span><h3>📝 Proposal &amp; Engagement Automation</h3><p>Fee proposals generated in minutes, sent for digital signature, and automatically filed. Inconsistent Word templates and lost engagement letters become a thing of the past.</p></div>
+      <div class="svc-card"><span class="svc-tag">Practice</span><h3>🔔 Client Communication Workflows</h3><p>Automated milestone updates keep clients informed at every stage. Fewer inbound calls asking "what's happening?" More time for your team to do meaningful work.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFER -->
+<section class="offer">
+  <div class="container">
+    <div class="offer-box">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px">Our flagship build</div>
+        <h2>The 14-Day Practice <span class="gold">Transformation</span></h2>
+        <p>Replace your entire manual client onboarding process with a professionally designed, fully operational system. Your clients complete the process themselves — your team receives a complete, compliant file and gets straight to work.</p>
+        <a href="pricing.html" class="btn btn-gold" style="margin-top:8px">View All Packages</a>
+      </div>
+      <div>
+        <ul class="offer-list">
+          <li>Branded client onboarding portal, designed to your practice</li>
+          <li>Smart intake forms for individual and business clients</li>
+          <li>Automated document collection with client-facing reminders</li>
+          <li>Full AML/KYC compliance workflow with complete audit trail</li>
+          <li>Engagement letter generation and digital signature capability</li>
+          <li>Automated client welcome and onboarding communications</li>
+          <li>Internal notifications and task assignments for your team</li>
+          <li>Live training sessions, recorded for future staff</li>
+          <li>Written Standard Operating Procedures for every workflow</li>
+          <li>Monthly platform subscription covers all ongoing maintenance</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERSHIP -->
+<section class="partnership" id="partnership">
+  <div class="container">
+    <div class="partner-inner">
+      <div>
+        <div class="partner-label">Flagship Enterprise Programme</div>
+        <div class="partner-badge">★ A new revenue stream for your practice</div>
+        <h2>The Practice<br><span>Partner Programme</span></h2>
+        <p class="lead">Your practice already holds trusted relationships with dozens of business clients. Those clients face the same challenges you do. We build the solutions — under your practice name. You introduce them to your clients and share in the profits. Every month. Forever.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="booking.html" class="btn btn-gold">Apply as a founding partner</a>
+          <a href="pricing.html#partnership" class="btn btn-outline-gold">See how profit sharing works</a>
+        </div>
+        <p style="margin-top:16px;font-size:12px;color:#64748b">Limited to 20 founding partner practices · Priority onboarding · Dedicated relationship manager</p>
+      </div>
+      <div class="partner-cards">
+        <div class="partner-card">
+          <h3>🤝 How profit sharing works</h3>
+          <p>Your business clients pay a monthly subscription to your practice. Platform operating costs are deducted first. The remaining profit is shared between us.</p>
+          <div class="split-row">
+            <div class="split-pill gold"><span class="pct">70%</span><div class="who">Your practice</div></div>
+            <div class="split-pill blue"><span class="pct">30%</span><div class="who">The Practice</div></div>
+          </div>
+          <div class="profit-note"><strong>Profit sharing, not revenue sharing.</strong> Platform costs (typically £8–£15/client/month) are deducted from gross subscriptions first. You share in the net profit — not turnover. Full transparency every month.</div>
+        </div>
+        <div class="partner-card">
+          <h3>📈 What your practice earns</h3>
+          <p style="font-size:12px;color:#64748b;margin-bottom:10px">Example — 20 business clients at £99/month:</p>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:#94a3b8">Monthly subscriptions collected</span><span style="color:#fff">£1,980</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:#94a3b8">Less platform costs (est. £240)</span><span style="color:#f87171">-£240</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:#94a3b8">Net profit to split</span><span style="color:#fff">£1,740</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0;font-weight:700"><span style="color:#94a3b8">Your practice (70% of profit)</span><span style="color:var(--gold);font-size:18px">£1,218/mo</span></div>
+          </div>
+        </div>
+        <div class="partner-card">
+          <h3>⚙️ What you do vs what we do</h3>
+          <p style="font-size:13px;margin-bottom:8px"><strong style="color:#fff">Your practice:</strong> Introduce business clients, manage the relationship, collect subscriptions, pass 30% of net profit to us.</p>
+          <p style="font-size:13px;color:#94a3b8"><strong style="color:#fff">Our team:</strong> Build and maintain all systems, handle all technical support, update workflows as regulations change, provide technology advisory.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guarantee">
+  <div class="container">
+    <div class="guarantee-box">
+      <div class="g-icon">🛡️</div>
+      <div>
+        <h3>Our commitment — no small print</h3>
+        <p>If your systems are not live and processing real clients within <strong>14 working days</strong>, our team continues at no additional cost until they are.<br><br>
+        If after 30 days you do not agree that your practice has saved measurable time, we will refund <strong>50% of the project fee</strong>. No argument, no delay.<br><br>
+        Your monthly subscription covers ongoing maintenance, system updates, and technical support. Fair use is included per tier. Additional volume is billed transparently at cost, always notified in advance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="container">
+    <h2>Ready to transform your practice?</h2>
+    <p>Book a free 30-minute consultation. We will map exactly where your practice is losing time and show you what the solution looks like — at no cost and no obligation.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="booking.html" class="btn btn-gold">Book your free consultation</a>
+      <a href="pricing.html" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.4)">View packages first</a>
+    </div>
+    <p style="margin-top:28px;font-size:13px;color:#64748b">A team of Chartered Accountants and technology specialists with 80 years of combined experience in practice and systems development · practice.finaccord.pro</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><strong>The Practice</strong> · practice.finaccord.pro · info@kafs-ltd.com · GDPR-compliant · UK-hosted · Strictly confidential</p>
+    <p style="margin-top:8px">© 2026 · All rights reserved · A Finaccord professional services programme</p>
+  </div>
+</footer>
+</body>
+</html>

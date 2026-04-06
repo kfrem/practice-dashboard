@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Live Service Demonstrations | The Practice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Georgia,sans-serif;background:#f8f7f4;color:#1a1a2e;min-height:100vh}
+:root{--navy:#1a3558;--navy-dark:#0f2238;--gold:#c9a84c;--gold-dark:#a07830;--cream:#f8f7f4;--border:#ddd8cf;--muted:#64748b;--green:#2d6a4f}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:16px 28px;background:#fff;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:20px;font-weight:800;color:var(--navy)}.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:22px;font-size:13px}
+.nav-links a{color:#374151}.nav-links a:hover{color:var(--navy)}
+.nav-links a.active{color:var(--navy);font-weight:600}
+.nav-links a.partner{color:var(--gold);font-weight:600}
+.nav-cta{font-size:13px;font-weight:700;background:var(--navy);color:#fff;padding:9px 20px;border-radius:4px}
+
+/* HERO */
+.hero{background:linear-gradient(180deg,#eef1f7 0%,#fff 100%);padding:48px 28px 36px;text-align:center}
+.hero-badge{display:inline-block;background:#e8edf5;color:var(--navy);font-size:12px;font-weight:600;padding:5px 16px;border-radius:20px;margin-bottom:14px;letter-spacing:.6px;text-transform:uppercase;border:1px solid #c8d2e0}
+.hero h1{font-size:34px;font-weight:800;color:var(--navy-dark);margin-bottom:10px;letter-spacing:-.3px}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:16px;color:var(--muted);max-width:600px;margin:0 auto;line-height:1.7}
+
+/* DEMO TABS */
+.demo-tabs{display:flex;gap:0;justify-content:center;padding:0 24px;max-width:1060px;margin:28px auto 0;border-bottom:2px solid var(--border);flex-wrap:wrap}
+.demo-tab{padding:12px 24px;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.demo-tab:hover{color:var(--navy)}
+.demo-tab.active{color:var(--navy);border-bottom-color:var(--gold)}
+.demo-tab .tab-icon{font-size:16px}
+
+/* DEMO SECTIONS */
+.demo-section{display:none;max-width:1060px;margin:0 auto;padding:32px 24px}
+.demo-section.active{display:block}
+
+/* DEMO BANNER */
+.demo-banner{background:var(--gold);color:var(--navy-dark);text-align:center;padding:9px 20px;font-size:13px;font-weight:700}
+.demo-banner span{font-weight:400;opacity:.8}
+
+/* ===================== */
+/* DEMO 1: ONBOARDING    */
+/* ===================== */
+.portal-frame{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.portal-header{background:var(--navy-dark);padding:16px 28px;display:flex;align-items:center;justify-content:space-between}
+.firm-info{display:flex;align-items:center;gap:10px}
+.firm-logo{width:36px;height:36px;background:var(--gold);border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--navy-dark)}
+.firm-name{color:#fff;font-weight:700;font-size:15px}
+.firm-sub{color:#94a3b8;font-size:11px}
+.portal-secure{font-size:12px;color:#94a3b8}
+.portal-body{display:grid;grid-template-columns:220px 1fr;min-height:420px}
+.p-sidebar{background:var(--navy);padding:20px 14px}
+.p-sidebar-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#475569;margin-bottom:12px}
+.p-step{display:flex;align-items:flex-start;gap:9px;margin-bottom:10px;opacity:.5}
+.p-step.done,.p-step.active{opacity:1}
+.p-dot{width:24px;height:24px;border-radius:50%;border:2px solid #334155;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#475569;flex-shrink:0;transition:all .3s}
+.p-step.done .p-dot{background:var(--green);border-color:var(--green);color:#fff}
+.p-step.active .p-dot{background:var(--navy-dark);border-color:var(--gold);color:var(--gold)}
+.p-step-name{font-size:12px;color:#94a3b8;padding-top:3px}
+.p-step.active .p-step-name{color:#fff;font-weight:600}
+.p-step.done .p-step-name{color:#6ee7b7}
+.p-main{padding:28px 32px;max-width:560px}
+.p-badge{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.p-main h2{font-size:19px;font-weight:800;color:var(--navy-dark);margin-bottom:4px}
+.p-main .p-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.p-progress{background:#e2e8f0;border-radius:10px;height:5px;margin-bottom:5px}
+.p-prog-fill{height:5px;background:var(--gold);border-radius:10px;transition:width .4s}
+.p-prog-lbl{font-size:11px;color:var(--muted);text-align:right;margin-bottom:16px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:10px;font-weight:700;color:#374151;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:5px;font-size:13px;color:#1a1a2e;background:#fff;font-family:inherit}
+.fg textarea{min-height:70px;resize:vertical}
+.radio-grp{display:flex;flex-direction:column;gap:7px}
+.r-opt{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid var(--border);border-radius:5px;cursor:pointer;font-size:13px;transition:all .2s;background:#fff}
+.r-opt:hover{border-color:var(--navy);background:#eef1f7}
+.r-opt.sel{border-color:var(--navy);background:#eef1f7;font-weight:600;color:var(--navy)}
+.upload-box{border:2px dashed #c8d2e0;border-radius:7px;padding:22px;text-align:center;cursor:pointer;background:#f8f7f4;transition:all .2s}
+.upload-box:hover{border-color:var(--navy);background:#eef1f7}
+.upload-box h4{font-size:13px;font-weight:600;color:#374151;margin:6px 0 3px}
+.upload-box p{font-size:11px;color:var(--muted)}
+.uploaded-file{display:flex;align-items:center;gap:9px;padding:8px 12px;background:#fff;border:1px solid var(--border);border-radius:5px;font-size:12px;margin-top:8px}
+.uploaded-file .fc{color:var(--green);font-weight:700;margin-left:auto}
+.chk-grp{display:flex;flex-direction:column;gap:8px}
+.chk-item{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border:1px solid var(--border);border-radius:5px;cursor:pointer;font-size:13px;color:#374151;line-height:1.4;transition:all .2s;background:#fff}
+.chk-item:hover{border-color:var(--navy)}
+.chk-item.chked{border-color:var(--green);background:#f0fdf4}
+.chk-item input{margin-top:2px;flex-shrink:0;accent-color:var(--navy)}
+.sig-box{display:none;background:#fff;border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center;margin-bottom:12px}
+.sig-text{font-size:26px;color:var(--navy);font-style:italic;font-family:Georgia,serif}
+.sig-date{font-size:11px;color:var(--muted);margin-top:4px}
+.p-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid #f1f5f9}
+.btn-next{background:var(--navy);color:#fff;padding:10px 24px;border:none;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-next:hover{background:var(--navy-dark)}
+.btn-back{background:#fff;color:var(--muted);border:1px solid var(--border);padding:10px 20px;border-radius:5px;font-size:13px;cursor:pointer}
+.save-note{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.success-screen{text-align:center;padding:40px 20px}
+.success-screen h2{font-size:22px;font-weight:800;color:var(--navy-dark);margin:14px 0 8px}
+.success-screen p{font-size:14px;color:var(--muted);line-height:1.7;max-width:440px;margin:0 auto 20px}
+.ns-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:18px;text-align:left;max-width:420px;margin:0 auto}
+.ns-box h4{font-size:13px;font-weight:700;color:var(--navy-dark);margin-bottom:10px}
+.ns-item{display:flex;gap:8px;margin-bottom:7px;font-size:13px;color:#374151}
+.ns-item::before{content:"✓";color:var(--green);font-weight:700;flex-shrink:0}
+
+/* ========================= */
+/* DEMO 2: CASH FLOW         */
+/* ========================= */
+.cf-frame{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.cf-header{background:var(--navy-dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.cf-header h3{color:#fff;font-size:16px;font-weight:700}
+.cf-header p{color:#94a3b8;font-size:12px}
+.cf-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cf-btn{padding:7px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.cf-btn.active,.cf-btn:hover{background:var(--gold);color:var(--navy-dark);border-color:var(--gold)}
+.cf-body{padding:24px}
+.cf-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.cf-metric{background:var(--cream);border-radius:8px;padding:14px 16px;border:1px solid var(--border)}
+.cf-metric-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.cf-metric-value{font-size:22px;font-weight:800;color:var(--navy-dark)}
+.cf-metric-value.positive{color:var(--green)}
+.cf-metric-value.negative{color:#c0392b}
+.cf-metric-change{font-size:11px;margin-top:3px}
+.cf-metric-change.up{color:var(--green)}
+.cf-metric-change.down{color:#c0392b}
+.cf-chart-wrap{margin-bottom:20px}
+.cf-chart-title{font-size:13px;font-weight:700;color:var(--navy-dark);margin-bottom:12px}
+.cf-bars{display:flex;gap:8px;align-items:flex-end;height:160px;padding:0 4px}
+.cf-bar-grp{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+.cf-bar-pair{display:flex;gap:2px;align-items:flex-end;flex:1;width:100%}
+.cf-bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:all .4s;cursor:pointer;position:relative}
+.cf-bar.income{background:var(--navy)}
+.cf-bar.expense{background:var(--gold)}
+.cf-bar.projected{opacity:.5;border:2px dashed}
+.cf-bar.projected.income{border-color:var(--navy);background:transparent}
+.cf-bar.projected.expense{border-color:var(--gold);background:transparent}
+.cf-bar-lbl{font-size:10px;color:var(--muted);text-align:center;margin-top:5px}
+.cf-legend{display:flex;gap:16px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+.cf-leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.cf-leg-dot{width:10px;height:10px;border-radius:2px}
+.cf-table{width:100%;border-collapse:collapse;font-size:13px}
+.cf-table th{padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--cream)}
+.cf-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#374151}
+.cf-table tr:hover td{background:#f8f7f4}
+.cf-table .pos{color:var(--green);font-weight:600}
+.cf-table .neg{color:#c0392b;font-weight:600}
+.cf-table .proj{color:var(--muted);font-style:italic}
+
+/* ========================= */
+/* DEMO 3: KPI DASHBOARD     */
+/* ========================= */
+.kpi-frame{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.kpi-header{background:var(--navy-dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.kpi-header h3{color:#fff;font-size:16px;font-weight:700}
+.kpi-header p{color:#94a3b8;font-size:12px}
+.kpi-period{display:flex;gap:6px}
+.kpi-period-btn{padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#94a3b8;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s}
+.kpi-period-btn.active{background:var(--gold);color:var(--navy-dark);border-color:var(--gold)}
+.kpi-body{padding:24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.kpi-card{border-radius:8px;padding:16px;border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi-card::after{content:'';position:absolute;top:0;right:0;bottom:0;width:4px;border-radius:0 8px 8px 0}
+.kpi-card.green::after{background:var(--green)}
+.kpi-card.amber::after{background:var(--gold-dark)}
+.kpi-card.red::after{background:#c0392b}
+.kpi-card.blue::after{background:var(--navy)}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi-value{font-size:24px;font-weight:800;color:var(--navy-dark);margin-bottom:4px}
+.kpi-trend{font-size:12px;font-weight:600}
+.kpi-trend.up{color:var(--green)}.kpi-trend.down{color:#c0392b}.kpi-trend.flat{color:var(--muted)}
+.kpi-target{font-size:11px;color:var(--muted);margin-top:2px}
+.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.kpi-chart-box{background:var(--cream);border-radius:8px;padding:16px;border:1px solid var(--border)}
+.kpi-chart-title{font-size:13px;font-weight:700;color:var(--navy-dark);margin-bottom:12px}
+.bar-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-h-label{font-size:12px;color:#374151;width:110px;flex-shrink:0}
+.bar-h-track{flex:1;background:#e2e8f0;border-radius:3px;height:8px;overflow:hidden}
+.bar-h-fill{height:100%;border-radius:3px;transition:width .6s}
+.bar-h-val{font-size:12px;font-weight:600;color:var(--navy-dark);width:50px;text-align:right}
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.dl-item{display:flex;align-items:center;gap:8px;font-size:12px;color:#374151}
+.dl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.kpi-table{width:100%;border-collapse:collapse;font-size:13px}
+.kpi-table th{padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--cream)}
+.kpi-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#374151}
+.kpi-table tr:hover td{background:#f8f7f4}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.badge-green{background:#f0fdf4;color:var(--green)}
+.badge-amber{background:#fffbeb;color:#78350f}
+.badge-red{background:#fef2f2;color:#c0392b}
+
+/* ========================= */
+/* DEMO 4: AML TRACKER       */
+/* ========================= */
+.aml-frame{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.aml-header{background:var(--navy-dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.aml-header h3{color:#fff;font-size:16px;font-weight:700}
+.aml-header p{color:#94a3b8;font-size:12px}
+.aml-body{padding:24px}
+.aml-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.aml-metric{background:var(--cream);border-radius:8px;padding:14px;border:1px solid var(--border);text-align:center}
+.aml-metric-num{font-size:28px;font-weight:800;color:var(--navy-dark)}
+.aml-metric-num.green{color:var(--green)}
+.aml-metric-num.amber{color:var(--gold-dark)}
+.aml-metric-num.red{color:#c0392b}
+.aml-metric-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.aml-table{width:100%;border-collapse:collapse;font-size:13px}
+.aml-table th{padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--cream)}
+.aml-table td{padding:11px 14px;border-bottom:1px solid #f1f5f9;color:#374151;vertical-align:middle}
+.aml-table tr:hover td{background:#f8f7f4}
+.aml-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.aml-status.complete{background:#f0fdf4;color:var(--green)}
+.aml-status.pending{background:#fffbeb;color:#78350f}
+.aml-status.overdue{background:#fef2f2;color:#c0392b}
+.aml-status.review{background:#eef1f7;color:var(--navy)}
+.aml-progress-cell{width:140px}
+.aml-prog{background:#e2e8f0;border-radius:3px;height:6px}
+.aml-prog-fill{height:6px;border-radius:3px;transition:width .5s}
+.aml-prog-fill.c100{background:var(--green)}
+.aml-prog-fill.c75{background:var(--navy)}
+.aml-prog-fill.c50{background:var(--gold-dark)}
+.aml-prog-fill.c25{background:#c0392b}
+.risk-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.risk-low{background:#f0fdf4;color:var(--green)}
+.risk-med{background:#fffbeb;color:#78350f}
+.risk-high{background:#fef2f2;color:#c0392b}
+.aml-action-btn{background:var(--navy);color:#fff;border:none;padding:5px 14px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s}
+.aml-action-btn:hover{background:var(--navy-dark)}
+.aml-action-btn.done{background:var(--green)}
+.aml-action-btn.warn{background:var(--gold-dark)}
+
+/* SHARED */
+.demo-cta{background:var(--navy-dark);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.demo-cta p{font-size:13px;color:#94a3b8}<br>.demo-cta strong{color:#fff}
+.demo-cta a{background:var(--gold);color:var(--navy-dark);padding:9px 22px;border-radius:5px;font-size:13px;font-weight:700}
+
+/* FOOTER */
+footer{background:var(--navy-dark);padding:22px 24px;text-align:center;margin-top:32px}
+footer .mf{font-size:13px;color:#475569}
+footer strong{color:#94a3b8}
+footer .legal{font-size:11px;color:#334155;margin-top:5px}
+.footer-contact{display:flex;justify-content:center;gap:14px;margin-bottom:10px;flex-wrap:wrap}
+.footer-contact a{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:7px 16px;border-radius:20px;text-decoration:none}
+.footer-contact a:hover{opacity:.85}
+.f-wa{background:#25D366;color:#fff}
+.f-tg{background:#229ED9;color:#fff}
+.footer-contact svg{width:14px;height:14px;fill:#fff}
+
+/* WIDGET */
+.cw{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.co{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s;opacity:0;pointer-events:none;transform:translateY(10px)}
+.co.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.c-opt{display:flex;align-items:center;gap:9px;padding:10px 18px;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 2px 12px rgba(0,0,0,.15);transition:transform .2s;white-space:nowrap}
+.c-opt:hover{transform:scale(1.04)}
+.c-opt.wa{background:#25D366;color:#fff}
+.c-opt.tg{background:#229ED9;color:#fff}
+.c-opt svg{width:17px;height:17px;fill:#fff;flex-shrink:0}
+.ct{width:54px;height:54px;border-radius:50%;background:var(--navy);border:2px solid var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(0,0,0,.2);transition:all .3s;color:#fff;font-size:22px}
+.ct:hover{background:var(--navy-dark);transform:scale(1.06)}
+.ct .io{display:block}.ct .ic{display:none;font-size:16px}
+.ct.active .io{display:none}.ct.active .ic{display:block}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+  .portal-body{grid-template-columns:1fr}
+  .p-sidebar{display:none}
+  .cf-summary,.kpi-grid,.aml-summary{grid-template-columns:repeat(2,1fr)}
+  .kpi-row{grid-template-columns:1fr}
+  .cf-bars{height:100px}
+  .demo-tab{padding:10px 14px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">The <span>Practice</span></a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="roi.html">ROI Calculator</a>
+    <a href="scorecard.html">Practice Scorecard</a>
+    <a href="portal.html" class="active">Live Demos</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="resources.html">Free Resources</a>
+    <a href="pricing.html#partnership" class="partner">★ Partner Programme</a>
+        <a href="dashboard.php">Client Dashboard</a>
+  </div>
+  <a href="booking.html" class="nav-cta">Book Free Consultation</a>
+</nav>
+
+<div class="demo-banner">⚡ Live demonstrations — experience exactly what your clients will see · No data is saved</div>
+
+<div class="hero">
+  <div class="hero-badge">Four live demonstrations</div>
+  <h1>See Our Services<br><span>In Action</span></h1>
+  <p>Click through each demonstration below to experience exactly the systems your practice and your clients will use — built and maintained by our team of Chartered Accountants and technology specialists.</p>
+</div>
+
+<div class="demo-tabs">
+  <div class="demo-tab active" onclick="showDemo('onboarding')"><span class="tab-icon">📋</span> Client Onboarding</div>
+  <div class="demo-tab" onclick="showDemo('cashflow')"><span class="tab-icon">💰</span> Cash Flow Forecasting</div>
+  <div class="demo-tab" onclick="showDemo('kpi')"><span class="tab-icon">📊</span> KPI Dashboard</div>
+  <div class="demo-tab" onclick="showDemo('aml')"><span class="tab-icon">🛡️</span> AML Compliance Tracker</div>
+</div>
+
+<!-- ===================== -->
+<!-- DEMO 1: ONBOARDING    -->
+<!-- ===================== -->
+<div class="demo-section active" id="demo-onboarding">
+  <div style="margin-bottom:16px">
+    <h2 style="font-size:20px;font-weight:800;color:var(--navy-dark);margin-bottom:4px">Client Onboarding Portal</h2>
+    <p style="font-size:14px;color:var(--muted)">Your clients complete this process themselves — your team receives a complete, compliant file ready to work on.</p>
+  </div>
+  <div class="portal-frame">
+    <div class="portal-header">
+      <div class="firm-info">
+        <div class="firm-logo">TC</div>
+        <div><div class="firm-name">Thompson &amp; Co Accountants</div><div class="firm-sub">Secure client onboarding · Powered by The Practice</div></div>
+      </div>
+      <div class="portal-secure">🔒 Encrypted · UK-hosted · GDPR compliant</div>
+    </div>
+    <div class="portal-body">
+      <div class="p-sidebar">
+        <div class="p-sidebar-lbl">Your steps</div>
+        <div class="p-step active" id="os1"><div class="p-dot">1</div><div class="p-step-name">Your details</div></div>
+        <div class="p-step" id="os2"><div class="p-dot">2</div><div class="p-step-name">Business info</div></div>
+        <div class="p-step" id="os3"><div class="p-dot">3</div><div class="p-step-name">Identity documents</div></div>
+        <div class="p-step" id="os4"><div class="p-dot">4</div><div class="p-step-name">AML declaration</div></div>
+        <div class="p-step" id="os5"><div class="p-dot">5</div><div class="p-step-name">Sign engagement letter</div></div>
+      </div>
+      <div class="p-main" id="ob-main"></div>
+    </div>
+    <div class="demo-cta">
+      <p><strong>This portal is built for your practice</strong> — branded with your firm name and colours — within 14 days.</p>
+      <a href="booking.html">Book a free consultation →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== -->
+<!-- DEMO 2: CASH FLOW     -->
+<!-- ===================== -->
+<div class="demo-section" id="demo-cashflow">
+  <div style="margin-bottom:16px">
+    <h2 style="font-size:20px;font-weight:800;color:var(--navy-dark);margin-bottom:4px">Cash Flow Forecasting Dashboard</h2>
+    <p style="font-size:14px;color:var(--muted)">A premium advisory service your practice can offer to every business client — delivering real-time cash visibility, scenario planning, and runway tracking.</p>
+  </div>
+  <div class="cf-frame">
+    <div class="cf-header">
+      <div><h3>Henderson Design Ltd — Cash Flow Forecast</h3><p>12-month rolling forecast · Updated automatically · Prepared by Thompson &amp; Co</p></div>
+      <div class="cf-controls">
+        <button class="cf-btn active" onclick="setCFView(this,'monthly')">Monthly</button>
+        <button class="cf-btn" onclick="setCFView(this,'quarterly')">Quarterly</button>
+        <button class="cf-btn" onclick="setCFView(this,'scenario')">Scenarios</button>
+      </div>
+    </div>
+    <div class="cf-body">
+      <div class="cf-summary">
+        <div class="cf-metric"><div class="cf-metric-label">Opening balance</div><div class="cf-metric-value">£48,240</div><div class="cf-metric-change flat">1 April 2026</div></div>
+        <div class="cf-metric"><div class="cf-metric-label">Projected closing</div><div class="cf-metric-value positive">£67,850</div><div class="cf-metric-change up">▲ £19,610 by March 2027</div></div>
+        <div class="cf-metric"><div class="cf-metric-label">Lowest point</div><div class="cf-metric-value">£31,200</div><div class="cf-metric-change flat">September 2026</div></div>
+        <div class="cf-metric"><div class="cf-metric-label">Cash runway</div><div class="cf-metric-value positive">14 months</div><div class="cf-metric-change up">▲ Healthy position</div></div>
+      </div>
+      <div class="cf-chart-wrap">
+        <div class="cf-chart-title">Monthly cash inflows vs outflows (Apr 2026 – Mar 2027)</div>
+        <div class="cf-bars" id="cf-bars"></div>
+        <div class="cf-legend">
+          <div class="cf-leg-item"><div class="cf-leg-dot" style="background:var(--navy)"></div>Inflows (actual)</div>
+          <div class="cf-leg-item"><div class="cf-leg-dot" style="background:var(--gold)"></div>Outflows (actual)</div>
+          <div class="cf-leg-item"><div class="cf-leg-dot" style="background:#94a3b8;border:1px dashed var(--navy)"></div>Projected</div>
+        </div>
+      </div>
+      <div class="cf-chart-title" style="margin-bottom:12px">Monthly breakdown</div>
+      <table class="cf-table">
+        <thead><tr><th>Month</th><th>Inflows</th><th>Outflows</th><th>Net</th><th>Balance</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>April 2026</td><td>£28,500</td><td>£22,100</td><td class="pos">+£6,400</td><td>£54,640</td><td><span class="badge badge-green">Actual</span></td></tr>
+          <tr><td>May 2026</td><td>£31,200</td><td>£24,800</td><td class="pos">+£6,400</td><td>£61,040</td><td><span class="badge badge-green">Actual</span></td></tr>
+          <tr><td>June 2026</td><td>£26,400</td><td>£28,900</td><td class="neg">-£2,500</td><td>£58,540</td><td><span class="badge badge-green">Actual</span></td></tr>
+          <tr><td>July 2026</td><td class="proj">£29,000</td><td class="proj">£25,300</td><td class="pos proj">+£3,700</td><td class="proj">£62,240</td><td><span class="badge badge-amber">Forecast</span></td></tr>
+          <tr><td>Aug 2026</td><td class="proj">£18,500</td><td class="proj">£24,800</td><td class="neg proj">-£6,300</td><td class="proj">£55,940</td><td><span class="badge badge-amber">Forecast</span></td></tr>
+          <tr><td>Sep 2026</td><td class="proj">£16,200</td><td class="proj">£24,400</td><td class="neg proj">-£8,200</td><td class="proj">£47,740</td><td><span class="badge badge-amber">⚠ Monitor</span></td></tr>
+        </tbody>
+      </table>
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:12px 16px;font-size:13px;color:#78350f;margin-top:14px">
+        <strong>Advisory note:</strong> September cash position dips to £47,740 — lowest in the forecast period. We recommend reviewing the August invoice schedule and considering whether any debtor collections can be accelerated. We have modelled an alternative scenario showing the impact of 14-day faster debtor collection. <a href="#" style="color:var(--navy);font-weight:700">View scenario →</a>
+      </div>
+    </div>
+    <div class="demo-cta">
+      <p><strong>Offer this service to every business client</strong> — built and maintained by our team, branded under your practice name.</p>
+      <a href="pricing.html#partnership">See Partner Programme →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== -->
+<!-- DEMO 3: KPI DASHBOARD -->
+<!-- ===================== -->
+<div class="demo-section" id="demo-kpi">
+  <div style="margin-bottom:16px">
+    <h2 style="font-size:20px;font-weight:800;color:var(--navy-dark);margin-bottom:4px">Management Reporting &amp; KPI Dashboard</h2>
+    <p style="font-size:14px;color:var(--muted)">Transform your monthly client meetings. Instead of spreadsheets, your clients see this — gross margin trends, profitability, debtor days, and forecast-vs-actual in one professional view.</p>
+  </div>
+  <div class="kpi-frame">
+    <div class="kpi-header">
+      <div><h3>Henderson Design Ltd — Monthly Management Report</h3><p>Period: March 2026 · Prepared by Thompson &amp; Co Accountants</p></div>
+      <div class="kpi-period">
+        <button class="kpi-period-btn active">Mar 26</button>
+        <button class="kpi-period-btn">Feb 26</button>
+        <button class="kpi-period-btn">YTD</button>
+      </div>
+    </div>
+    <div class="kpi-body">
+      <div class="kpi-grid">
+        <div class="kpi-card green"><div class="kpi-label">Monthly revenue</div><div class="kpi-value">£94,200</div><div class="kpi-trend up">▲ 12.4% vs last month</div><div class="kpi-target">Target: £90,000 ✓</div></div>
+        <div class="kpi-card amber"><div class="kpi-label">Gross profit margin</div><div class="kpi-value">38.2%</div><div class="kpi-trend down">▼ 1.8% vs last month</div><div class="kpi-target">Target: 40% — monitor</div></div>
+        <div class="kpi-card green"><div class="kpi-label">Net profit</div><div class="kpi-value">£18,840</div><div class="kpi-trend up">▲ £2,100 vs last month</div><div class="kpi-target">Margin: 20.0% ✓</div></div>
+        <div class="kpi-card red"><div class="kpi-label">Debtor days</div><div class="kpi-value">47 days</div><div class="kpi-trend down">▲ 8 days vs last month</div><div class="kpi-target">Target: 30 days — action</div></div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-chart-box">
+          <div class="kpi-chart-title">Revenue by service line — March 2026</div>
+          <div class="bar-h"><div class="bar-h-label">Design services</div><div class="bar-h-track"><div class="bar-h-fill" style="width:78%;background:var(--navy)"></div></div><div class="bar-h-val">£73,500</div></div>
+          <div class="bar-h"><div class="bar-h-label">Consultancy</div><div class="bar-h-track"><div class="bar-h-fill" style="width:18%;background:var(--gold)"></div></div><div class="bar-h-val">£17,200</div></div>
+          <div class="bar-h"><div class="bar-h-label">Licensing</div><div class="bar-h-track"><div class="bar-h-fill" style="width:4%;background:var(--green)"></div></div><div class="bar-h-val">£3,500</div></div>
+        </div>
+        <div class="kpi-chart-box">
+          <div class="kpi-chart-title">Cost breakdown</div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90">
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#e2e8f0" stroke-width="14"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="var(--navy)" stroke-width="14" stroke-dasharray="88 132" stroke-dashoffset="0"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="var(--gold)" stroke-width="14" stroke-dasharray="52 168" stroke-dashoffset="-88"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="var(--green)" stroke-width="14" stroke-dasharray="40 180" stroke-dashoffset="-140"/>
+            </svg>
+            <div class="donut-legend">
+              <div class="dl-item"><div class="dl-dot" style="background:var(--navy)"></div>Staff costs 40%</div>
+              <div class="dl-item"><div class="dl-dot" style="background:var(--gold)"></div>Overheads 24%</div>
+              <div class="dl-item"><div class="dl-dot" style="background:var(--green)"></div>Direct costs 18%</div>
+              <div class="dl-item"><div class="dl-dot" style="background:#e2e8f0"></div>Retained 18%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-chart-title" style="margin-bottom:12px">Actions recommended this month</div>
+      <table class="kpi-table">
+        <thead><tr><th>Area</th><th>Observation</th><th>Recommendation</th><th>Priority</th></tr></thead>
+        <tbody>
+          <tr><td>Debtor days</td><td>Rising from 39 to 47 days</td><td>Chase overdue invoices — 3 clients over 60 days</td><td><span class="badge badge-red">Urgent</span></td></tr>
+          <tr><td>Gross margin</td><td>Slipped from 40% to 38.2%</td><td>Review March project costings — 2 projects over-ran</td><td><span class="badge badge-amber">Monitor</span></td></tr>
+          <tr><td>Revenue</td><td>12.4% above target</td><td>Strong month — consultancy pipeline healthy</td><td><span class="badge badge-green">On track</span></td></tr>
+          <tr><td>Cash flow</td><td>Strong — £54,640 balance</td><td>Consider September dip — review debtor collection</td><td><span class="badge badge-amber">Plan ahead</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="demo-cta">
+      <p><strong>Every business client deserves a report like this.</strong> We build and maintain it under your practice name.</p>
+      <a href="pricing.html#partnership">See Partner Programme →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== -->
+<!-- DEMO 4: AML TRACKER   -->
+<!-- ===================== -->
+<div class="demo-section" id="demo-aml">
+  <div style="margin-bottom:16px">
+    <h2 style="font-size:20px;font-weight:800;color:var(--navy-dark);margin-bottom:4px">AML Compliance Tracker</h2>
+    <p style="font-size:14px;color:var(--muted)">Every client's AML status visible at a glance. Automated reminders chase outstanding checks. Complete audit trail for every submission. No more spreadsheets or paper checklists.</p>
+  </div>
+  <div class="aml-frame">
+    <div class="aml-header">
+      <div><h3>Thompson &amp; Co — AML Compliance Dashboard</h3><p>All clients · Live status · Auto-updated · Full audit trail</p></div>
+      <div style="display:flex;gap:8px">
+        <button style="padding:7px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:600;cursor:pointer">Export report</button>
+        <button style="padding:7px 16px;border-radius:20px;background:var(--gold);border:none;color:var(--navy-dark);font-size:12px;font-weight:700;cursor:pointer">+ New client</button>
+      </div>
+    </div>
+    <div class="aml-body">
+      <div class="aml-summary">
+        <div class="aml-metric"><div class="aml-metric-num green">84</div><div class="aml-metric-lbl">Fully compliant</div></div>
+        <div class="aml-metric"><div class="aml-metric-num amber">12</div><div class="aml-metric-lbl">Review due soon</div></div>
+        <div class="aml-metric"><div class="aml-metric-num red">4</div><div class="aml-metric-lbl">Action required</div></div>
+        <div class="aml-metric"><div class="aml-metric-num" style="color:var(--navy)">100</div><div class="aml-metric-lbl">Total clients tracked</div></div>
+      </div>
+      <table class="aml-table">
+        <thead>
+          <tr><th>Client</th><th>Type</th><th>Risk</th><th>CDD status</th><th>Completion</th><th>Next review</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Thompson Design Ltd</strong><br><span style="font-size:11px;color:var(--muted)">Onboarded: Jan 2026</span></td>
+            <td>Ltd company</td>
+            <td><span class="risk-badge risk-low">Low</span></td>
+            <td><span class="aml-status complete">✓ Complete</span></td>
+            <td class="aml-progress-cell"><div class="aml-prog"><div class="aml-prog-fill c100" style="width:100%"></div></div><span style="font-size:10px;color:var(--muted)">5/5 items</span></td>
+            <td>Jan 2027</td>
+            <td><button class="aml-action-btn done">View file</button></td>
+          </tr>
+          <tr>
+            <td><strong>Maria Santos</strong><br><span style="font-size:11px;color:var(--muted)">Onboarded: Mar 2026</span></td>
+            <td>Sole trader</td>
+            <td><span class="risk-badge risk-low">Low</span></td>
+            <td><span class="aml-status complete">✓ Complete</span></td>
+            <td class="aml-progress-cell"><div class="aml-prog"><div class="aml-prog-fill c100" style="width:100%"></div></div><span style="font-size:10px;color:var(--muted)">5/5 items</span></td>
+            <td>Mar 2027</td>
+            <td><button class="aml-action-btn done">View file</button></td>
+          </tr>
+          <tr style="background:#fffbeb">
+            <td><strong>Riverside Properties Ltd</strong><br><span style="font-size:11px;color:var(--muted)">Onboarded: Apr 2025</span></td>
+            <td>Ltd company</td>
+            <td><span class="risk-badge risk-med">Medium</span></td>
+            <td><span class="aml-status review">⟳ Review due</span></td>
+            <td class="aml-progress-cell"><div class="aml-prog"><div class="aml-prog-fill c75" style="width:75%"></div></div><span style="font-size:10px;color:var(--muted)">3/4 items</span></td>
+            <td><strong style="color:#78350f">Apr 2026 — due</strong></td>
+            <td><button class="aml-action-btn warn" onclick="this.textContent='Reminder sent';this.style.background='var(--green)'">Send reminder</button></td>
+          </tr>
+          <tr style="background:#fef2f2">
+            <td><strong>Global Import Co Ltd</strong><br><span style="font-size:11px;color:var(--muted)">Onboarded: Oct 2024</span></td>
+            <td>Ltd company</td>
+            <td><span class="risk-badge risk-high">High</span></td>
+            <td><span class="aml-status overdue">⚠ Overdue</span></td>
+            <td class="aml-progress-cell"><div class="aml-prog"><div class="aml-prog-fill c25" style="width:40%"></div></div><span style="font-size:10px;color:#c0392b">2/5 items</span></td>
+            <td><strong style="color:#c0392b">Oct 2025 — overdue</strong></td>
+            <td><button class="aml-action-btn" style="background:#c0392b" onclick="this.textContent='Escalated';this.style.background='#7f1d1d'">Escalate</button></td>
+          </tr>
+          <tr>
+            <td><strong>James Thornton</strong><br><span style="font-size:11px;color:var(--muted)">Onboarded: Feb 2026</span></td>
+            <td>Individual</td>
+            <td><span class="risk-badge risk-low">Low</span></td>
+            <td><span class="aml-status pending">⏳ Pending docs</span></td>
+            <td class="aml-progress-cell"><div class="aml-prog"><div class="aml-prog-fill c50" style="width:60%"></div></div><span style="font-size:10px;color:var(--muted)">3/5 items</span></td>
+            <td>Feb 2027</td>
+            <td><button class="aml-action-btn" onclick="this.textContent='Sent';this.style.background='var(--green)'">Chase docs</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="background:#eef1f7;border:1px solid #c8d2e0;border-radius:7px;padding:12px 16px;font-size:13px;color:var(--navy);margin-top:14px">
+        <strong>Automated actions running:</strong> Reminder emails sent automatically 30, 14, and 7 days before each review date · Overdue clients escalated automatically after 14 days · All actions logged with timestamp for HMRC supervision purposes.
+      </div>
+    </div>
+    <div class="demo-cta">
+      <p><strong>Replace your spreadsheet checklists</strong> with a fully automated compliance system — built and maintained for your practice.</p>
+      <a href="booking.html">Book a free consultation →</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-contact">
+    <a href="wa.php" class="f-wa" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <a href="tg.php" class="f-tg" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+      Telegram
+    </a>
+  </div>
+  <p class="mf"><strong>The Practice</strong> · practice.finaccord.pro · info@kafs-ltd.com · Strictly confidential · GDPR compliant · UK-hosted</p>
+  <p class="legal">KAFS Group Ltd · Co. No. 06762730 · England &amp; Wales · © 2026</p>
+</footer>
+
+<!-- FLOATING WIDGET -->
+<div class="cw" id="cw">
+  <div class="co" id="co">
+    <a href="wa.php" class="c-opt wa" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp us
+    </a>
+    <a href="tg.php" class="c-opt tg" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+      Telegram
+    </a>
+  </div>
+  <div class="ct" id="ct" onclick="toggleW()">
+    <span class="io">💬</span><span class="ic">✕</span>
+  </div>
+</div>
+
+<script>
+// DEMO TABS
+function showDemo(id){
+  document.querySelectorAll('.demo-tab').forEach((t,i)=>{
+    const ids=['onboarding','cashflow','kpi','aml'];
+    t.classList.toggle('active',ids[i]===id);
+  });
+  document.querySelectorAll('.demo-section').forEach(s=>{
+    s.classList.toggle('active',s.id==='demo-'+id);
+  });
+  window.scrollTo({top:document.querySelector('.demo-tabs').offsetTop-70,behavior:'smooth'});
+}
+
+// ONBOARDING DEMO
+let obStep=1;
+const obSteps={
+  1:{badge:"Step 1 of 5",title:"Welcome — let's get you set up",sub:"Your personal and contact details. Takes approximately 2 minutes.",
+  html:`<div class="frow"><div class="fg"><label>First name *</label><input value="Sarah" type="text"/></div><div class="fg"><label>Last name *</label><input value="Thompson" type="text"/></div></div>
+  <div class="fg"><label>Email address *</label><input value="sarah.thompson@example.com" type="email"/></div>
+  <div class="frow"><div class="fg"><label>Phone</label><input value="07700 900123" type="tel"/></div><div class="fg"><label>NI Number</label><input value="AB 12 34 56 C" type="text"/></div></div>
+  <div class="fg"><label>Services required *</label><div class="radio-grp">
+    <label class="r-opt sel" onclick="selR(this)"><input type="radio" name="svc" checked> Self assessment tax return</label>
+    <label class="r-opt" onclick="selR(this)"><input type="radio" name="svc"> Bookkeeping &amp; management accounts</label>
+    <label class="r-opt" onclick="selR(this)"><input type="radio" name="svc"> Company accounts &amp; corporation tax</label>
+  </div></div>`},
+  2:{badge:"Step 2 of 5",title:"Business information",sub:"Company details and current accounting setup.",
+  html:`<div class="fg"><label>Business name</label><input value="Thompson Design Ltd" type="text"/></div>
+  <div class="frow"><div class="fg"><label>Company number</label><input value="12345678" type="text"/></div><div class="fg"><label>UTR</label><input value="1234 56789 0" type="text"/></div></div>
+  <div class="fg"><label>Annual turnover</label><select><option>£85K–£250K</option></select></div>
+  <div class="fg"><label>Current software</label><select><option>QuickBooks</option><option>Xero</option><option>Sage</option></select></div>`},
+  3:{badge:"Step 3 of 5",title:"Identity documents",sub:"Required for AML compliance purposes. All documents stored securely.",
+  html:`<div class="fg"><label>Photo ID *</label>
+  <div class="upload-box" onclick="fakeUp('ul1','passport_scan.pdf')"><div style="font-size:28px">📎</div><h4>Click to upload</h4><p>PDF, JPG or PNG · Max 10MB</p></div>
+  <div id="ul1"></div></div>
+  <div class="fg"><label>Proof of address *</label>
+  <div class="upload-box" onclick="fakeUp('ul2','bank_statement.pdf')"><div style="font-size:28px">🏠</div><h4>Click to upload</h4><p>Bank statement or utility bill — dated within 3 months</p></div>
+  <div id="ul2"></div></div>`},
+  4:{badge:"Step 4 of 5",title:"AML declaration",sub:"We are required by law to complete these checks for every new client.",
+  html:`<div class="chk-grp">
+  <label class="chk-item" onclick="tog(this)"><input type="checkbox"> I confirm that the funds relating to my affairs arise from legitimate sources.</label>
+  <label class="chk-item" onclick="tog(this)"><input type="checkbox"> I am not subject to any sanctions or investigations relating to financial crime.</label>
+  <label class="chk-item" onclick="tog(this)"><input type="checkbox"> I understand my accountant has a legal obligation to report any suspicion of money laundering.</label>
+  <label class="chk-item" onclick="tog(this)"><input type="checkbox"> All information I have provided is accurate and complete.</label>
+  </div>
+  <div class="fg" style="margin-top:14px"><label>Source of funds</label><select><option>Employment income</option><option selected>Self-employment / business</option><option>Investments</option></select></div>`},
+  5:{badge:"Step 5 of 5",title:"Sign your engagement letter",sub:"Please review and sign electronically to confirm your instruction.",
+  html:`<div style="background:#f8f7f4;border:1px solid var(--border);border-radius:6px;padding:16px;font-size:12px;color:#374151;line-height:1.7;max-height:160px;overflow-y:auto;margin-bottom:14px">
+  <strong>Engagement Letter — Thompson &amp; Co Accountants</strong><br><br>
+  We will prepare your self assessment tax return for the year ending 5 April 2025 on the basis of the information you provide. Our professional fee will be confirmed following our initial review. All information is held in strict confidence in accordance with ICAEW professional standards and GDPR.
+  </div>
+  <div class="fg"><label>Type your full name to sign electronically *</label><input type="text" id="sig-input" placeholder="Sarah Thompson" oninput="updateSig(this.value)"/></div>
+  <div class="sig-box" id="sig-box"><div class="sig-text" id="sig-text"></div><div class="sig-date" id="sig-date"></div></div>
+  <label class="chk-item" onclick="tog(this)"><input type="checkbox"> I have read and agree to the terms of this engagement letter.</label>`}
+};
+const uploads={};
+function fakeUp(id,name){
+  if(uploads[id])return; uploads[id]=true;
+  const d=document.createElement('div');d.className='uploaded-file';
+  d.innerHTML=`<span>📄</span><span>${name}</span><span class="fc">✓ Uploaded</span>`;
+  document.getElementById(id).appendChild(d);
+}
+function selR(el){el.closest('.radio-grp').querySelectorAll('.r-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');}
+function tog(el){el.classList.toggle('chked');}
+function updateSig(v){
+  const b=document.getElementById('sig-box');
+  if(v.trim()){b.style.display='block';document.getElementById('sig-text').textContent=v;document.getElementById('sig-date').textContent='Signed: '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});}
+  else b.style.display='none';
+}
+function updateObSidebar(){
+  for(let i=1;i<=5;i++){
+    const el=document.getElementById('os'+i);
+    el.classList.remove('active','done');
+    const dot=el.querySelector('.p-dot');
+    if(i<obStep){el.classList.add('done');dot.textContent='✓';}
+    else if(i===obStep){el.classList.add('active');dot.textContent=i;}
+    else dot.textContent=i;
+  }
+}
+function renderOb(){
+  const s=obSteps[obStep];
+  const pct=Math.round((obStep/5)*100);
+  document.getElementById('ob-main').innerHTML=`
+    <div class="p-progress"><div class="p-prog-fill" style="width:${pct}%"></div></div>
+    <div class="p-prog-lbl" style="margin-bottom:14px">Step ${obStep} of 5</div>
+    <div class="p-badge">${s.badge}</div>
+    <h2>${s.title}</h2><p class="p-sub">${s.sub}</p>
+    ${s.html}
+    <div class="p-nav">
+      ${obStep>1?'<button class="btn-back" onclick="obGo(-1)">← Back</button>':'<span></span>'}
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="save-note">🔒 Auto-saved</span>
+        <button class="btn-next" onclick="obGo(1)">${obStep===5?'Submit & sign ✓':'Save & continue →'}</button>
+      </div>
+    </div>`;
+  updateObSidebar();
+}
+function obGo(d){
+  if(d===1&&obStep<5)obStep++;
+  else if(d===1&&obStep===5){obSuccess();return;}
+  else if(d===-1&&obStep>1)obStep--;
+  renderOb();
+}
+function obSuccess(){
+  document.getElementById('ob-main').innerHTML=`
+    <div class="success-screen">
+      <div style="font-size:52px">🎉</div>
+      <h2>Onboarding complete</h2>
+      <p>Thank you Sarah. Your engagement with Thompson &amp; Co is confirmed. Your team has been notified and your file is ready to work on.</p>
+      <div class="ns-box"><h4>What happened automatically</h4>
+        <div class="ns-item">Your documents filed and verified</div>
+        <div class="ns-item">AML checklist completed and logged</div>
+        <div class="ns-item">Engagement letter signed and archived</div>
+        <div class="ns-item">Partner notified and task created</div>
+        <div class="ns-item">Welcome email sent to client</div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:16px">This was a demonstration. In your live portal, every step above happens without any manual intervention from your team.</p>
+    </div>`;
+  document.querySelectorAll('.p-step').forEach(s=>{s.classList.remove('active');s.classList.add('done');s.querySelector('.p-dot').textContent='✓';});
+}
+
+// CASH FLOW
+function setCFView(el,v){
+  document.querySelectorAll('.cf-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function buildCFBars(){
+  const months=['Apr','May','Jun','Jul','Aug','Sep'];
+  const inc=[28500,31200,26400,29000,18500,16200];
+  const exp=[22100,24800,28900,25300,24800,24400];
+  const proj=[false,false,false,true,true,true];
+  const max=Math.max(...inc,...exp);
+  const bars=document.getElementById('cf-bars');
+  if(!bars)return;
+  bars.innerHTML='';
+  months.forEach((m,i)=>{
+    const grp=document.createElement('div');grp.className='cf-bar-grp';
+    const pair=document.createElement('div');pair.className='cf-bar-pair';
+    const bIn=document.createElement('div');
+    bIn.className='cf-bar income'+(proj[i]?' projected':'');
+    bIn.style.height=Math.round((inc[i]/max)*140)+'px';
+    bIn.title='Income: £'+inc[i].toLocaleString();
+    const bEx=document.createElement('div');
+    bEx.className='cf-bar expense'+(proj[i]?' projected':'');
+    bEx.style.height=Math.round((exp[i]/max)*140)+'px';
+    bEx.title='Expenses: £'+exp[i].toLocaleString();
+    pair.appendChild(bIn);pair.appendChild(bEx);
+    const lbl=document.createElement('div');lbl.className='cf-bar-lbl';lbl.textContent=m;
+    grp.appendChild(pair);grp.appendChild(lbl);
+    bars.appendChild(grp);
+  });
+}
+
+// WIDGET
+function toggleW(){
+  document.getElementById('ct').classList.toggle('active');
+  document.getElementById('co').classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  const w=document.getElementById('cw');
+  if(w&&!w.contains(e.target)){
+    document.getElementById('ct').classList.remove('active');
+    document.getElementById('co').classList.remove('open');
+  }
+});
+
+// INIT
+renderOb();
+setTimeout(buildCFBars,100);
+</script>
+</body>
+</html>

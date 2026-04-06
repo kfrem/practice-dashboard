@@ -1,0 +1,561 @@
+<?php
+// ============================================================
+// FIRMREADY — API
+// All data operations: save clients, update AML, sign documents
+// ============================================================
+
+require_once __DIR__ . '/config.php';
+
+header('Content-Type: application/json');
+header('X-Content-Type-Options: nosniff');
+
+// ── Helpers ────────────────────────────────────────────────
+
+function respond($data, $code = 200) {
+    http_response_code($code);
+    echo json_encode($data);
+    exit;
+}
+
+function error($msg, $code = 400) {
+    respond(['success' => false, 'error' => $msg], $code);
+}
+
+function clean($val) {
+    return htmlspecialchars(strip_tags(trim($val ?? '')), ENT_QUOTES, 'UTF-8');
+}
+
+function load_clients() {
+    $file = FR_DATA_DIR . 'clients.json';
+    $json = file_get_contents($file);
+    return json_decode($json, true) ?: [];
+}
+
+function save_clients($clients) {
+    $file = FR_DATA_DIR . 'clients.json';
+    $fp = fopen($file, 'c+');
+    flock($fp, LOCK_EX);
+    ftruncate($fp, 0);
+    rewind($fp);
+    fwrite($fp, json_encode($clients, JSON_PRETTY_PRINT));
+    flock($fp, LOCK_UN);
+    fclose($fp);
+}
+
+function send_email($to, $subject, $html, $from = null, $pdfB64 = null, $pdfName = 'SignedDocument.pdf') {
+    $fromEmail = $from ?? FR_FROM_EMAIL;
+    $fromName  = FR_FIRM_NAME;
+    $b1        = '----=_Part_' . md5(uniqid('', true));
+    $b2        = '----=_Part_' . md5(uniqid('', true));
+
+    $headers  = "From: {$fromName} <{$fromEmail}>\r\n";
+    $headers .= "Reply-To: {$fromEmail}\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+
+    if ($pdfB64 && strlen($pdfB64) > 100) {
+        $headers .= "Content-Type: multipart/mixed; boundary=\"{$b1}\"\r\n";
+
+        $body  = "This is a multi-part message in MIME format.\r\n\r\n";
+
+        // HTML part
+        $body .= "--{$b1}\r\n";
+        $body .= "Content-Type: multipart/alternative; boundary=\"{$b2}\"\r\n\r\n";
+        $body .= "--{$b2}\r\n";
+        $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $body .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+        $body .= quoted_printable_encode($html) . "\r\n\r\n";
+        $body .= "--{$b2}--\r\n\r\n";
+
+        // PDF attachment
+        $body .= "--{$b1}\r\n";
+        $body .= "Content-Type: application/pdf; name=\"{$pdfName}\"\r\n";
+        $body .= "Content-Transfer-Encoding: base64\r\n";
+        $body .= "Content-Disposition: attachment; filename=\"{$pdfName}\"\r\n\r\n";
+        $body .= chunk_split(wordwrap($pdfB64, 76, "\r\n", true)) . "\r\n";
+        $body .= "--{$b1}--\r\n";
+    } else {
+        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "Content-Transfer-Encoding: quoted-printable\r\n";
+        $body = quoted_printable_encode($html);
+    }
+
+    return mail($to, $subject, $body, $headers);
+}
+
+function save_pdf($clientId, $pdfB64) {
+    $dir = FR_DATA_DIR . 'pdfs/';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0750, true);
+        file_put_contents($dir . '.htaccess', "Deny from all\n");
+    }
+    $bytes = base64_decode($pdfB64);
+    if ($bytes && strlen($bytes) > 100) {
+        file_put_contents($dir . $clientId . '.pdf', $bytes);
+        return true;
+    }
+    return false;
+}
+
+function email_html($title, $body_html, $footer = '') {
+    $firm = FR_FIRM_NAME;
+    return "<!DOCTYPE html><html><head><meta charset='UTF-8'></head>
+<body style='font-family:Georgia,serif;background:#f5f3ee;margin:0;padding:0;'>
+<div style='max-width:580px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);'>
+<div style='background:#1a2940;padding:24px 32px;'>
+  <div style='color:#c9a84c;font-size:20px;font-weight:bold;letter-spacing:1px;'>{$firm}</div>
+  <div style='color:#8a9ab0;font-size:12px;margin-top:4px;'>Client Compliance Portal</div>
+</div>
+<div style='padding:32px;color:#1a2940;font-size:15px;line-height:1.7;'>{$body_html}</div>
+<div style='background:#1a2940;padding:14px 32px;font-size:11px;color:#4a6070;'>{$footer}</div>
+</div></body></html>";
+}
+
+// ── Session Auth Check ─────────────────────────────────────
+
+function require_auth() {
+    session_start();
+    if (empty($_SESSION['fr_auth'])) {
+        error('Unauthorised', 401);
+    }
+}
+
+// ── Route ──────────────────────────────────────────────────
+
+$action = clean($_GET['action'] ?? $_POST['action'] ?? '');
+$input  = json_decode(file_get_contents('php://input'), true) ?? [];
+
+switch ($action) {
+
+    // LOGIN
+    case 'login':
+        session_start();
+        $pwd = $input['password'] ?? '';
+        if (password_verify($pwd, FR_PASSWORD_HASH)) {
+            $_SESSION['fr_auth'] = true;
+            respond(['success' => true]);
+        } else {
+            error('Invalid password', 401);
+        }
+        break;
+
+    // LOGOUT
+    case 'logout':
+        session_start();
+        session_destroy();
+        respond(['success' => true]);
+        break;
+
+    // CHECK AUTH
+    case 'check':
+        session_start();
+        respond(['auth' => !empty($_SESSION['fr_auth'])]);
+        break;
+
+    // GET ALL CLIENTS
+    case 'clients':
+        require_auth();
+        respond(['success' => true, 'clients' => array_values(load_clients())]);
+        break;
+
+    // ADD CLIENT
+    case 'add_client':
+        require_auth();
+        $name    = clean($input['name'] ?? '');
+        $email   = filter_var($input['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $company = clean($input['company'] ?? '');
+        $type    = clean($input['type'] ?? 'Ltd Company');
+        $service = clean($input['service'] ?? 'Self Assessment Tax Return');
+        $phone   = clean($input['phone'] ?? '');
+
+        if (!$name || !$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            error('Name and valid email are required');
+        }
+
+        $clients = load_clients();
+        $id = 'c_' . bin2hex(random_bytes(6));
+        $clients[$id] = [
+            'id'                => $id,
+            'name'              => $name,
+            'email'             => $email,
+            'company'           => $company,
+            'type'              => $type,
+            'service'           => $service,
+            'phone'             => $phone,
+            'fee'               => '',
+            'notes'             => '',
+            'custom_letter'     => '',
+            'mtd_threshold'     => '',
+            'mtd_status'        => 'not_started',
+            'mtd_software'      => '',
+            'mtd_enrol_date'    => '',
+            'mtd_next_sub'      => '',
+            'mtd_notes'         => '',
+            'status'            => 'pending',
+            'sign_token'        => '',
+            'signed_at'         => '',
+            'signed_ip'         => '',
+            'sig_method'        => '',
+            'doc_hash'          => '',
+            'sent_at'           => '',
+            'deadline_at'       => '',
+            'deadline_hours'    => 48,
+            'reminders_sent'    => 0,
+            'last_reminder_at'  => '',
+            'aml_status'        => 'pending',
+            'aml_id_type'       => '',
+            'aml_id_ref'        => '',
+            'aml_verified_date' => '',
+            'aml_risk'          => 'Low',
+            'aml_notes'         => '',
+            'aml_completed_date'=> '',
+            'created_at'        => date('c'),
+            'pdf_b64'           => '',
+        ];
+        save_clients($clients);
+        respond(['success' => true, 'client' => $clients[$id]]);
+        break;
+
+    // SEND SIGNING LINK
+    case 'send_link':
+        require_auth();
+        $id           = clean($input['id'] ?? '');
+        $deadlineHours= intval($input['deadline_hours'] ?? 48);
+        if ($deadlineHours < 1) $deadlineHours = 48;
+        $clients = load_clients();
+
+        if (!isset($clients[$id])) error('Client not found');
+
+        // Keep same token if resending, generate new one if first time
+        $token = $clients[$id]['sign_token'] ?: bin2hex(random_bytes(32));
+        $clients[$id]['sign_token']     = $token;
+        $clients[$id]['status']         = 'sent';
+        $clients[$id]['sent_at']        = date('c');
+        $clients[$id]['deadline_at']    = date('c', time() + ($deadlineHours * 3600));
+        $clients[$id]['deadline_hours'] = $deadlineHours;
+        save_clients($clients);
+
+        $c    = $clients[$id];
+        $link = FR_BASE_URL . '/client.php?token=' . $token;
+        $deadline = date('l j F Y \a\t g:ia', strtotime($c['deadline_at']));
+
+        $body = "<p>Dear <strong>{$c['name']}</strong>,</p>
+<p>Thank you for choosing <strong>" . FR_FIRM_NAME . "</strong>. Please review and sign your client engagement letter by clicking the button below.</p>
+<div style='text-align:center;margin:28px 0;'>
+  <a href='{$link}' style='background:#1a3558;color:#c9a84c;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block;'>Review &amp; Sign Document →</a>
+</div>
+<div style='background:#fff8ed;border:1px solid #f6d860;border-radius:6px;padding:12px 16px;margin:0 0 16px;text-align:center;'>
+  <strong style='color:#92400e;'>⏰ Please sign by: {$deadline}</strong>
+</div>
+<p style='font-size:13px;color:#666;'>This link is unique to you. If you have any questions, contact us at " . FR_FIRM_EMAIL . " or call " . FR_FIRM_PHONE . "</p>";
+
+        $footer = FR_FIRM_NAME . " | " . FR_FIRM_ADDRESS . " | ICO: " . FR_ICO_NUMBER;
+        $html   = email_html('Action Required: Please Sign Your Document', $body, $footer);
+
+        $sent = send_email($c['email'], 'Action required: Please sign your document — ' . FR_FIRM_NAME, $html);
+        respond(['success' => true, 'sent' => $sent, 'link' => $link, 'deadline' => $c['deadline_at']]);
+        break;
+
+    // SEND REMINDER
+    case 'send_reminder':
+        require_auth();
+        $id = clean($input['id'] ?? '');
+        $clients = load_clients();
+
+        if (!isset($clients[$id])) error('Client not found');
+        $c = $clients[$id];
+        if ($c['status'] === 'signed') error('Document already signed');
+        if (!$c['sign_token']) error('No signing link found — please send the link first');
+
+        $link     = FR_BASE_URL . '/client.php?token=' . $c['sign_token'];
+        $sentDate = $c['sent_at'] ? date('j F Y', strtotime($c['sent_at'])) : 'recently';
+        $remCount = intval($c['reminders_sent'] ?? 0) + 1;
+        $deadline = $c['deadline_at'] ? date('l j F Y \a\t g:ia', strtotime($c['deadline_at'])) : '';
+
+        // Escalate tone based on reminder number
+        if ($remCount === 1) {
+            $urgency  = 'This is a gentle reminder';
+            $tone     = 'We wanted to follow up on the engagement letter we sent you on ' . $sentDate . '.';
+            $colour   = '#1a3558';
+        } elseif ($remCount === 2) {
+            $urgency  = 'Second reminder — action required';
+            $tone     = 'We notice your engagement letter is still unsigned. Could you please take a moment to sign it at your earliest convenience?';
+            $colour   = '#b45309';
+        } else {
+            $urgency  = 'Final reminder — urgent action required';
+            $tone     = 'This is our final reminder regarding your unsigned engagement letter. Please sign as soon as possible to avoid any delay to your service.';
+            $colour   = '#c0392b';
+        }
+
+        $body = "<p>Dear <strong>{$c['name']}</strong>,</p>
+<p style='margin-top:10px;'>{$tone}</p>
+<div style='text-align:center;margin:24px 0;'>
+  <a href='{$link}' style='background:{$colour};color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block;'>Sign Your Document Now →</a>
+</div>" .
+($deadline ? "<div style='background:#fff8ed;border:1px solid #f6d860;border-radius:6px;padding:12px 16px;margin:0 0 16px;text-align:center;'><strong style='color:#92400e;'>⏰ Deadline: {$deadline}</strong></div>" : "") .
+"<p style='font-size:13px;color:#666;margin-top:12px;'>If you have already signed this document, please disregard this message. For any questions, contact us at " . FR_FIRM_EMAIL . " or call " . FR_FIRM_PHONE . "</p>";
+
+        $footer = FR_FIRM_NAME . " | " . FR_FIRM_ADDRESS;
+        $html   = email_html($urgency . ': ' . $c['service'], $body, $footer);
+
+        $sent = send_email(
+            $c['email'],
+            'Reminder ' . $remCount . ': Please sign your document — ' . FR_FIRM_NAME,
+            $html
+        );
+
+        if ($sent) {
+            $clients[$id]['reminders_sent']   = $remCount;
+            $clients[$id]['last_reminder_at'] = date('c');
+            save_clients($clients);
+        }
+
+        respond(['success' => $sent, 'reminder_count' => $remCount]);
+
+    // GET CLIENT BY TOKEN (public — for signing page)
+    case 'get_by_token':
+        $token = clean($input['token'] ?? '');
+        if (!$token) error('Invalid token');
+
+        $clients = load_clients();
+        foreach ($clients as $c) {
+            if ($c['sign_token'] === $token) {
+                if ($c['status'] === 'signed') error('This document has already been signed');
+                respond(['success' => true, 'client' => [
+                    'id'            => $c['id'],
+                    'name'          => $c['name'],
+                    'company'       => $c['company'],
+                    'type'          => $c['type'],
+                    'service'       => $c['service'],
+                    'fee'           => $c['fee'] ?? '',
+                    'custom_letter' => $c['custom_letter'] ?? '',
+                ]]);
+            }
+        }
+        error('Invalid or expired link', 404);
+        break;
+
+    // SAVE SIGNATURE (public — called from client page)
+    case 'sign':
+        $token     = clean($input['token'] ?? '');
+        $sigData   = $input['sig_data'] ?? '';   // base64 canvas or typed name
+        $sigMethod = clean($input['sig_method'] ?? 'draw');
+        $hash      = clean($input['hash'] ?? '');
+        $pdfB64    = $input['pdf'] ?? '';
+        $ip        = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+        if (!$token || !$hash) error('Missing required fields');
+
+        $clients = load_clients();
+        $matched = null;
+        foreach ($clients as $id => $c) {
+            if ($c['sign_token'] === $token) { $matched = $id; break; }
+        }
+        if (!$matched) error('Invalid token', 404);
+        if ($clients[$matched]['status'] === 'signed') error('Already signed');
+
+        $clients[$matched]['status']     = 'signed';
+        $clients[$matched]['signed_at']  = date('c');
+        $clients[$matched]['signed_ip']  = $ip;
+        $clients[$matched]['sig_method'] = $sigMethod;
+        $clients[$matched]['doc_hash']   = $hash;
+        $clients[$matched]['pdf_b64']    = '';
+        save_clients($clients);
+
+        // Save PDF on server as backup
+        save_pdf($matched, $pdfB64);
+
+        $c        = $clients[$matched];
+        $signedAt = date('D d M Y \a\t H:i', strtotime($c['signed_at']));
+
+        // ── Email YOU (accountant) with PDF attached ──────────
+        $abody = "
+<p>Good news — a client has just signed their engagement letter.</p>
+<table style='width:100%;font-size:14px;border-collapse:collapse;margin-top:16px;'>
+  <tr style='border-bottom:1px solid #eee;'><td style='padding:10px 0;color:#666;width:130px;font-weight:600;'>Client</td><td style='padding:10px 0;'><strong>{$c['name']}</strong></td></tr>
+  <tr style='border-bottom:1px solid #eee;'><td style='padding:10px 0;color:#666;font-weight:600;'>Company</td><td style='padding:10px 0;'>{$c['company']}</td></tr>
+  <tr style='border-bottom:1px solid #eee;'><td style='padding:10px 0;color:#666;font-weight:600;'>Service</td><td style='padding:10px 0;'>{$c['service']}</td></tr>
+  <tr style='border-bottom:1px solid #eee;'><td style='padding:10px 0;color:#666;font-weight:600;'>Signed</td><td style='padding:10px 0;'>{$signedAt}</td></tr>
+  <tr style='border-bottom:1px solid #eee;'><td style='padding:10px 0;color:#666;font-weight:600;'>IP Address</td><td style='padding:10px 0;'>{$c['signed_ip']}</td></tr>
+  <tr><td style='padding:10px 0;color:#666;font-weight:600;'>Method</td><td style='padding:10px 0;'>" . ucfirst($sigMethod) . " signature</td></tr>
+</table>
+<p style='margin-top:16px;font-size:13px;color:#888;'>The signed audit report PDF is attached to this email.</p>
+<p style='font-size:12px;color:#aaa;margin-top:8px;'>SHA-256: <span style='font-family:monospace;'>{$c['doc_hash']}</span></p>";
+
+        send_email(
+            FR_FIRM_EMAIL,
+            "\xE2\x9C\x85 Signed: {$c['name']} — {$c['service']}",
+            email_html('Document Signed', $abody, FR_FIRM_NAME . ' | ' . FR_FIRM_ADDRESS),
+            null,
+            $pdfB64,
+            'SignedAudit_' . preg_replace('/[^a-zA-Z0-9]/', '_', $c['name']) . '.pdf'
+        );
+
+        // ── Email CLIENT — confirmation with their signed PDF ─────
+        $cbody = "
+<p>Dear <strong>{$c['name']}</strong>,</p>
+<p style='margin-top:12px;'>This is to confirm that you have successfully signed your document with <strong>The Practice</strong>.</p>
+<div style='background:#f0faf5;border:1px solid #a7f3d0;border-radius:6px;padding:16px 20px;margin:20px 0;'>
+  <p style='font-size:15px;font-weight:700;color:#065f46;margin-bottom:8px;'>✓ Your signature has been received</p>
+  <p style='font-size:13px;color:#374151;'>Document: <strong>{$c['service']}</strong><br>Signed: {$signedAt}</p>
+</div>
+<p style='font-size:14px;color:#374151;'>Your signed copy is attached to this email as a PDF. Please save it for your records.</p>
+<p style='font-size:13px;color:#666;margin-top:12px;'>You do not need to do anything else. If you have any questions, please call us on <strong>" . FR_FIRM_PHONE . "</strong> or email <strong>" . FR_FIRM_EMAIL . "</strong></p>";
+
+        send_email(
+            $c['email'],
+            'You have successfully signed your document — The Practice',
+            email_html('Signature Confirmed', $cbody, FR_FIRM_NAME . ' | ' . FR_FIRM_EMAIL),
+            null,
+            $pdfB64,
+            'SignedDocument_' . preg_replace('/[^a-zA-Z0-9]/', '_', $c['name']) . '.pdf'
+        );
+
+        respond(['success' => true]);
+        break;
+
+    // UPDATE AML CHECKLIST
+    case 'update_aml':
+        require_auth();
+        $id = clean($input['id'] ?? '');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+
+        $clients[$id]['aml_id_type']        = clean($input['aml_id_type'] ?? '');
+        $clients[$id]['aml_id_ref']         = clean($input['aml_id_ref'] ?? '');
+        $clients[$id]['aml_verified_date']  = clean($input['aml_verified_date'] ?? '');
+        $clients[$id]['aml_risk']           = clean($input['aml_risk'] ?? 'Low');
+        $clients[$id]['aml_notes']          = clean($input['aml_notes'] ?? '');
+        $clients[$id]['aml_status']         = 'complete';
+        $clients[$id]['aml_completed_date'] = date('c');
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
+    // SAVE MTD RECORD
+    case 'save_mtd':
+        require_auth();
+        $id = clean($input['id'] ?? '');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        $clients[$id]['mtd_threshold']  = clean($input['mtd_threshold'] ?? '');
+        $clients[$id]['mtd_status']     = clean($input['mtd_status'] ?? 'not_started');
+        $clients[$id]['mtd_software']   = clean($input['mtd_software'] ?? '');
+        $clients[$id]['mtd_enrol_date'] = clean($input['mtd_enrol_date'] ?? '');
+        $clients[$id]['mtd_next_sub']   = clean($input['mtd_next_sub'] ?? '');
+        $clients[$id]['mtd_notes']      = htmlspecialchars(strip_tags(trim($input['mtd_notes'] ?? '')), ENT_QUOTES, 'UTF-8');
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
+    // UPDATE LETTER & FEE
+    case 'update_letter':
+        require_auth();
+        $id     = clean($input['id'] ?? '');
+        $letter = $input['custom_letter'] ?? '';
+        $fee    = clean($input['fee'] ?? '');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        $clients[$id]['custom_letter'] = $letter;
+        $clients[$id]['fee']           = $fee;
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
+    // SAVE NOTES
+    case 'save_notes':
+        require_auth();
+        $id    = clean($input['id'] ?? '');
+        $notes = $input['notes'] ?? '';
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        $clients[$id]['notes'] = htmlspecialchars(strip_tags(trim($notes)), ENT_QUOTES, 'UTF-8');
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
+    // REMIND ALL OVERDUE
+    case 'remind_all':
+        require_auth();
+        $clients = load_clients();
+        $now = time(); $sent = 0; $failed = 0;
+        foreach ($clients as $id => $c) {
+            if ($c['status'] === 'signed' || empty($c['deadline_at']) || empty($c['sign_token'])) continue;
+            if (strtotime($c['deadline_at']) > $now) continue;
+            $link     = FR_BASE_URL . '/client.php?token=' . $c['sign_token'];
+            $remCount = intval($c['reminders_sent'] ?? 0) + 1;
+            $deadline = date('l j F Y \a\t g:ia', strtotime($c['deadline_at']));
+            $colour   = $remCount === 1 ? '#1a3558' : ($remCount === 2 ? '#b45309' : '#c0392b');
+            $urgency  = $remCount === 1 ? 'Gentle reminder' : ($remCount === 2 ? 'Second reminder — action required' : 'Final reminder — urgent');
+            $body = "<p>Dear <strong>{$c['name']}</strong>,</p><p>We are following up on your unsigned engagement letter. Please sign at your earliest convenience.</p>
+<div style='text-align:center;margin:24px 0;'><a href='{$link}' style='background:{$colour};color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block;'>Sign Your Document Now →</a></div>
+<div style='background:#fff8ed;border:1px solid #f6d860;border-radius:6px;padding:12px 16px;margin:0 0 16px;text-align:center;'><strong style='color:#92400e;'>Deadline was: {$deadline}</strong></div>
+<p style='font-size:13px;color:#666;'>Contact us at " . FR_FIRM_EMAIL . " or " . FR_FIRM_PHONE . " if you have questions.</p>";
+            $ok = send_email($c['email'], "Reminder {$remCount}: Please sign your document — " . FR_FIRM_NAME,
+                email_html($urgency . ': ' . $c['service'], $body, FR_FIRM_NAME . ' | ' . FR_FIRM_ADDRESS));
+            if ($ok) { $clients[$id]['reminders_sent'] = $remCount; $clients[$id]['last_reminder_at'] = date('c'); $sent++; }
+            else $failed++;
+        }
+        save_clients($clients);
+        respond(['success' => true, 'sent' => $sent, 'failed' => $failed]);
+        break;
+
+    // EXPORT CSV
+    case 'export_csv':
+        require_auth();
+        $clients = load_clients();
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="clients_' . date('Y-m-d') . '.csv"');
+        $out = fopen('php://output', 'w');
+        fputcsv($out, ['Name','Email','Company','Type','Service','Fee','Status','Signed At','Deadline','Reminders Sent','AML Status','AML Risk','MTD Threshold','MTD Status','MTD Software','MTD Next Submission','Notes','Created']);
+        foreach ($clients as $c) {
+            fputcsv($out, [
+                $c['name'], $c['email'], $c['company']??'', $c['type'], $c['service'], $c['fee']??'', $c['status'],
+                $c['signed_at'] ? date('d/m/Y H:i', strtotime($c['signed_at'])) : '',
+                $c['deadline_at'] ? date('d/m/Y H:i', strtotime($c['deadline_at'])) : '',
+                $c['reminders_sent']??0, $c['aml_status'], $c['aml_risk']??'',
+                $c['mtd_threshold']??'', $c['mtd_status']??'', $c['mtd_software']??'',
+                $c['mtd_next_sub'] ? date('d/m/Y', strtotime($c['mtd_next_sub'])) : '',
+                $c['notes']??'',
+                $c['created_at'] ? date('d/m/Y H:i', strtotime($c['created_at'])) : '',
+            ]);
+        }
+        fclose($out); exit;
+
+    // DOWNLOAD PDF (accountant only — requires auth via GET session)
+    case 'download_pdf':
+        session_start();
+        if (empty($_SESSION['fr_auth'])) {
+            http_response_code(401);
+            echo 'Unauthorised — please log in to your dashboard first.';
+            exit;
+        }
+        $id = clean($_GET['id'] ?? '');
+        $file = FR_DATA_DIR . 'pdfs/' . $id . '.pdf';
+        if (!$id || !file_exists($file)) {
+            http_response_code(404);
+            echo 'PDF not found.';
+            exit;
+        }
+        $clients = load_clients();
+        $name = isset($clients[$id]) ? $clients[$id]['name'] : 'Audit';
+        $name = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $name);
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="Audit_' . $name . '.pdf"');
+        header('Content-Length: ' . filesize($file));
+        readfile($file);
+        exit;
+
+    // DELETE CLIENT
+    case 'delete_client':
+        require_auth();
+        $id = clean($input['id'] ?? '');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        unset($clients[$id]);
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
+    default:
+        error('Unknown action', 404);
+}
