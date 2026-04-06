@@ -443,12 +443,25 @@ switch ($action) {
         $id = clean($input['id'] ?? '');
         $clients = load_clients();
         if (!isset($clients[$id])) error('Client not found');
-        $clients[$id]['mtd_threshold']  = clean($input['mtd_threshold'] ?? '');
-        $clients[$id]['mtd_status']     = clean($input['mtd_status'] ?? 'not_started');
-        $clients[$id]['mtd_software']   = clean($input['mtd_software'] ?? '');
-        $clients[$id]['mtd_enrol_date'] = clean($input['mtd_enrol_date'] ?? '');
-        $clients[$id]['mtd_next_sub']   = clean($input['mtd_next_sub'] ?? '');
-        $clients[$id]['mtd_notes']      = htmlspecialchars(strip_tags(trim($input['mtd_notes'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $prevSub = $clients[$id]['mtd_next_sub'] ?? '';
+        $newSub  = clean($input['mtd_next_sub'] ?? '');
+        $clients[$id]['mtd_threshold']    = clean($input['mtd_threshold'] ?? '');
+        $clients[$id]['mtd_status']       = clean($input['mtd_status'] ?? 'not_started');
+        $clients[$id]['mtd_software']     = clean($input['mtd_software'] ?? '');
+        $clients[$id]['mtd_enrol_date']   = clean($input['mtd_enrol_date'] ?? '');
+        $clients[$id]['mtd_next_sub']     = $newSub;
+        $clients[$id]['mtd_notes']        = htmlspecialchars(strip_tags(trim($input['mtd_notes'] ?? '')), ENT_QUOTES, 'UTF-8');
+        // Reminder days — validate array of integers 0,1,3,7,14,28
+        $allowed_days = [0, 1, 3, 7, 14, 28];
+        $raw_days = is_array($input['mtd_reminder_days'] ?? null) ? $input['mtd_reminder_days'] : [];
+        $clients[$id]['mtd_reminder_days'] = array_values(array_filter(
+            array_map('intval', $raw_days),
+            fn($d) => in_array($d, $allowed_days)
+        ));
+        // Reset sent log if submission date changed
+        if ($prevSub !== $newSub) {
+            $clients[$id]['mtd_reminders_sent'] = [];
+        }
         save_clients($clients);
         respond(['success' => true]);
         break;

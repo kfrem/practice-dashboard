@@ -533,6 +533,34 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
       <div class="fg"><label>Next Quarterly Submission Due</label>
         <input type="date" id="mtdNextSubmission">
       </div>
+
+      <!-- REMINDER PREFERENCES -->
+      <div class="fg" style="border:1px solid var(--border);border-radius:6px;padding:14px 16px;background:#fafaf8;">
+        <label style="display:block;margin-bottom:10px;font-weight:700;color:var(--navy-dark)">🔔 Automatic Submission Reminders</label>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Select when reminders are sent before the submission date. Reminders go to both the client and the accountant.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:12px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="mtdRem28" value="28"> 28 days before
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="mtdRem14" value="14"> 14 days before
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="mtdRem7" value="7"> 7 days before
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="mtdRem3" value="3"> 3 days before
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="mtdRem1" value="1"> 1 day before
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+            <input type="checkbox" id="mtdRem0" value="0"> On the day
+          </label>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">💡 Requires cron job to be active on the server — see setup guide.</div>
+      </div>
+
       <div class="fg"><label>MTD Notes</label>
         <textarea id="mtdNotes" placeholder="e.g. Client signed up to Xero on 1 April. First quarterly submission due July. Bank feed connected."></textarea>
       </div>
@@ -1207,6 +1235,8 @@ function renderMtd() {
   </tr>`).join('');
 }
 
+const MTD_REM_IDS = ['mtdRem28','mtdRem14','mtdRem7','mtdRem3','mtdRem1','mtdRem0'];
+
 function openMtd(id) {
   curMtdId = id;
   const c = clients.find(x=>x.id===id);
@@ -1218,28 +1248,40 @@ function openMtd(id) {
   document.getElementById('mtdNextSubmission').value = c.mtd_next_sub||'';
   document.getElementById('mtdNotes').value      = c.mtd_notes||'';
   document.getElementById('mtdAlert').innerHTML  = '';
+  // Load reminder day checkboxes
+  const savedDays = Array.isArray(c.mtd_reminder_days) ? c.mtd_reminder_days.map(String) : [];
+  MTD_REM_IDS.forEach(rid => {
+    const el = document.getElementById(rid);
+    el.checked = savedDays.includes(el.value);
+  });
   openM('mtdModal');
 }
 
 async function saveMtd() {
+  const reminderDays = MTD_REM_IDS
+    .map(rid => document.getElementById(rid))
+    .filter(el => el.checked)
+    .map(el => parseInt(el.value));
   const d = await api('save_mtd', {
-    id:             curMtdId,
-    mtd_threshold:  document.getElementById('mtdThreshold').value,
-    mtd_status:     document.getElementById('mtdStatus').value,
-    mtd_software:   document.getElementById('mtdSoftware').value,
-    mtd_enrol_date: document.getElementById('mtdEnrolDate').value,
-    mtd_next_sub:   document.getElementById('mtdNextSubmission').value,
-    mtd_notes:      document.getElementById('mtdNotes').value.trim()
+    id:                  curMtdId,
+    mtd_threshold:       document.getElementById('mtdThreshold').value,
+    mtd_status:          document.getElementById('mtdStatus').value,
+    mtd_software:        document.getElementById('mtdSoftware').value,
+    mtd_enrol_date:      document.getElementById('mtdEnrolDate').value,
+    mtd_next_sub:        document.getElementById('mtdNextSubmission').value,
+    mtd_notes:           document.getElementById('mtdNotes').value.trim(),
+    mtd_reminder_days:   reminderDays
   });
   if (d.success) {
     const idx = clients.findIndex(c=>c.id===curMtdId);
     Object.assign(clients[idx], {
-      mtd_threshold:  document.getElementById('mtdThreshold').value,
-      mtd_status:     document.getElementById('mtdStatus').value,
-      mtd_software:   document.getElementById('mtdSoftware').value,
-      mtd_enrol_date: document.getElementById('mtdEnrolDate').value,
-      mtd_next_sub:   document.getElementById('mtdNextSubmission').value,
-      mtd_notes:      document.getElementById('mtdNotes').value
+      mtd_threshold:      document.getElementById('mtdThreshold').value,
+      mtd_status:         document.getElementById('mtdStatus').value,
+      mtd_software:       document.getElementById('mtdSoftware').value,
+      mtd_enrol_date:     document.getElementById('mtdEnrolDate').value,
+      mtd_next_sub:       document.getElementById('mtdNextSubmission').value,
+      mtd_notes:          document.getElementById('mtdNotes').value,
+      mtd_reminder_days:  reminderDays
     });
     renderAll();
     closeM('mtdModal');
