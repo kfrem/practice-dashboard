@@ -24,6 +24,20 @@ define('FR_FROM_EMAIL',     'info@kafs-ltd.com');
 define('FR_DATA_DIR',       __DIR__ . '/fr_data/');
 
 // ============================================================
+// STRIPE CONFIGURATION — Phase 3 Billing
+// Replace placeholder values with your Stripe keys
+// Get them from: https://dashboard.stripe.com/apikeys
+// ============================================================
+
+// Test keys (use these while building, then swap for live)
+define('FR_STRIPE_SECRET_KEY',     'sk_test_YOUR_SECRET_KEY_HERE');
+define('FR_STRIPE_PUBLIC_KEY',     'pk_test_YOUR_PUBLIC_KEY_HERE');
+// Create a recurring £12/month price in Stripe Dashboard, paste the ID here
+define('FR_STRIPE_PRICE_ID',       'price_YOUR_PRICE_ID_HERE');
+// Get this from Stripe Dashboard → Webhooks → your endpoint → Signing secret
+define('FR_STRIPE_WEBHOOK_SECRET', 'whsec_YOUR_WEBHOOK_SECRET_HERE');
+
+// ============================================================
 // AUTO SETUP — do not edit below
 // ============================================================
 if (!is_dir(FR_DATA_DIR)) {

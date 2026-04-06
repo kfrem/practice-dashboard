@@ -1,0 +1,33 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Upload to Hostinger via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server:   ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /public_html/practice.finaccord.pro/
+          local-dir: ./
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            CLAUDE.md
+            fr_data/**
+            tg_php_final.php
+            wa_php_final.php
+            *.md
