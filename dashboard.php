@@ -1,4 +1,20 @@
-<?php require_once __DIR__ . '/config.php'; ?>
+<?php
+require_once __DIR__ . '/config.php';
+
+// ── Subscription guard (only for provisioned firm instances) ──
+$_sub_file = FR_DATA_DIR . 'subscription.json';
+if (file_exists($_sub_file)) {
+    $_sub = json_decode(file_get_contents($_sub_file), true) ?: [];
+    if (($_sub['status'] ?? '') === 'cancelled') {
+        $_grace = $_sub['grace_period_end'] ?? '';
+        if ($_grace && strtotime($_grace) < time()) {
+            header('Location: ' . FR_BASE_URL . '/suspended.php');
+            exit;
+        }
+    }
+}
+unset($_sub_file, $_sub, $_grace);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -226,7 +242,7 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
 <div id="app">
 
   <nav>
-    <div class="logo">The <span>Practice</span></div>
+    <div class="logo"><?= htmlspecialchars(FR_FIRM_NAME) ?></div>
     <div class="nav-links">
       <a href="index.html">Home</a>
       <a href="pricing.html">Pricing</a>
@@ -237,8 +253,10 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
       <a href="pricing.html#partnership" class="partner">★ Partner Programme</a>
       <a href="dashboard.php" class="active">Client Dashboard</a>
       <a href="letters.php">✉ Correspondence</a>
+      <a href="setup.php">⚙ Settings</a>
     </div>
     <div class="nav-right">
+      <span id="clientCountBadge" style="font-size:12px;color:#64748b;display:none"></span>
       <button class="logout-btn" onclick="doLogout()">Log out</button>
       <button class="btn btn-outline" style="font-size:13px;padding:8px 16px" onclick="openM('onboardModal')">📋 Send Onboarding Link</button>
       <button class="nav-cta" onclick="openAddClient()">+ Add Client</button>
@@ -862,6 +880,25 @@ function renderMonthlyStats() {
 
 function renderAll() {
   const overdue = clients.filter(c => isOverdue(c));
+  // Show client count badge (only meaningful for provisioned firm instances with a limit)
+  const badge = document.getElementById('clientCountBadge');
+  if (badge) {
+    const active = clients.filter(c => c.status !== 'onboarding').length;
+    const limit  = <?php
+      $sub_file = FR_DATA_DIR . 'subscription.json';
+      if (file_exists($sub_file)) {
+          $sub_data = json_decode(file_get_contents($sub_file), true) ?: [];
+          echo (int)($sub_data['client_limit'] ?? 50);
+      } else {
+          echo 0;
+      }
+    ?>;
+    if (limit > 0) {
+      badge.textContent = active + '/' + limit + ' clients';
+      badge.style.display = 'inline';
+      badge.style.color = active >= limit ? '#c0392b' : (active >= limit * 0.8 ? '#b45309' : '#64748b');
+    }
+  }
   document.getElementById('stTotal').textContent  = clients.length;
   document.getElementById('stSent').textContent   = clients.filter(c=>c.status==='sent').length;
   document.getElementById('stSigned').textContent = clients.filter(c=>c.status==='signed').length;

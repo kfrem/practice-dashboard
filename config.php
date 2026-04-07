@@ -14,6 +14,10 @@ define('FR_ICO_NUMBER',     'ZC112776');
 // Dashboard password — pre-set, ready to use
 define('FR_PASSWORD_HASH',  '$2y$10$fjuF9qoPdg1N2BAbkSnL1OnRW.tsXLFGpCZ1Y6vXsIMWsTfkFCBaG');
 
+// Admin dashboard password (for /admin/ — owner only)
+// Change this! Generate a hash with: php -r "echo password_hash('yourpassword', PASSWORD_BCRYPT);"
+define('FR_ADMIN_PASSWORD', '$2y$10$fjuF9qoPdg1N2BAbkSnL1OnRW.tsXLFGpCZ1Y6vXsIMWsTfkFCBaG'); // same as dashboard default: Lo2355
+
 // Base URL — no trailing slash
 define('FR_BASE_URL',       'https://practice.finaccord.pro');
 

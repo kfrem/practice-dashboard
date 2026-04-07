@@ -174,6 +174,19 @@ switch ($action) {
         }
 
         $clients = load_clients();
+
+        // Enforce per-firm client limit (only for provisioned instances that have subscription.json)
+        $sub_file = FR_DATA_DIR . 'subscription.json';
+        if (file_exists($sub_file)) {
+            $sub_data    = json_decode(file_get_contents($sub_file), true) ?: [];
+            $client_limit = (int)($sub_data['client_limit'] ?? 50);
+            // Don't count onboarding prospects toward the limit
+            $active_count = count(array_filter($clients, fn($c) => ($c['status'] ?? '') !== 'onboarding'));
+            if ($active_count >= $client_limit) {
+                error("Client limit reached ({$client_limit}). Please contact support to increase your limit.");
+            }
+        }
+
         $id = 'c_' . bin2hex(random_bytes(6));
         $clients[$id] = [
             'id'                => $id,

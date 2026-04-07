@@ -14,6 +14,7 @@
 // ============================================================
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/provision.php';
 
 // ── Verify this request is genuinely from Stripe ────────────
 
@@ -93,14 +94,17 @@ function handle_checkout_completed(array $session): void {
         if ($s['stripe_subscription_id'] === $subId) return;
     }
 
+    // Save initial subscriber record (slug + url filled in by provision_firm)
     $id = 'sub_fr_' . bin2hex(random_bytes(6));
-    $subs[$id] = [
+    $subs[] = [
         'id'                      => $id,
         'stripe_customer_id'      => $customerId,
         'stripe_subscription_id'  => $subId,
         'email'                   => $email,
         'firm_name'               => $firmName,
         'contact_name'            => $contactName,
+        'firm_slug'               => '',
+        'firm_url'                => '',
         'status'                  => 'trialing',
         'trial_end'               => '',
         'current_period_end'      => '',
@@ -111,21 +115,28 @@ function handle_checkout_completed(array $session): void {
     ];
     save_subscribers($subs);
 
-    // Welcome email
-    send_email(
-        $email,
-        'Welcome to FirmReady — Your 14-Day Free Trial Has Started',
-        welcome_email_html($contactName ?: $firmName, $firmName)
-    );
+    // Provision the firm instance (creates /firms/{slug}/, sends welcome email with password)
+    try {
+        provision_firm($firmName, $email, $contactName, $customerId, $subId);
+    } catch (\Throwable $e) {
+        log_webhook("PROVISION ERROR: " . $e->getMessage());
+        // Notify owner of failure
+        send_email(
+            FR_FIRM_EMAIL,
+            "FirmReady — PROVISIONING FAILED for {$firmName}",
+            "<p><strong>Provisioning failed</strong> for {$firmName} ({$email}).</p><p>Error: " . htmlspecialchars($e->getMessage()) . "</p><p>Please provision manually.</p>"
+        );
+        return;
+    }
 
-    // Notify accountant (yourself)
+    // Notify owner of new signup
     send_email(
         FR_FIRM_EMAIL,
         "New FirmReady Subscriber — {$firmName}",
-        "<p>New subscriber: <strong>{$firmName}</strong> ({$email})</p><p>Contact: {$contactName}</p><p>Stripe customer: {$customerId}</p>"
+        "<p>New subscriber provisioned: <strong>{$firmName}</strong> ({$email})</p><p>Contact: {$contactName}</p><p>Stripe customer: {$customerId}</p><p>Check the <a href='" . FR_BASE_URL . "/admin/'>admin dashboard</a> for details.</p>"
     );
 
-    log_webhook("checkout.completed: {$email} ({$firmName})");
+    log_webhook("checkout.completed + provisioned: {$email} ({$firmName})");
 }
 
 function handle_payment_succeeded(array $invoice): void {
@@ -143,6 +154,11 @@ function handle_payment_succeeded(array $invoice): void {
             $sub['current_period_end'] = $periodEnd ? date('c', $periodEnd) : '';
             $sub['last_payment_at']  = date('c');
             save_subscribers($subs);
+            // Update per-firm subscription.json
+            update_firm_subscription($subId, [
+                'status'             => 'active',
+                'current_period_end' => $periodEnd ? date('c', $periodEnd) : '',
+            ]);
 
             // Don't email for £0 trial invoices
             if (($invoice['amount_paid'] ?? 0) > 0) {
@@ -202,6 +218,12 @@ function handle_subscription_updated(array $subscription): void {
             $sub['trial_end']          = $trialEnd  ? date('c', $trialEnd)  : '';
             $sub['current_period_end'] = $periodEnd ? date('c', $periodEnd) : '';
             save_subscribers($subs);
+            // Mirror into per-firm subscription.json
+            update_firm_subscription($subId, [
+                'status'             => $status,
+                'trial_end'          => $trialEnd  ? date('c', $trialEnd)  : '',
+                'current_period_end' => $periodEnd ? date('c', $periodEnd) : '',
+            ]);
             log_webhook("subscription_updated: {$sub['email']} → {$status}");
             return;
         }
@@ -218,6 +240,8 @@ function handle_subscription_deleted(array $subscription): void {
             $sub['status']       = 'cancelled';
             $sub['cancelled_at'] = date('c');
             save_subscribers($subs);
+            // Set 7-day grace period on per-firm subscription.json
+            suspend_firm_after_grace($subId);
 
             send_email(
                 $sub['email'],
@@ -227,9 +251,9 @@ function handle_subscription_deleted(array $subscription): void {
             send_email(
                 FR_FIRM_EMAIL,
                 "FirmReady — Subscription Cancelled: {$sub['firm_name']}",
-                "<p><strong>{$sub['firm_name']}</strong> ({$sub['email']}) has cancelled their subscription.</p>"
+                "<p><strong>{$sub['firm_name']}</strong> ({$sub['email']}) has cancelled. 7-day grace period applied.</p>"
             );
-            log_webhook("subscription_deleted: {$sub['email']}");
+            log_webhook("subscription_deleted: {$sub['email']} — grace period set");
             return;
         }
     }
