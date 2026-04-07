@@ -38,6 +38,12 @@ define('FR_STRIPE_PRICE_ID',       'price_YOUR_PRICE_ID_HERE');
 define('FR_STRIPE_WEBHOOK_SECRET', 'whsec_YOUR_WEBHOOK_SECRET_HERE');
 
 // ============================================================
+// COMPANIES HOUSE API — Free lookup for UK company details
+// Register free at: https://developer.company-information.service.gov.uk
+// ============================================================
+define('FR_CH_API_KEY', 'YOUR_COMPANIES_HOUSE_API_KEY_HERE');
+
+// ============================================================
 // AUTO SETUP — do not edit below
 // ============================================================
 if (!is_dir(FR_DATA_DIR)) {

@@ -240,6 +240,7 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
     </div>
     <div class="nav-right">
       <button class="logout-btn" onclick="doLogout()">Log out</button>
+      <button class="btn btn-outline" style="font-size:13px;padding:8px 16px" onclick="openM('onboardModal')">📋 Send Onboarding Link</button>
       <button class="nav-cta" onclick="openAddClient()">+ Add Client</button>
     </div>
   </nav>
@@ -399,8 +400,22 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
         <div class="fg"><label>Full Name *</label><input type="text" id="addName" placeholder="Jane Smith"></div>
         <div class="fg"><label>Email Address *</label><input type="email" id="addEmail" placeholder="jane@example.co.uk"></div>
       </div>
+      <div class="fg">
+        <label>Company / Trading Name
+          <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--muted)"> — type name then click Lookup to auto-fill from Companies House</span>
+        </label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="addCompany" placeholder="Smith Ltd" style="flex:1">
+          <button type="button" class="btn btn-outline" onclick="chLookup()" style="white-space:nowrap;padding:8px 14px;font-size:13px">🔍 CH Lookup</button>
+        </div>
+        <div id="chResults" style="display:none;border:1px solid var(--border);border-radius:4px;margin-top:4px;max-height:200px;overflow-y:auto;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.1)"></div>
+      </div>
       <div class="fg-row">
-        <div class="fg"><label>Company / Trading Name</label><input type="text" id="addCompany" placeholder="Smith Ltd"></div>
+        <div class="fg"><label>Registered Address</label><input type="text" id="addAddress" placeholder="Auto-filled from Companies House"></div>
+        <div class="fg"><label>Company Number</label><input type="text" id="addCompanyNumber" placeholder="e.g. 12345678"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg" style="display:none"><label>_</label></div>
         <div class="fg"><label>Entity Type</label>
           <select id="addType">
             <option>Ltd Company</option><option>Sole Trader</option><option>Partnership</option>
@@ -608,6 +623,32 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
     <div class="m-foot">
       <button class="btn btn-outline" onclick="closeM('mtdModal')">Cancel</button>
       <button class="btn btn-navy" onclick="saveMtd()">Save MTD Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARDING MODAL -->
+<div class="overlay" id="onboardModal">
+  <div class="modal">
+    <div class="m-head"><div class="m-title">📋 Send Client Onboarding Link</div><button class="m-close" onclick="closeM('onboardModal')">×</button></div>
+    <div class="m-body">
+      <div id="onboardAlert"></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Send a link to a new or prospective client so they fill in their own details. Their information arrives directly in your dashboard ready to activate.</p>
+      <div class="fg-row">
+        <div class="fg"><label>Client Full Name *</label><input type="text" id="obName" placeholder="Jane Smith"></div>
+        <div class="fg"><label>Client Email Address *</label><input type="email" id="obEmail" placeholder="jane@smithltd.co.uk"></div>
+      </div>
+      <div id="onboardLink" style="display:none;margin-top:12px">
+        <div class="alert" style="background:#d1fae5;border:1px solid #a7f3d0;border-radius:4px;padding:14px;font-size:13px">
+          ✅ Onboarding link sent to <span id="obSentEmail"></span><br>
+          <span style="font-size:11px;color:var(--muted)">You can also copy the link below:</span><br>
+          <input type="text" id="obLinkCopy" readonly style="margin-top:6px;width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;font-size:12px;background:#f8f7f4">
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-outline" onclick="closeM('onboardModal')">Close</button>
+      <button class="btn btn-navy" id="obSendBtn" onclick="sendOnboard()">Send Onboarding Link</button>
     </div>
   </div>
 </div>
@@ -958,6 +999,18 @@ function actions(c) {
   }
   a+=`<button class="btn btn-outline" onclick="openAml('${c.id}')" style="margin-right:4px">AML</button>`;
   a+=`<button class="btn btn-outline" onclick="openDeadlines('${c.id}')" style="margin-right:4px" title="Deadline tracker">📅</button>`;
+  // DPA button
+  if (c.dpa_status === 'signed') {
+    a+=`<span class="badge" style="background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;margin-right:4px;font-size:10px">✓ DPA</span>`;
+  } else if (c.dpa_status === 'sent') {
+    a+=`<span class="badge" style="background:#fef9c3;color:#92400e;border:1px solid #fde68a;margin-right:4px;font-size:10px">DPA Sent</span>`;
+  } else {
+    a+=`<button class="btn btn-outline" onclick="sendDpa('${c.id}')" style="margin-right:4px;font-size:11px" title="Send GDPR Data Processing Agreement">DPA</button>`;
+  }
+  // Activate onboarding
+  if (c.status === 'onboarded') {
+    a+=`<button class="btn btn-gold" onclick="activateOnboard('${c.id}')" style="margin-right:4px;font-size:11px">✓ Activate</button>`;
+  }
   a+=`<button class="btn btn-red" onclick="delClient('${c.id}')">✕</button>`;
   return a;
 }
@@ -994,7 +1047,8 @@ function renderServices(svc) {
 }
 
 function openAddClient() {
-  ['addName','addEmail','addCompany','addPhone'].forEach(id=>document.getElementById(id).value='');
+  ['addName','addEmail','addCompany','addCompanyNumber','addAddress','addPhone'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const chRes = document.getElementById('chResults'); if(chRes) chRes.style.display='none';
   document.querySelectorAll('#addModal input[name="svc"]').forEach(cb=>cb.checked=false);
   customSvcs = [];
   renderSvcTags();
@@ -1009,10 +1063,12 @@ async function addClient() {
   const svcs = getSelectedServices();
   if (!svcs.length) { document.getElementById('addAlert').innerHTML='<div class="alert a-err">Please select at least one service.</div>'; return; }
   const d = await api('add_client',{name,email,
-    company:document.getElementById('addCompany').value.trim(),
-    type:document.getElementById('addType').value,
-    service:svcs.join('\n'),
-    phone:document.getElementById('addPhone').value.trim()
+    company:       document.getElementById('addCompany').value.trim(),
+    company_number:document.getElementById('addCompanyNumber').value.trim(),
+    address:       document.getElementById('addAddress').value.trim(),
+    type:          document.getElementById('addType').value,
+    service:       svcs.join('\n'),
+    phone:         document.getElementById('addPhone').value.trim()
   });
   if (d.success) { clients.unshift(d.client); renderAll(); closeM('addModal'); toast('Client added'); }
   else document.getElementById('addAlert').innerHTML=`<div class="alert a-err">${d.error}</div>`;
@@ -1673,6 +1729,86 @@ async function markDl(clientId, key, status) {
     const oc = allDl.filter(x => x.status !== 'filed' && x.status !== 'paid' && x.dueDate < today).length;
     const dlTab = document.getElementById('tabDeadlines');
     if (dlTab) dlTab.textContent = oc > 0 ? `📅 Deadlines (${oc})` : '📅 Deadlines';
+  }
+}
+
+// ── Companies House Lookup ───────────────────────
+async function chLookup() {
+  const q = document.getElementById('addCompany').value.trim();
+  if (q.length < 2) { alert('Enter at least 2 characters to search.'); return; }
+  const res  = document.getElementById('chResults');
+  res.style.display = 'block';
+  res.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px">Searching Companies House…</div>';
+  const d = await api('ch_lookup', { query: q });
+  if (!d.ok || !d.results.length) {
+    res.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--muted)">' + (d.error || 'No active companies found.') + '</div>';
+    return;
+  }
+  res.innerHTML = d.results.map(r => `
+    <div onclick="chSelect(${JSON.stringify(r).replace(/"/g,'&quot;')})"
+         style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0ede6;font-size:13px"
+         onmouseover="this.style.background='#f8f7f4'" onmouseout="this.style.background=''">
+      <strong>${e(r.title)}</strong>
+      <span style="font-size:11px;color:var(--muted);margin-left:8px">${e(r.company_number)}</span>
+      <div style="font-size:11px;color:var(--muted)">${e([r.address_line_1,r.locality,r.postal_code].filter(Boolean).join(', '))}</div>
+    </div>
+  `).join('');
+}
+
+function chSelect(r) {
+  document.getElementById('addCompany').value       = r.title;
+  document.getElementById('addCompanyNumber').value = r.company_number;
+  const addr = [r.address_line_1, r.address_line_2, r.locality, r.region, r.postal_code].filter(Boolean).join(', ');
+  document.getElementById('addAddress').value = addr;
+  // Map CH company type to our entity types
+  const typeMap = { 'ltd': 'Ltd Company', 'llp': 'LLP', 'private-unlimited': 'Ltd Company', 'plc': 'Ltd Company' };
+  const mapped  = typeMap[(r.type||'').toLowerCase()] || '';
+  if (mapped) document.getElementById('addType').value = mapped;
+  document.getElementById('chResults').style.display = 'none';
+}
+
+// ── Onboarding ────────────────────────────────────
+async function sendOnboard() {
+  const name  = document.getElementById('obName').value.trim();
+  const email = document.getElementById('obEmail').value.trim();
+  if (!name || !email) { document.getElementById('onboardAlert').innerHTML = '<div class="alert a-err">Name and email are required.</div>'; return; }
+  document.getElementById('obSendBtn').disabled = true;
+  document.getElementById('obSendBtn').textContent = 'Sending…';
+  const d = await api('create_onboard', { name, email });
+  document.getElementById('obSendBtn').disabled = false;
+  document.getElementById('obSendBtn').textContent = 'Send Onboarding Link';
+  if (d.success) {
+    document.getElementById('onboardAlert').innerHTML = '';
+    document.getElementById('obSentEmail').textContent = email;
+    document.getElementById('obLinkCopy').value = d.link;
+    document.getElementById('onboardLink').style.display = 'block';
+    document.getElementById('obName').value  = '';
+    document.getElementById('obEmail').value = '';
+    loadClients();
+  } else {
+    document.getElementById('onboardAlert').innerHTML = `<div class="alert a-err">${d.error}</div>`;
+  }
+}
+
+async function activateOnboard(id) {
+  if (!confirm('Activate this client? They will move from Onboarded to Pending and be ready for an engagement letter.')) return;
+  const d = await api('activate_onboard', { id });
+  if (d.success) { await loadClients(); toast('Client activated'); }
+  else alert(d.error);
+}
+
+// ── DPA ───────────────────────────────────────────
+async function sendDpa(id) {
+  const c = clients.find(x=>x.id===id);
+  if (!confirm(`Send a GDPR Data Processing Agreement to ${c.name} (${c.email}) for e-signature?`)) return;
+  const d = await api('send_dpa', { id });
+  if (d.success) {
+    const idx = clients.findIndex(x=>x.id===id);
+    clients[idx].dpa_status  = 'sent';
+    renderAll();
+    toast('DPA sent to ' + c.email);
+  } else {
+    alert('Error: ' + d.error);
   }
 }
 

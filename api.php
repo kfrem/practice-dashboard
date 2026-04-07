@@ -160,12 +160,14 @@ switch ($action) {
     // ADD CLIENT
     case 'add_client':
         require_auth();
-        $name    = clean($input['name'] ?? '');
-        $email   = filter_var($input['email'] ?? '', FILTER_SANITIZE_EMAIL);
-        $company = clean($input['company'] ?? '');
-        $type    = clean($input['type'] ?? 'Ltd Company');
-        $service = clean($input['service'] ?? 'Self Assessment Tax Return');
-        $phone   = clean($input['phone'] ?? '');
+        $name           = clean($input['name'] ?? '');
+        $email          = filter_var($input['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $company        = clean($input['company'] ?? '');
+        $type           = clean($input['type'] ?? 'Ltd Company');
+        $service        = clean($input['service'] ?? 'Self Assessment Tax Return');
+        $phone          = clean($input['phone'] ?? '');
+        $company_number = clean($input['company_number'] ?? '');
+        $address        = clean($input['address'] ?? '');
 
         if (!$name || !$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             error('Name and valid email are required');
@@ -178,6 +180,8 @@ switch ($action) {
             'name'              => $name,
             'email'             => $email,
             'company'           => $company,
+            'company_number'    => $company_number,
+            'address'           => $address,
             'type'              => $type,
             'service'           => $service,
             'phone'             => $phone,
@@ -616,6 +620,280 @@ switch ($action) {
         respond(['success' => true]);
         break;
 
+    // ── COMPANIES HOUSE LOOKUP ──────────────────────────────────────
+
+    case 'ch_lookup':
+        require_auth();
+        $query = trim($input['query'] ?? '');
+        if (strlen($query) < 2) error('Query too short');
+        $apiKey = FR_CH_API_KEY;
+        if (strpos($apiKey, 'YOUR_') === 0) error('Companies House API key not configured. Add FR_CH_API_KEY to config.php');
+        $url = 'https://api.company-information.service.gov.uk/search/companies?q=' . urlencode($query) . '&items_per_page=8';
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERPWD        => $apiKey . ':',
+            CURLOPT_TIMEOUT        => 8,
+            CURLOPT_USERAGENT      => 'FirmReady/1.0',
+        ]);
+        $raw  = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($code !== 200 || !$raw) error('Companies House API error — check your API key');
+        $data = json_decode($raw, true);
+        $results = [];
+        foreach (($data['items'] ?? []) as $item) {
+            if (($item['company_status'] ?? '') === 'dissolved') continue;
+            $addr = $item['registered_office_address'] ?? [];
+            $results[] = [
+                'title'          => $item['title'] ?? '',
+                'company_number' => $item['company_number'] ?? '',
+                'type'           => $item['company_type'] ?? '',
+                'status'         => $item['company_status'] ?? '',
+                'address_line_1' => $addr['address_line_1'] ?? '',
+                'address_line_2' => $addr['address_line_2'] ?? '',
+                'locality'       => $addr['locality'] ?? '',
+                'region'         => $addr['region'] ?? '',
+                'postal_code'    => $addr['postal_code'] ?? '',
+                'date_of_creation' => $item['date_of_creation'] ?? '',
+            ];
+        }
+        respond(['ok' => true, 'results' => $results]);
+        break;
+
+    // ── DIGITAL CLIENT ONBOARDING ────────────────────────────────────
+
+    case 'create_onboard':
+        require_auth();
+        $name  = htmlspecialchars(strip_tags(trim($input['name']  ?? '')), ENT_QUOTES, 'UTF-8');
+        $email = filter_var(trim($input['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+        if (!$name || !$email) error('Name and email are required');
+        $clients = load_clients();
+        // Check for duplicate email already onboarding/active
+        foreach ($clients as $c) {
+            if (strtolower($c['email']) === strtolower($email) && ($c['status'] ?? '') !== 'archived') {
+                error('A client with this email already exists');
+            }
+        }
+        $token = bin2hex(random_bytes(32));
+        $id    = 'c_' . bin2hex(random_bytes(6));
+        $clients[$id] = [
+            'id'           => $id,
+            'name'         => $name,
+            'email'        => $email,
+            'company'      => '',
+            'type'         => '',
+            'service'      => '',
+            'phone'        => '',
+            'fee'          => '',
+            'notes'        => '',
+            'status'       => 'onboarding',
+            'onboard_token'=> $token,
+            'created_at'   => date('c'),
+            'aml_status'   => 'pending',
+        ];
+        save_clients($clients);
+        // Send onboarding email
+        $link    = FR_BASE_URL . '/onboard.php?token=' . $token;
+        $firm    = FR_FIRM_NAME;
+        $subject = "Welcome — Please Complete Your Details | {$firm}";
+        $html    = "<!DOCTYPE html><html><body style=\"font-family:'Segoe UI',Arial,sans-serif;color:#1a2433;background:#f8f7f4\">
+<table width='600' align='center' style='background:#fff;border:1px solid #ddd8cf;margin:32px auto;border-radius:4px;overflow:hidden'>
+  <tr><td style='background:#1a3558;padding:24px 32px'>
+    <span style='font-size:20px;font-weight:800;color:#fff'>{$firm}</span>
+  </td></tr>
+  <tr><td style='padding:32px'>
+    <p>Dear {$name},</p>
+    <p>Thank you for choosing {$firm}. To get started, please take a moment to complete your details using the link below.</p>
+    <p style='margin:24px 0'><a href='{$link}' style='background:#1a3558;color:#fff;padding:12px 28px;border-radius:4px;text-decoration:none;font-weight:700'>Complete My Details</a></p>
+    <p>If the button doesn't work, copy and paste this link:<br><a href='{$link}'>{$link}</a></p>
+    <p>This takes less than 2 minutes.</p>
+    <p>Kind regards,<br><strong>{$firm}</strong><br>" . FR_FIRM_EMAIL . " | " . FR_FIRM_PHONE . "</p>
+  </td></tr>
+</table></body></html>";
+        $boundary = md5(uniqid());
+        $headers  = implode("\r\n", [
+            "From: {$firm} <" . FR_FROM_EMAIL . ">",
+            'MIME-Version: 1.0',
+            "Content-Type: multipart/alternative; boundary=\"{$boundary}\"",
+        ]);
+        $body = "--{$boundary}\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nDear {$name},\n\nPlease complete your details: {$link}\n\nKind regards,\n{$firm}\r\n"
+              . "--{$boundary}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{$html}\r\n--{$boundary}--";
+        mail($email, $subject, $body, $headers);
+        respond(['success' => true, 'link' => $link]);
+        break;
+
+    case 'get_onboard_by_token':
+        $token   = clean($input['token'] ?? '');
+        $clients = load_clients();
+        $found   = null;
+        foreach ($clients as $c) {
+            if (($c['onboard_token'] ?? '') === $token && ($c['status'] ?? '') === 'onboarding') {
+                $found = $c; break;
+            }
+        }
+        if (!$found) error('Onboarding link not found or already completed');
+        respond(['ok' => true, 'client' => ['name' => $found['name'], 'email' => $found['email']]]);
+        break;
+
+    case 'submit_onboard':
+        $token   = clean($input['token'] ?? '');
+        $clients = load_clients();
+        $id      = null;
+        foreach ($clients as $cid => $c) {
+            if (($c['onboard_token'] ?? '') === $token && ($c['status'] ?? '') === 'onboarding') {
+                $id = $cid; break;
+            }
+        }
+        if (!$id) error('Onboarding link not found or already used');
+        $clients[$id]['company']      = htmlspecialchars(strip_tags(trim($input['company'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $clients[$id]['type']         = clean($input['type'] ?? '');
+        $clients[$id]['phone']        = clean($input['phone'] ?? '');
+        $clients[$id]['service']      = htmlspecialchars(strip_tags(trim($input['service'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $clients[$id]['onboard_notes']= htmlspecialchars(strip_tags(trim($input['notes'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $clients[$id]['onboard_submitted_at'] = date('c');
+        $clients[$id]['status']       = 'onboarded'; // waiting for accountant to activate
+        save_clients($clients);
+        // Notify accountant
+        $name = $clients[$id]['name'];
+        mail(FR_FIRM_EMAIL, "New Client Onboarding Completed — {$name}", "Client {$name} ({$clients[$id]['email']}) has submitted their onboarding details.\n\nLog in to review and activate: " . FR_BASE_URL . "/dashboard.php", "From: " . FR_FROM_EMAIL);
+        respond(['success' => true]);
+        break;
+
+    case 'activate_onboard':
+        require_auth();
+        $id      = clean($input['id'] ?? '');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        if (!in_array($clients[$id]['status'], ['onboarding','onboarded'])) error('Client is not in onboarding status');
+        $clients[$id]['status']      = 'pending';
+        $clients[$id]['sign_token']  = bin2hex(random_bytes(32));
+        $clients[$id]['activated_at']= date('c');
+        unset($clients[$id]['onboard_token']);
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
+    // ── GDPR DATA PROCESSING AGREEMENT ──────────────────────────────
+
+    case 'send_dpa':
+        require_auth();
+        $id      = clean($input['id'] ?? '');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        $c       = $clients[$id];
+        $firm    = FR_FIRM_NAME;
+        $firmAddr= FR_FIRM_ADDRESS;
+        $firmEmail= FR_FIRM_EMAIL;
+        $ico     = FR_ICO_NUMBER;
+        $today   = date('j F Y');
+        $clientName = $c['name'];
+        $clientCo   = $c['company'] ?: $c['name'];
+        // Generate DPA text
+        $dpaBody = "DATA PROCESSING AGREEMENT\n"
+            . "════════════════════════════════════════════════════════════\n\n"
+            . "This Data Processing Agreement (\"Agreement\") is entered into on {$today} between:\n\n"
+            . "DATA CONTROLLER:\n"
+            . "{$clientCo}\n"
+            . "Represented by: {$clientName}\n"
+            . "(\"the Controller\")\n\n"
+            . "DATA PROCESSOR:\n"
+            . "{$firm}\n"
+            . "{$firmAddr}\n"
+            . "Email: {$firmEmail}\n"
+            . "ICO Registration: {$ico}\n"
+            . "(\"the Processor\")\n\n"
+            . "════════════════════════════════════════════════════════════\n\n"
+            . "1. PURPOSE AND SCOPE\n\n"
+            . "1.1 The Processor provides accountancy and related professional services to the Controller. In doing so, the Processor processes personal data on behalf of the Controller as described in Schedule 1 of this Agreement.\n\n"
+            . "1.2 This Agreement governs the processing of personal data in accordance with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018, as required by Article 28 UK GDPR.\n\n"
+            . "2. PROCESSOR OBLIGATIONS\n\n"
+            . "The Processor agrees to:\n\n"
+            . "2.1 Process personal data only on documented instructions from the Controller, including with regard to transfers to third countries.\n\n"
+            . "2.2 Ensure that all personnel authorised to process personal data are subject to a duty of confidentiality.\n\n"
+            . "2.3 Implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including:\n"
+            . "    (a) Encryption of personal data at rest and in transit\n"
+            . "    (b) Ability to ensure ongoing confidentiality, integrity, availability and resilience of processing systems\n"
+            . "    (c) Regular testing and evaluation of technical and organisational security measures\n\n"
+            . "2.4 Not engage sub-processors without prior specific or general written authorisation from the Controller. Current sub-processors: Hostinger International Ltd (hosting, UK/EU-compliant).\n\n"
+            . "2.5 Assist the Controller in responding to data subject rights requests (access, rectification, erasure, portability, restriction, objection).\n\n"
+            . "2.6 Delete or return all personal data to the Controller at the end of the provision of services.\n\n"
+            . "2.7 Provide all information necessary to demonstrate compliance with this Agreement and allow for audits.\n\n"
+            . "2.8 Notify the Controller without undue delay (within 72 hours) of becoming aware of a personal data breach.\n\n"
+            . "3. CONTROLLER OBLIGATIONS\n\n"
+            . "3.1 The Controller confirms they have a lawful basis for processing under Article 6 UK GDPR for all personal data provided to the Processor.\n\n"
+            . "3.2 The Controller is responsible for the accuracy of personal data provided to the Processor.\n\n"
+            . "3.3 The Controller shall promptly notify the Processor of any changes to processing instructions.\n\n"
+            . "4. DATA DETAILS — SCHEDULE 1\n\n"
+            . "Categories of data subjects: Individuals who are clients, employees, or directors of the Controller\n"
+            . "Categories of personal data: Names, addresses, dates of birth, National Insurance numbers, tax records, financial information, contact details\n"
+            . "Special categories: None (unless otherwise agreed in writing)\n"
+            . "Nature of processing: Storage, analysis, preparation of tax returns and accounts, submission to HMRC and Companies House\n"
+            . "Duration: For the duration of the engagement and as required by HMRC record-keeping obligations (minimum 6 years)\n\n"
+            . "5. GOVERNING LAW\n\n"
+            . "This Agreement is governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.\n\n"
+            . "════════════════════════════════════════════════════════════\n\n"
+            . "By signing below, the Controller agrees to the terms of this Data Processing Agreement.\n\n"
+            . "Signed for and on behalf of {$clientCo}:\n\n"
+            . "___________________________\n"
+            . "{$clientName}\n"
+            . "Date: {$today}";
+        // Store as a letter record
+        $lettersPath = FR_DATA_DIR . 'letters.json';
+        $letters     = file_exists($lettersPath) ? (json_decode(file_get_contents($lettersPath), true) ?: []) : [];
+        $lToken      = bin2hex(random_bytes(32));
+        $lid         = 'l_' . bin2hex(random_bytes(6));
+        $letters[$lid] = [
+            'id'               => $lid,
+            'type'             => 'dpa',
+            'client_id'        => $id,
+            'recipient_name'   => $clientName,
+            'recipient_email'  => $c['email'],
+            'subject'          => 'Data Processing Agreement — ' . $firm,
+            'body'             => $dpaBody,
+            'category'         => 'Compliance',
+            'token'            => $lToken,
+            'status'           => 'sent',
+            'requires_ack'     => true,
+            'created_at'       => date('c'),
+            'sent_at'          => date('c'),
+        ];
+        $fp = fopen($lettersPath, 'c+');
+        flock($fp, LOCK_EX);
+        ftruncate($fp, 0); rewind($fp);
+        fwrite($fp, json_encode($letters, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        flock($fp, LOCK_UN); fclose($fp);
+        // Update client DPA status
+        $clients[$id]['dpa_status']  = 'sent';
+        $clients[$id]['dpa_sent_at'] = date('c');
+        $clients[$id]['dpa_letter_id'] = $lid;
+        save_clients($clients);
+        // Send email
+        $link    = FR_BASE_URL . '/letter_view.php?token=' . $lToken;
+        $subject = "Data Processing Agreement — Action Required | {$firm}";
+        $html    = "<!DOCTYPE html><html><body style=\"font-family:'Segoe UI',Arial,sans-serif;color:#1a2433;background:#f8f7f4\">
+<table width='600' align='center' style='background:#fff;border:1px solid #ddd8cf;margin:32px auto;border-radius:4px;overflow:hidden'>
+  <tr><td style='background:#1a3558;padding:24px 32px'>
+    <span style='font-size:20px;font-weight:800;color:#fff'>{$firm}</span>
+    <span style='display:block;color:#c9a84c;font-size:13px;margin-top:4px'>Data Processing Agreement</span>
+  </td></tr>
+  <tr><td style='padding:32px'>
+    <p>Dear {$clientName},</p>
+    <p>As required under UK GDPR Article 28, please review and acknowledge the Data Processing Agreement between <strong>{$clientCo}</strong> and <strong>{$firm}</strong>.</p>
+    <p>This agreement sets out how we handle personal data on your behalf as part of our accountancy services.</p>
+    <p style='margin:24px 0'><a href='{$link}' style='background:#1a3558;color:#fff;padding:12px 28px;border-radius:4px;text-decoration:none;font-weight:700'>Review &amp; Accept DPA</a></p>
+    <p style='font-size:12px;color:#888'>Or copy this link: {$link}</p>
+    <p>Kind regards,<br><strong>{$firm}</strong></p>
+  </td></tr>
+</table></body></html>";
+        $bnd  = md5(uniqid());
+        $hdrs = implode("\r\n", ["From: {$firm} <" . FR_FROM_EMAIL . ">", 'MIME-Version: 1.0', "Content-Type: multipart/alternative; boundary=\"{$bnd}\""]);
+        $mbody= "--{$bnd}\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\nDear {$clientName},\n\nPlease review your Data Processing Agreement: {$link}\n\n{$firm}\r\n"
+              . "--{$bnd}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{$html}\r\n--{$bnd}--";
+        mail($c['email'], $subject, $mbody, $hdrs);
+        respond(['success' => true, 'link' => $link]);
+        break;
+
     // ── LETTERHEAD ──────────────────────────────────────────────────
 
     case 'get_letterhead':
@@ -776,11 +1054,20 @@ switch ($action) {
             if ($l['token'] === $token) {
                 $letters[$id]['acknowledged_at'] = date('c');
                 $letters[$id]['status']          = 'acknowledged';
-                if (!$letters[$id]['read_at']) $letters[$id]['read_at'] = date('c');
+                if (empty($letters[$id]['read_at'])) $letters[$id]['read_at'] = date('c');
                 $fp = fopen($lpath, 'c+'); flock($fp, LOCK_EX);
                 ftruncate($fp, 0); rewind($fp);
                 fwrite($fp, json_encode($letters, JSON_PRETTY_PRINT));
                 flock($fp, LOCK_UN); fclose($fp);
+                // If this was a DPA letter, update the client record
+                if (($l['type'] ?? '') === 'dpa' && !empty($l['client_id'])) {
+                    $clients = load_clients();
+                    if (isset($clients[$l['client_id']])) {
+                        $clients[$l['client_id']]['dpa_status']  = 'signed';
+                        $clients[$l['client_id']]['dpa_signed_at'] = date('c');
+                        save_clients($clients);
+                    }
+                }
                 respond(['success' => true]);
             }
         }
