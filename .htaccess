@@ -1,0 +1,9 @@
+Options -Indexes
+
+RewriteEngine On
+
+# Clean URL: /firmready → subscribe.php
+RewriteRule ^firmready/?$ /subscribe.php [L,R=301]
+
+# Clean URL: /start → subscribe.php (alternative short link)
+RewriteRule ^start/?$ /subscribe.php [L,R=301]
