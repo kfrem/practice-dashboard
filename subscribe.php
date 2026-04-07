@@ -333,6 +333,12 @@ footer{border-top:1px solid var(--border);background:#fff;padding:24px;text-alig
         </div>
       </div>
     </div>
+
+    <!-- WHAT'S NOT INCLUDED NOTE -->
+    <div style="margin-top:14px;background:#f8f7f4;border:1px solid #ddd8cf;border-radius:8px;padding:14px 16px;font-size:12px;color:#64748b;line-height:1.7">
+      <strong style="color:#1a3558;display:block;margin-bottom:4px">FirmReady is a self-service software tool.</strong>
+      It does not include consultancy support, financial modelling, cash flow forecasting, business plan preparation or dedicated specialist access. If you need those services alongside the platform, our <a href="https://practice.finaccord.pro/pricing.html" style="color:#1a3558;font-weight:700;text-decoration:underline">Practice Transformation Packages</a> start from £79/month and include 2–10 hours of bespoke expert time per month.
+    </div>
   </div>
 
 </div><!-- /main -->
