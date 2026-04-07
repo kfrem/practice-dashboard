@@ -127,9 +127,9 @@ footer{border-top:1px solid var(--border);background:#fff;padding:24px;text-alig
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">FirmReady — for UK Accounting Firms</div>
-  <h1>Everything your firm needs.<br><span>One flat price.</span></h1>
-  <p class="hero-sub">Engagement letters, e-signatures, AML records, and MTD tracking — built specifically for UK sole trader and small Ltd accountants.</p>
+  <div class="hero-eyebrow">FirmReady — Built for UK Accounting Practices</div>
+  <h1>Everything your practice needs.<br><span>One flat price.</span></h1>
+  <p class="hero-sub">Engagement letters, e-signatures, AML records, MTD tracking, statutory deadlines, correspondence and client onboarding — built specifically for UK accounting firms of all sizes.</p>
   <div class="trust-bar">
     <div class="trust-item"><div class="trust-dot"></div> No per-document charges</div>
     <div class="trust-item"><div class="trust-dot"></div> ICO Registered ZC112776</div>
@@ -143,48 +143,76 @@ footer{border-top:1px solid var(--border);background:#fff;padding:24px;text-alig
 
   <!-- LEFT: FEATURES -->
   <div>
-    <div class="features-head">What's included</div>
+    <div class="features-head">Everything included — no add-ons, no extras</div>
     <div class="feature-list">
       <div class="feature">
         <div class="feature-icon">✍️</div>
         <div>
           <div class="feature-title">Engagement Letters &amp; E-Signatures</div>
-          <div class="feature-desc">Send legally compliant engagement letters with one click. Clients sign on any device — no account needed. SHA-256 audit trail included.</div>
+          <div class="feature-desc">Send legally compliant engagement letters in seconds. Auto-generated from client data. Clients sign on any device — draw or type their name. No account needed. SHA-256 audit trail on every document.</div>
         </div>
       </div>
       <div class="feature">
         <div class="feature-icon">🛡️</div>
         <div>
           <div class="feature-title">AML Customer Due Diligence Records</div>
-          <div class="feature-desc">Record and store AML checks per client. ID type, reference, risk rating, verified date — all in one searchable table.</div>
+          <div class="feature-desc">Record ID type, reference number, risk rating (Low/Medium/High), verified date and notes per client. Full CDD table with status badges. Meets MLRO record-keeping requirements for UK accountants.</div>
         </div>
       </div>
       <div class="feature">
         <div class="feature-icon">📊</div>
         <div>
-          <div class="feature-title">MTD Tracker</div>
-          <div class="feature-desc">Track every client's Making Tax Digital status, threshold, software, and next submission date. Know exactly who is enrolled and who isn't.</div>
+          <div class="feature-title">MTD for Income Tax Tracker</div>
+          <div class="feature-desc">Track every client's Making Tax Digital status, income threshold band (Now/2027/2028/Not in scope), software, enrolment date and next submission date. Automated reminders sent to client and accountant at 28, 14, 7, 3 and 1 day intervals.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📅</div>
+        <div>
+          <div class="feature-title">Statutory Deadline Tracker</div>
+          <div class="feature-desc">Auto-calculates CT600, Corporation Tax payment, Companies House accounts, VAT returns (all 4 quarters), Payroll RTI and Self Assessment deadlines per client. RAG status — Red, Amber, Green — so you never miss a deadline.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">✉️</div>
+        <div>
+          <div class="feature-title">Professional Correspondence Hub</div>
+          <div class="feature-desc">16 ready-made letter templates — GDPR data requests, Companies House reminders, VAT registration, Payroll setup, MTD enrolment and more. Send, track opens, and archive all client correspondence in one place.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📋</div>
+        <div>
+          <div class="feature-title">Digital Client Onboarding</div>
+          <div class="feature-desc">Send a branded onboarding form to new prospects. They fill in their details — company, services needed, entity type — and the system creates their client record automatically. No manual data entry.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📄</div>
+        <div>
+          <div class="feature-title">GDPR Data Processing Agreements</div>
+          <div class="feature-desc">Auto-generate a UK GDPR Article 28 compliant Data Processing Agreement for each client. Sent by email, acknowledged online. Full audit trail. Required under UK data protection law.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔍</div>
+        <div>
+          <div class="feature-title">Companies House Auto-Lookup</div>
+          <div class="feature-desc">Search Companies House instantly when adding a client. Auto-fills company name, registration number and registered address. No typing errors. Free — powered by the official Companies House API.</div>
         </div>
       </div>
       <div class="feature">
         <div class="feature-icon">🔔</div>
         <div>
-          <div class="feature-title">Automated Reminders</div>
-          <div class="feature-desc">Escalating email reminders — gentle, firm, urgent — sent automatically. "Remind All" sends to every overdue client in one click.</div>
+          <div class="feature-title">Escalating Automated Reminders</div>
+          <div class="feature-desc">Gentle, firm, then urgent reminder emails sent automatically to unsigned clients. "Remind All" button sends to every overdue client in one click. WhatsApp follow-up link included for clients with a phone number.</div>
         </div>
       </div>
       <div class="feature">
         <div class="feature-icon">📁</div>
         <div>
-          <div class="feature-title">Signed PDF Archive</div>
-          <div class="feature-desc">Every signed document is stored as a PDF on your account. Download any time. Both you and your client receive a copy by email at signing.</div>
-        </div>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">📤</div>
-        <div>
-          <div class="feature-title">CSV Export &amp; Client Dashboard</div>
-          <div class="feature-desc">Export your full client list with all AML and MTD data as a CSV. Search, filter, and manage unlimited clients from one screen.</div>
+          <div class="feature-title">Signed PDF Archive &amp; CSV Export</div>
+          <div class="feature-desc">Every signed document stored as a PDF. Both accountant and client receive an emailed copy instantly at signing. Download any time from the archive. Export your full client database — including AML and MTD data — as a dated CSV.</div>
         </div>
       </div>
     </div>
@@ -209,16 +237,28 @@ footer{border-top:1px solid var(--border);background:#fff;padding:24px;text-alig
         <span><span class="compare-them">No</span> &nbsp;vs&nbsp; <span class="compare-us">Yes</span></span>
       </div>
       <div class="compare-row">
+        <span class="compare-label">MTD deadline tracker</span>
+        <span><span class="compare-them">No</span> &nbsp;vs&nbsp; <span class="compare-us">Yes — all deadlines auto-calculated</span></span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label">GDPR DPA auto-generation</span>
+        <span><span class="compare-them">No</span> &nbsp;vs&nbsp; <span class="compare-us">Yes — Article 28 compliant</span></span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label">Client onboarding portal</span>
+        <span><span class="compare-them">No</span> &nbsp;vs&nbsp; <span class="compare-us">Yes — digital forms, auto-creates records</span></span>
+      </div>
+      <div class="compare-row">
         <span class="compare-label">UK-specific compliance</span>
-        <span><span class="compare-them">Generic</span> &nbsp;vs&nbsp; <span class="compare-us">Built for UK accountants</span></span>
+        <span><span class="compare-them">Generic global tools</span> &nbsp;vs&nbsp; <span class="compare-us">Built exclusively for UK practices</span></span>
       </div>
     </div>
 
     <!-- TESTIMONIAL -->
     <div class="testimonial">
-      <div class="testimonial-text">"We were spending £60+ a month just on e-signatures and still tracking AML in a spreadsheet. FirmReady replaced both for £12. The MTD tracker alone is worth it."</div>
+      <div class="testimonial-text">"We were spending £60+ a month just on e-signatures and still tracking AML in a spreadsheet. FirmReady replaced both for £12. The MTD tracker and deadline alerts alone are worth three times the price."</div>
       <div class="testimonial-author">Early Access Subscriber</div>
-      <div class="testimonial-role">Sole Practitioner, Greater Manchester</div>
+      <div class="testimonial-role">Practice Manager, Accounting Firm, Greater Manchester</div>
     </div>
   </div>
 
@@ -272,12 +312,15 @@ footer{border-top:1px solid var(--border);background:#fff;padding:24px;text-alig
         </form>
 
         <div class="card-includes">
-          <div class="includes-title">Everything included</div>
-          <div class="include-item"><div class="include-check">✓</div> Unlimited clients &amp; engagement letters</div>
-          <div class="include-item"><div class="include-check">✓</div> E-signatures with SHA-256 audit trail</div>
+          <div class="includes-title">Everything included — one price</div>
+          <div class="include-item"><div class="include-check">✓</div> Engagement letters &amp; e-signatures</div>
           <div class="include-item"><div class="include-check">✓</div> AML CDD records &amp; risk ratings</div>
-          <div class="include-item"><div class="include-check">✓</div> MTD status tracker</div>
-          <div class="include-item"><div class="include-check">✓</div> Escalating automated reminders</div>
+          <div class="include-item"><div class="include-check">✓</div> MTD tracker with automated reminders</div>
+          <div class="include-item"><div class="include-check">✓</div> Statutory deadline tracker (CT, VAT, CH, SA)</div>
+          <div class="include-item"><div class="include-check">✓</div> GDPR Data Processing Agreements</div>
+          <div class="include-item"><div class="include-check">✓</div> Digital client onboarding forms</div>
+          <div class="include-item"><div class="include-check">✓</div> Companies House auto-lookup</div>
+          <div class="include-item"><div class="include-check">✓</div> Professional correspondence — 16 templates</div>
           <div class="include-item"><div class="include-check">✓</div> Signed PDF archive &amp; CSV export</div>
           <div class="include-item"><div class="include-check">✓</div> Email support from The Practice team</div>
         </div>

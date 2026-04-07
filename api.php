@@ -71,7 +71,7 @@ function send_email($to, $subject, $html, $from = null, $pdfB64 = null, $pdfName
         $body .= "Content-Type: application/pdf; name=\"{$pdfName}\"\r\n";
         $body .= "Content-Transfer-Encoding: base64\r\n";
         $body .= "Content-Disposition: attachment; filename=\"{$pdfName}\"\r\n\r\n";
-        $body .= chunk_split(wordwrap($pdfB64, 76, "\r\n", true)) . "\r\n";
+        $body .= chunk_split($pdfB64, 76, "\r\n") . "\r\n";
         $body .= "--{$b1}--\r\n";
     } else {
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
