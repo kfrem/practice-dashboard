@@ -41,7 +41,7 @@ define('FR_STRIPE_WEBHOOK_SECRET', 'whsec_YOUR_WEBHOOK_SECRET_HERE');
 // COMPANIES HOUSE API — Free lookup for UK company details
 // Register free at: https://developer.company-information.service.gov.uk
 // ============================================================
-define('FR_CH_API_KEY', 'YOUR_COMPANIES_HOUSE_API_KEY_HERE');
+define('FR_CH_API_KEY', '4eca5c2d-0bce-4f44-aa20-b91a57fd65d0');
 
 // ============================================================
 // AUTO SETUP — do not edit below
