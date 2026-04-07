@@ -928,11 +928,8 @@ The `subscribe.php → stripe_checkout.php → success.php` flow works. But ther
 **6. No client portal**
 Clients access their engagement letter via a one-time token URL. There is no client login where they can view their signing history or access past letters. This is on the Phase 3 roadmap.
 
-**7. onboard.php not yet built**
-The digital client onboarding flow (sending a prospect a form to fill in their own details) is listed in the CLAUDE.md roadmap but `onboard.php` does not yet exist in the codebase. The related API actions (`create_onboard`, `get_onboard_by_token`, `submit_onboard`, `activate_onboard`) are also not yet implemented.
-
-**8. DPA signing not yet built**
-The Data Processing Agreement flow (required under UK GDPR Article 28) is planned but not yet implemented. The `send_dpa` API action does not exist yet.
+**7. Stripe webhook not yet built** *(moved from item 5 — see above)*
+Subscription lifecycle events (cancellations, failed renewals, trial endings) require a `stripe_webhook.php` handler. Until built, manage subscriptions manually via the Stripe Dashboard.
 
 ---
 
@@ -943,7 +940,9 @@ The Data Processing Agreement flow (required under UK GDPR Article 28) is planne
 - Correspondence hub (`letters.php` + `letter_view.php`) with 16 system templates
 - Automated MTD reminders (`mtd_cron.php`) with per-client intervals and deduplication
 - Statutory Deadline Tracker (CT600, Corporation Tax, Companies House, VAT, Payroll, Self Assessment)
-- Companies House API auto-lookup in Add Client modal
+- Companies House API auto-lookup in Add Client modal (company name, number, address, entity type)
+- Digital Client Onboarding (`onboard.php`) — send prospect a link, they fill own details, lands in dashboard
+- GDPR Data Processing Agreement — one click generates UK GDPR Article 28 DPA and sends for e-signature
 - Firm letterhead designer (logo, colours, tagline, footer, disclaimer)
 - Firm signature — draw, type, or upload; persists across all letters
 - Custom letter template saving
@@ -952,8 +951,6 @@ The Data Processing Agreement flow (required under UK GDPR Article 28) is planne
 
 ### Pending
 
-- **Digital Client Onboarding** — send prospect a link to fill in their own details
-- **GDPR / DPA signing** — auto-generate and send Data Processing Agreement for client to sign
 - **Stripe webhook handler** — handle subscription cancellations, failed payments, trial endings
 - **Multi-user / team access** — per-user accounts with role-based permissions
 - **Client portal login** — clients log in to view their signing history
@@ -1017,10 +1014,19 @@ Work through this list top to bottom to verify every feature is working end-to-e
 [ ] Subscribe page loads at /subscribe.php
 [ ] Subscribe form shows validation error on empty fields
 [ ] Subscribe form redirects to Stripe (requires live keys) or shows error (placeholder keys)
+[ ] Send Onboarding Link button in nav bar opens modal
+[ ] Enter name + email → onboarding email sent → link opens onboard.php
+[ ] Prospect fills form and submits → accountant receives notification email
+[ ] Client appears in dashboard with "Activate" button
+[ ] Clicking Activate moves client to Pending status
+[ ] DPA button appears on client rows without a DPA sent
+[ ] Click DPA → confirm dialog → DPA email sent to client
+[ ] DPA badge changes to "DPA Sent" (yellow) immediately
+[ ] Client opens letter_view.php DPA link → clicks "Acknowledge" → badge changes to ✓ DPA (green)
 [ ] Auto-deploy: push a minor change to main → check GitHub Actions → confirm change live on Hostinger within 2 minutes
 [ ] fr_data/ directory is NOT deployed by GitHub Actions (confirm no client data in git)
 ```
 
 ---
 
-*Last updated: April 2026 — Phase 2 complete, Phase 3 in progress.*
+*Last updated: April 2026 — Phase 3 complete (Stripe webhook pending).*
