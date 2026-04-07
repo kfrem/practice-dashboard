@@ -148,6 +148,17 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
 .b-mtd-ok{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}
 .b-mtd-na{background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
 
+/* DEADLINE TRACKER */
+.dl-red{background:#fee2e2;color:#991b1b}
+.dl-amber{background:#fff7ed;color:#c2410c}
+.dl-green{background:#d1fae5;color:#065f46}
+.dl-done{background:#f1f5f9;color:#94a3b8;text-decoration:line-through}
+.dl-type{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;background:#e8edf5;color:var(--navy);white-space:nowrap}
+.dl-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dl-filter{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;cursor:pointer;color:var(--muted);font-family:'Segoe UI',Georgia,sans-serif}
+.dl-filter.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.dl-count{display:inline-block;background:#fee2e2;color:#991b1b;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:3px}
+
 /* ARCHIVE */
 .hash-short{font-family:monospace;font-size:10px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -274,6 +285,7 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
       <div class="tab" onclick="switchTab('signed',this)">Signed</div>
       <div class="tab" onclick="switchTab('aml',this)">AML Records</div>
       <div class="tab" onclick="switchTab('mtd',this)">📊 MTD Tracker</div>
+      <div class="tab" id="tabDeadlines" onclick="switchTab('deadlines',this)">📅 Deadlines</div>
       <div class="tab" onclick="switchTab('archive',this)">📁 Archive</div>
     </div>
 
@@ -325,6 +337,31 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
             <tr><th>Client</th><th>Income Threshold</th><th>MTD Status</th><th>Software</th><th>Enrolled</th><th>Next Submission</th><th>Notes</th><th>Action</th></tr>
           </thead>
           <tbody id="mtdTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DEADLINE TRACKER -->
+    <div id="viewDeadlines" style="display:none">
+      <div class="table-wrap">
+        <div class="table-top">
+          <div class="table-ttl">📅 Statutory Deadline Tracker</div>
+          <div class="dl-filters">
+            <button class="dl-filter active" onclick="dlFilter('all',this)">All</button>
+            <button class="dl-filter" onclick="dlFilter('overdue',this)">🔴 Overdue <span id="dlCountOverdue" class="dl-count" style="display:none"></span></button>
+            <button class="dl-filter" onclick="dlFilter('soon',this)">🟡 Due Soon</button>
+            <button class="dl-filter" onclick="dlFilter('upcoming',this)">🟢 Upcoming</button>
+            <button class="dl-filter" onclick="dlFilter('done',this)">✓ Completed</button>
+          </div>
+        </div>
+        <div style="padding:12px 20px;background:#eff6ff;border-bottom:1px solid #bfdbfe;font-size:12px;color:#1e40af">
+          ℹ️ Set up deadline tracking per client using the <strong>📅</strong> button on any client row. Deadlines auto-calculate from year end dates.
+        </div>
+        <table>
+          <thead>
+            <tr><th>Client</th><th>Deadline Type</th><th>Due Date</th><th>Days Left</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody id="dlTbody"></tbody>
         </table>
       </div>
     </div>
@@ -575,6 +612,72 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
   </div>
 </div>
 
+<!-- DEADLINE SETUP MODAL -->
+<div class="overlay" id="dlModal">
+  <div class="modal">
+    <div class="m-head"><div class="m-title">📅 Deadline Setup — <span id="dlClientName"></span></div><button class="m-close" onclick="closeM('dlModal')">×</button></div>
+    <div class="m-body">
+      <div id="dlAlert"></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Configure which deadlines apply to this client. Dates auto-calculate. You can mark individual deadlines as filed or paid from the Deadlines tab.</p>
+
+      <!-- Year End -->
+      <div class="fg-row">
+        <div class="fg">
+          <label>Accounting Year End Date</label>
+          <input type="date" id="dlYearEnd">
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Used to calculate CT return, CT payment, and Companies House accounts due dates.</div>
+        </div>
+        <div class="fg">
+          <label>Confirmation Statement Due</label>
+          <input type="date" id="dlConfirmation">
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Find on Companies House. Recurs annually.</div>
+        </div>
+      </div>
+
+      <!-- VAT -->
+      <div class="fg">
+        <label>VAT Registration</label>
+        <select id="dlVat">
+          <option value="none">Not VAT registered</option>
+          <option value="jan">VAT Quarter: Jan / Apr / Jul / Oct</option>
+          <option value="feb">VAT Quarter: Feb / May / Aug / Nov</option>
+          <option value="mar">VAT Quarter: Mar / Jun / Sep / Dec</option>
+        </select>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">VAT returns due 1 month + 7 days after quarter end (online filing).</div>
+      </div>
+
+      <!-- Payroll + SA -->
+      <div class="fg-row">
+        <div class="fg">
+          <label>Payroll / RTI</label>
+          <select id="dlPayroll">
+            <option value="none">No payroll</option>
+            <option value="monthly">Monthly payroll</option>
+            <option value="weekly">Weekly payroll</option>
+          </select>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">RTI submissions due by 19th of each month.</div>
+        </div>
+        <div class="fg" style="display:flex;align-items:flex-start;flex-direction:column;justify-content:center;padding-top:8px">
+          <label style="margin-bottom:12px">Self Assessment</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400">
+            <input type="checkbox" id="dlSa" style="width:16px;height:16px">
+            Client submits a Self Assessment tax return
+          </label>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px">SA deadline: 31 Jan (online). Payment on account: 31 Jan + 31 Jul.</div>
+        </div>
+      </div>
+
+      <div class="alert a-warn" style="font-size:12px;margin-top:4px">
+        <strong>Note:</strong> Deadlines are calculated automatically. Use the Deadlines tab to mark each deadline as Filed, Paid, or Pending.
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-outline" onclick="closeM('dlModal')">Cancel</button>
+      <button class="btn btn-navy" onclick="saveDeadlines()">Save & Calculate Deadlines</button>
+    </div>
+  </div>
+</div>
+
 <!-- NOTES MODAL -->
 <div class="overlay" id="notesModal">
   <div class="modal">
@@ -734,6 +837,12 @@ function renderAll() {
   renderMonthlyStats();
   renderTable();
   renderAml();
+  // Update deadline tab badge
+  const allDl = computeAllDeadlines();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const overdueCount = allDl.filter(d => d.status !== 'filed' && d.status !== 'paid' && d.dueDate < today).length;
+  const dlTab = document.getElementById('tabDeadlines');
+  if (dlTab) dlTab.textContent = overdueCount > 0 ? `📅 Deadlines (${overdueCount})` : '📅 Deadlines';
 }
 
 function switchTab(tab, el) {
@@ -742,7 +851,7 @@ function switchTab(tab, el) {
   if (el) el.classList.add('active');
   const titles = {all:'All Clients', pending:'Awaiting Signature', signed:'Signed Clients', overdue:'⚠️ Overdue — Action Required', mtd:'📊 MTD Tracker', archive:'📁 Signed Document Archive'};
   // Hide all views
-  ['viewClients','viewAml','viewMtd','viewArchive'].forEach(id => {
+  ['viewClients','viewAml','viewMtd','viewDeadlines','viewArchive'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
@@ -751,6 +860,9 @@ function switchTab(tab, el) {
   } else if (tab === 'mtd') {
     document.getElementById('viewMtd').style.display = 'block';
     renderMtd();
+  } else if (tab === 'deadlines') {
+    document.getElementById('viewDeadlines').style.display = 'block';
+    renderDeadlines('all');
   } else if (tab === 'archive') {
     document.getElementById('viewArchive').style.display = 'block';
     renderArchive();
@@ -845,6 +957,7 @@ function actions(c) {
     }
   }
   a+=`<button class="btn btn-outline" onclick="openAml('${c.id}')" style="margin-right:4px">AML</button>`;
+  a+=`<button class="btn btn-outline" onclick="openDeadlines('${c.id}')" style="margin-right:4px" title="Deadline tracker">📅</button>`;
   a+=`<button class="btn btn-red" onclick="delClient('${c.id}')">✕</button>`;
   return a;
 }
@@ -1288,6 +1401,278 @@ async function saveMtd() {
     toast('MTD record saved');
   } else {
     document.getElementById('mtdAlert').innerHTML = `<div class="alert a-err">${d.error}</div>`;
+  }
+}
+
+// ── Deadline Tracker ─────────────────────────────
+let curDlId = null;
+let dlActiveFilter = 'all';
+
+// Add months to a date, return new Date
+function addMonths(date, months) {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + months);
+  return d;
+}
+function addDays(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+function nextDateForDay(month0, day) {
+  // Returns the next occurrence of a given month (0-based) and day
+  const now = new Date(); now.setHours(0,0,0,0);
+  let d = new Date(now.getFullYear(), month0, day);
+  if (d <= now) d.setFullYear(d.getFullYear() + 1);
+  return d;
+}
+
+// Get upcoming VAT due dates (next 4 quarters) for a given quarter group
+function vatDueDates(group) {
+  // quarter end months (0-based) per group
+  const ends = { jan:[0,3,6,9], feb:[1,4,7,10], mar:[2,5,8,11] };
+  if (!ends[group]) return [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const results = [];
+  const months = ends[group];
+  for (let y = today.getFullYear() - 1; y <= today.getFullYear() + 1; y++) {
+    for (const m of months) {
+      // Due = 1 month + 7 days after quarter end
+      const quarterEnd = new Date(y, m + 1, 0); // last day of quarter-end month
+      const due = addDays(addMonths(quarterEnd, 1), 7);
+      if (due >= today) results.push(due);
+    }
+  }
+  results.sort((a,b)=>a-b);
+  return results.slice(0, 4); // next 4 quarters
+}
+
+// Compute payroll RTI due dates (19th of each month, next 3)
+function payrollDueDates() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const results = [];
+  for (let i = 0; i < 4; i++) {
+    const d = new Date(today.getFullYear(), today.getMonth() + i, 19);
+    if (d >= today) results.push(d);
+    if (results.length >= 3) break;
+  }
+  return results;
+}
+
+// Return next 31 Jan / 31 Jul for SA
+function saDueDates() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const year = today.getFullYear();
+  const dates = [];
+  const candidates = [
+    new Date(year, 0, 31),   // 31 Jan this year
+    new Date(year, 6, 31),   // 31 Jul this year
+    new Date(year+1, 0, 31), // 31 Jan next year
+    new Date(year+1, 6, 31), // 31 Jul next year
+  ];
+  candidates.forEach(d => { if (d >= today) dates.push(d); });
+  return dates.slice(0, 3);
+}
+
+// Compute all deadline entries for a single client
+function computeClientDeadlines(c) {
+  const deadlines = [];
+  const statuses  = c.dl_statuses || {};
+  const today     = new Date(); today.setHours(0,0,0,0);
+
+  function entry(type, label, dueDate, keyOverride) {
+    const key = keyOverride || (type + ':' + dueDate.toISOString().slice(0,10));
+    const status = statuses[key] || 'pending';
+    return { clientId: c.id, clientName: c.name, type, label, dueDate, key, status };
+  }
+
+  // Corporation Tax & Companies House (needs year end)
+  if (c.dl_year_end) {
+    const ye = new Date(c.dl_year_end);
+    const ctReturn  = addMonths(ye, 12);
+    const ctPayment = addDays(addMonths(ye, 9), 1);
+    const chAccounts = addMonths(ye, 9);
+    deadlines.push(entry('ct_return',   'CT600 — Corporation Tax Return', ctReturn));
+    deadlines.push(entry('ct_payment',  'Corporation Tax Payment',        ctPayment));
+    deadlines.push(entry('ch_accounts', 'Companies House Annual Accounts', chAccounts));
+  }
+
+  // Confirmation Statement
+  if (c.dl_confirmation_due) {
+    const cs = new Date(c.dl_confirmation_due);
+    if (cs >= today) {
+      deadlines.push(entry('confirmation', 'Confirmation Statement', cs, 'confirmation:' + c.dl_confirmation_due));
+    }
+    // Also show next year's if this one is close
+    const csNext = new Date(cs); csNext.setFullYear(csNext.getFullYear() + 1);
+    if (csNext >= today && csNext <= addMonths(today, 14)) {
+      deadlines.push(entry('confirmation', 'Confirmation Statement', csNext, 'confirmation:' + csNext.toISOString().slice(0,10)));
+    }
+  }
+
+  // VAT
+  if (c.dl_vat && c.dl_vat !== 'none') {
+    vatDueDates(c.dl_vat).forEach(d => {
+      deadlines.push(entry('vat', 'VAT Return & Payment', d));
+    });
+  }
+
+  // Payroll RTI
+  if (c.dl_payroll && c.dl_payroll !== 'none') {
+    payrollDueDates().forEach(d => {
+      deadlines.push(entry('payroll', 'Payroll RTI Submission', d));
+    });
+  }
+
+  // Self Assessment
+  if (c.dl_self_assessment) {
+    saDueDates().forEach((d, i) => {
+      const label = (d.getMonth() === 0) ? 'Self Assessment Return + Payment on Account' : 'SA — Second Payment on Account';
+      deadlines.push(entry('sa', label, d));
+    });
+  }
+
+  return deadlines;
+}
+
+// Compute all deadlines across all clients
+function computeAllDeadlines() {
+  let all = [];
+  clients.forEach(c => { all = all.concat(computeClientDeadlines(c)); });
+  all.sort((a,b) => a.dueDate - b.dueDate);
+  return all;
+}
+
+function dlDaysLeft(dueDate) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.round((dueDate - today) / 86400000);
+}
+
+function dlRowClass(d) {
+  if (d.status === 'filed' || d.status === 'paid') return 'dl-done';
+  const days = dlDaysLeft(d.dueDate);
+  if (days < 0)  return 'dl-red';
+  if (days <= 30) return 'dl-red';
+  if (days <= 60) return 'dl-amber';
+  return 'dl-green';
+}
+
+function dlTypeColour(type) {
+  const map = {
+    ct_return:'#dbeafe', ct_payment:'#fce7f3', ch_accounts:'#ede9fe',
+    confirmation:'#d1fae5', vat:'#fef9c3', payroll:'#ffedd5', sa:'#e0f2fe'
+  };
+  return map[type] || '#f1f5f9';
+}
+
+let dlFilterState = 'all';
+
+function dlFilter(f, el) {
+  dlFilterState = f;
+  document.querySelectorAll('.dl-filter').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderDeadlines(f);
+}
+
+function renderDeadlines(filter) {
+  filter = filter || dlFilterState;
+  const today = new Date(); today.setHours(0,0,0,0);
+  let all = computeAllDeadlines();
+
+  // Update overdue badge
+  const overdueCount = all.filter(d => d.status !== 'filed' && d.status !== 'paid' && d.dueDate < today).length;
+  const oc = document.getElementById('dlCountOverdue');
+  if (oc) { oc.textContent = overdueCount; oc.style.display = overdueCount > 0 ? 'inline' : 'none'; }
+
+  // Apply filter
+  if (filter === 'overdue') all = all.filter(d => d.status !== 'filed' && d.status !== 'paid' && d.dueDate < today);
+  else if (filter === 'soon') all = all.filter(d => d.status !== 'filed' && d.status !== 'paid' && dlDaysLeft(d.dueDate) >= 0 && dlDaysLeft(d.dueDate) <= 30);
+  else if (filter === 'upcoming') all = all.filter(d => d.status !== 'filed' && d.status !== 'paid' && dlDaysLeft(d.dueDate) > 30);
+  else if (filter === 'done') all = all.filter(d => d.status === 'filed' || d.status === 'paid');
+
+  const tbody = document.getElementById('dlTbody');
+  if (!all.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-icon">📅</div><div class="empty-lbl">${filter === 'all' ? 'No deadlines set up yet. Click 📅 on any client row to configure.' : 'No deadlines match this filter.'}</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = all.map(d => {
+    const days = dlDaysLeft(d.dueDate);
+    const rc   = dlRowClass(d);
+    const done = d.status === 'filed' || d.status === 'paid';
+    const daysLabel = done ? '—'
+      : days < 0  ? `<strong style="color:#991b1b">${Math.abs(days)}d overdue</strong>`
+      : days === 0 ? '<strong style="color:#991b1b">Today!</strong>'
+      : days === 1 ? '<strong style="color:#c2410c">Tomorrow</strong>'
+      : `${days} days`;
+
+    const statusLabel = d.status === 'filed' ? '✓ Filed'
+      : d.status === 'paid' ? '✓ Paid'
+      : days < 0 ? '⚠️ Overdue' : 'Pending';
+
+    const actionBtns = done
+      ? `<button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markDl('${d.clientId}','${d.key}','pending')">↩ Reopen</button>`
+      : `<button class="btn btn-outline" style="font-size:11px;padding:4px 10px;margin-right:4px" onclick="markDl('${d.clientId}','${d.key}','filed')">✓ Filed</button>
+         <button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markDl('${d.clientId}','${d.key}','paid')">£ Paid</button>`;
+
+    return `<tr class="${rc}">
+      <td style="font-weight:600">${e(d.clientName)}</td>
+      <td><span class="dl-type" style="background:${dlTypeColour(d.type)}">${e(d.label)}</span></td>
+      <td>${d.dueDate.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td>${daysLabel}</td>
+      <td><span style="font-size:12px;font-weight:600">${statusLabel}</span></td>
+      <td>${actionBtns}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openDeadlines(id) {
+  curDlId = id;
+  const c = clients.find(x=>x.id===id);
+  document.getElementById('dlClientName').textContent = c.name;
+  document.getElementById('dlYearEnd').value       = c.dl_year_end || '';
+  document.getElementById('dlConfirmation').value  = c.dl_confirmation_due || '';
+  document.getElementById('dlVat').value           = c.dl_vat || 'none';
+  document.getElementById('dlPayroll').value       = c.dl_payroll || 'none';
+  document.getElementById('dlSa').checked          = !!c.dl_self_assessment;
+  document.getElementById('dlAlert').innerHTML     = '';
+  openM('dlModal');
+}
+
+async function saveDeadlines() {
+  const payload = {
+    id:                   curDlId,
+    dl_year_end:          document.getElementById('dlYearEnd').value,
+    dl_confirmation_due:  document.getElementById('dlConfirmation').value,
+    dl_vat:               document.getElementById('dlVat').value,
+    dl_payroll:           document.getElementById('dlPayroll').value,
+    dl_self_assessment:   document.getElementById('dlSa').checked
+  };
+  const d = await api('save_deadlines', payload);
+  if (d.success) {
+    const idx = clients.findIndex(c=>c.id===curDlId);
+    Object.assign(clients[idx], payload);
+    renderAll();
+    closeM('dlModal');
+    toast('Deadline settings saved');
+  } else {
+    document.getElementById('dlAlert').innerHTML = `<div class="alert a-err">${d.error}</div>`;
+  }
+}
+
+async function markDl(clientId, key, status) {
+  const d = await api('mark_deadline', { id: clientId, key, status });
+  if (d.success) {
+    const idx = clients.findIndex(c=>c.id===clientId);
+    if (!clients[idx].dl_statuses) clients[idx].dl_statuses = {};
+    clients[idx].dl_statuses[key] = status;
+    renderDeadlines();
+    // Update tab badge
+    const allDl = computeAllDeadlines();
+    const today = new Date(); today.setHours(0,0,0,0);
+    const oc = allDl.filter(x => x.status !== 'filed' && x.status !== 'paid' && x.dueDate < today).length;
+    const dlTab = document.getElementById('tabDeadlines');
+    if (dlTab) dlTab.textContent = oc > 0 ? `📅 Deadlines (${oc})` : '📅 Deadlines';
   }
 }
 

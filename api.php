@@ -575,6 +575,47 @@ switch ($action) {
         respond(['success' => true]);
         break;
 
+    // ── DEADLINE TRACKER ────────────────────────────────────────────
+
+    case 'save_deadlines':
+        require_auth();
+        $id = clean($input['id'] ?? '');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        // Validate year end date format
+        $ye = clean($input['dl_year_end'] ?? '');
+        if ($ye && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $ye)) $ye = '';
+        $cs = clean($input['dl_confirmation_due'] ?? '');
+        if ($cs && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $cs)) $cs = '';
+        $vat_opts = ['none','jan','feb','mar'];
+        $pay_opts = ['none','monthly','weekly'];
+        $clients[$id]['dl_year_end']         = $ye;
+        $clients[$id]['dl_confirmation_due'] = $cs;
+        $clients[$id]['dl_vat']              = in_array($input['dl_vat'] ?? '', $vat_opts) ? $input['dl_vat'] : 'none';
+        $clients[$id]['dl_payroll']          = in_array($input['dl_payroll'] ?? '', $pay_opts) ? $input['dl_payroll'] : 'none';
+        $clients[$id]['dl_self_assessment']  = !empty($input['dl_self_assessment']);
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
+    case 'mark_deadline':
+        require_auth();
+        $id  = clean($input['id'] ?? '');
+        $key = trim($input['key'] ?? '');
+        $allowed_statuses = ['pending','filed','paid'];
+        $status = in_array($input['status'] ?? '', $allowed_statuses) ? $input['status'] : 'pending';
+        // Validate key format: word:YYYY-MM-DD or word_word:YYYY-MM-DD
+        if (!preg_match('/^[\w_]+:\d{4}-\d{2}-\d{2}$/', $key)) error('Invalid deadline key');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        if (!isset($clients[$id]['dl_statuses']) || !is_array($clients[$id]['dl_statuses'])) {
+            $clients[$id]['dl_statuses'] = [];
+        }
+        $clients[$id]['dl_statuses'][$key] = $status;
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
     // ── LETTERHEAD ──────────────────────────────────────────────────
 
     case 'get_letterhead':
