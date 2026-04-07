@@ -28,6 +28,7 @@ jobs:
             .github/**
             CLAUDE.md
             fr_data/**
+            config.stripe.php
             tg_php_final.php
             wa_php_final.php
             *.md

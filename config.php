@@ -25,17 +25,19 @@ define('FR_DATA_DIR',       __DIR__ . '/fr_data/');
 
 // ============================================================
 // STRIPE CONFIGURATION — Phase 3 Billing
-// Replace placeholder values with your Stripe keys
-// Get them from: https://dashboard.stripe.com/apikeys
+// Keys are stored in config.stripe.php (not in git — upload
+// that file manually to Hostinger via File Manager).
+// Placeholders below are used only if config.stripe.php is absent.
 // ============================================================
 
-// Test keys (use these while building, then swap for live)
-define('FR_STRIPE_SECRET_KEY',     'sk_test_YOUR_SECRET_KEY_HERE');
-define('FR_STRIPE_PUBLIC_KEY',     'pk_test_YOUR_PUBLIC_KEY_HERE');
-// Create a recurring £12/month price in Stripe Dashboard, paste the ID here
-define('FR_STRIPE_PRICE_ID',       'price_YOUR_PRICE_ID_HERE');
-// Get this from Stripe Dashboard → Webhooks → your endpoint → Signing secret
-define('FR_STRIPE_WEBHOOK_SECRET', 'whsec_YOUR_WEBHOOK_SECRET_HERE');
+if (file_exists(__DIR__ . '/config.stripe.php')) {
+    require_once __DIR__ . '/config.stripe.php';
+} else {
+    define('FR_STRIPE_SECRET_KEY',     'sk_live_YOUR_SECRET_KEY_HERE');
+    define('FR_STRIPE_PUBLIC_KEY',     'pk_live_YOUR_PUBLIC_KEY_HERE');
+    define('FR_STRIPE_PRICE_ID',       'price_YOUR_PRICE_ID_HERE');
+    define('FR_STRIPE_WEBHOOK_SECRET', 'whsec_YOUR_WEBHOOK_SECRET_HERE');
+}
 
 // ============================================================
 // COMPANIES HOUSE API — Free lookup for UK company details
