@@ -254,6 +254,7 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
       <a href="dashboard.php" class="active">Client Dashboard</a>
       <a href="letters.php">✉ Correspondence</a>
       <a href="setup.php">⚙ Settings</a>
+      <a href="help.php">❓ Help</a>
     </div>
     <div class="nav-right">
       <span id="clientCountBadge" style="font-size:12px;color:#64748b;display:none"></span>

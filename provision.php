@@ -63,7 +63,7 @@ function provision_firm(string $firm_name, string $email, string $contact_name,
     // Copy application files
     $app_files = [
         'dashboard.php', 'api.php', 'client.php',
-        'letters.php',   'letter_view.php', 'onboard.php', 'setup.php',
+        'letters.php',   'letter_view.php', 'onboard.php', 'setup.php', 'help.php',
     ];
     foreach ($app_files as $f) {
         if (file_exists(__DIR__ . '/' . $f)) {
