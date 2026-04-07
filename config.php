@@ -11,12 +11,11 @@ define('FR_FIRM_ADDRESS',   '5 Brayford Square, London, E1 0SG');
 define('FR_FIRM_WEBSITE',   'https://practice.finaccord.pro');
 define('FR_ICO_NUMBER',     'ZC112776');
 
-// Dashboard password — pre-set, ready to use
-define('FR_PASSWORD_HASH',  '$2y$10$fjuF9qoPdg1N2BAbkSnL1OnRW.tsXLFGpCZ1Y6vXsIMWsTfkFCBaG');
+// Dashboard password
+define('FR_PASSWORD_HASH',  '$2b$10$DjoqR9L/H4ueq3gLGh2tP.YMDoUrC9JfQDCcAHgwcYpxJmMgQmO.W');
 
 // Admin dashboard password (for /admin/ — owner only)
-// Change this! Generate a hash with: php -r "echo password_hash('yourpassword', PASSWORD_BCRYPT);"
-define('FR_ADMIN_PASSWORD', '$2y$10$fjuF9qoPdg1N2BAbkSnL1OnRW.tsXLFGpCZ1Y6vXsIMWsTfkFCBaG'); // same as dashboard default: Lo2355
+define('FR_ADMIN_PASSWORD', '$2b$10$TC3pCenHhcZSulKgeIbE3uT/d.8RFheG8itgVT7S2.Ff.TMhRYgDm');
 
 // Base URL — no trailing slash
 define('FR_BASE_URL',       'https://practice.finaccord.pro');
