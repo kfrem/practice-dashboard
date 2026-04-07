@@ -337,6 +337,38 @@ footer{border-top:1px solid var(--border);background:#fff;padding:24px;text-alig
 
 </div><!-- /main -->
 
+<!-- CROSS-SELL: FULL PACKAGES -->
+<div style="background:var(--navy-dark);padding:48px 24px;margin-top:0">
+  <div style="max-width:860px;margin:0 auto;text-align:center">
+    <div style="display:inline-block;background:var(--gold);color:var(--navy-dark);font-size:11px;font-weight:800;padding:5px 14px;border-radius:20px;margin-bottom:14px;letter-spacing:.5px;text-transform:uppercase">Looking for more?</div>
+    <h2 style="font-size:26px;font-weight:800;color:#fff;margin-bottom:10px;letter-spacing:-.2px">Practice Transformation Packages</h2>
+    <p style="font-size:14px;color:#94a3b8;max-width:600px;margin:0 auto 28px;line-height:1.75">FirmReady gives you the tools. Our transformation packages give you the tools <em style="color:#e2e8f0">plus</em> a dedicated specialist team, bespoke consultancy hours, cash flow models, board packs, and full practice systems — built and maintained for you.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;max-width:700px;margin-left:auto;margin-right:auto">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:20px;text-align:center">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px">Essentials</div>
+        <div style="font-size:22px;font-weight:800;color:#fff">£79<span style="font-size:13px;font-weight:400;color:#94a3b8">/mo</span></div>
+        <div style="font-size:11px;color:#64748b;margin-top:4px">+ £1,200 setup</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:10px">2 hrs/mo consultancy</div>
+      </div>
+      <div style="background:rgba(201,168,76,.12);border:2px solid rgba(201,168,76,.4);border-radius:9px;padding:20px;text-align:center">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:6px">★ Most Popular</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px">Standard</div>
+        <div style="font-size:22px;font-weight:800;color:#fff">£149<span style="font-size:13px;font-weight:400;color:#94a3b8">/mo</span></div>
+        <div style="font-size:11px;color:#64748b;margin-top:4px">+ £2,200 setup</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:10px">5 hrs/mo consultancy</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:20px;text-align:center">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px">Premium</div>
+        <div style="font-size:22px;font-weight:800;color:#fff">£249<span style="font-size:13px;font-weight:400;color:#94a3b8">/mo</span></div>
+        <div style="font-size:11px;color:#64748b;margin-top:4px">+ £3,500 setup</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:10px">10 hrs/mo consultancy</div>
+      </div>
+    </div>
+    <a href="https://practice.finaccord.pro/pricing.html" style="display:inline-block;background:var(--gold);color:var(--navy-dark);font-weight:700;padding:13px 32px;border-radius:6px;font-size:14px">View full packages &rarr;</a>
+    <div style="font-size:12px;color:#475569;margin-top:12px">Includes FirmReady capabilities + dedicated specialist team + bespoke consultancy</div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-links">
