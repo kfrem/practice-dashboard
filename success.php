@@ -56,23 +56,25 @@ footer{border-top:1px solid var(--border);background:#fff;padding:18px;text-alig
     <p class="sub">Your 14-day free trial has started. You have full access to all features — no charge until your trial ends.</p>
 
     <div class="steps">
-      <div class="steps-title">Getting started</div>
+      <div class="steps-title">What happens next</div>
       <div class="step">
         <div class="step-num">1</div>
-        <div class="step-text"><strong>Log in to your dashboard</strong> — use the password you set up, or the default login password provided in your welcome email.</div>
+        <div class="step-text"><strong>Check your inbox</strong> — you'll receive a welcome email within 1–2 minutes with your personal dashboard link and login password.</div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <div class="step-text"><strong>Add your first client</strong> — enter their name, company, service, and email address.</div>
+        <div class="step-text"><strong>Complete your firm setup</strong> — add your firm name, logo and address. Takes less than 2 minutes.</div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <div class="step-text"><strong>Send an engagement letter</strong> — review, edit if needed, and send with one click. Your client signs on any device.</div>
+        <div class="step-text"><strong>Add your first client &amp; send an engagement letter</strong> — your client signs on any device, no account needed.</div>
       </div>
     </div>
 
-    <a href="dashboard.php" class="btn-dashboard">Go to Your Dashboard →</a>
-    <div class="help-note">Questions? Email us at <a href="mailto:info@kafs-ltd.com">info@kafs-ltd.com</a></div>
+    <div style="background:#f0f9f4;border:1px solid #a7f3d0;border-radius:6px;padding:16px 20px;font-size:14px;color:#065f46;margin-bottom:24px">
+      📧 <strong>Your login details are on their way.</strong> Please check your email — including your spam/junk folder.
+    </div>
+    <div class="help-note">Email not arrived after 5 minutes? Contact <a href="mailto:info@kafs-ltd.com">info@kafs-ltd.com</a> and we'll sort it immediately.</div>
   </div>
 </div>
 
