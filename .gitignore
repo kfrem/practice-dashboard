@@ -2,3 +2,5 @@ config.stripe.php
 fr_data/
 firms/
 *.log
+LAUNCHPAD.html
+OPEN-CLAUDE.bat
