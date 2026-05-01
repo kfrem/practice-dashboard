@@ -759,7 +759,24 @@ unset($_sub_file, $_sub, $_grace);
 
   <div class="toast" id="toast"></div>
 
-  <script src="app.js?v=1.1"></script>
+  <script>
+    const FIRM_NAME = <?= json_encode(FR_FIRM_NAME) ?>;
+    const FIRM_ADDR = <?= json_encode(FR_FIRM_ADDRESS) ?>;
+    const FIRM_EMAIL = <?= json_encode(FR_FIRM_EMAIL) ?>;
+    const FIRM_PHONE = <?= json_encode(FR_FIRM_PHONE) ?>;
+    const FIRM_WEBSITE = <?= json_encode(FR_FIRM_WEBSITE) ?>;
+    const FIRM_ICO = <?= json_encode(FR_ICO_NUMBER) ?>;
+    const CLIENT_LIMIT = <?php
+    $sub_file = FR_DATA_DIR . 'subscription.json';
+    if (file_exists($sub_file)) {
+      $sub_data = json_decode(file_get_contents($sub_file), true) ?: [];
+      echo (int) ($sub_data['client_limit'] ?? 50);
+    } else {
+      echo 0;
+    }
+    ?>;
+  </script>
+  <script src="app.js?v=1.3"></script>
 </body>
 
 </html>
