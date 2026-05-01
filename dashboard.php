@@ -21,8 +21,8 @@ unset($_sub_file, $_sub, $_grace);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Client Dashboard â€” The Practice</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Client Dashboard — The Practice</title>
+  <link rel="stylesheet" href="style.css?v=1.1">
 </head>
 
 <body>
@@ -759,7 +759,7 @@ unset($_sub_file, $_sub, $_grace);
 
   <div class="toast" id="toast"></div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=1.1"></script>
 </body>
 
 </html>
