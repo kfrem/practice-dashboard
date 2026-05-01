@@ -4,27 +4,27 @@
 // Fill in your details below. Upload to practice.finaccord.pro
 // ============================================================
 
-define('FR_FIRM_NAME',      'The Practice');
-define('FR_FIRM_EMAIL',     'info@kafs-ltd.com');
-define('FR_FIRM_PHONE',     '+44 7939 823988');
-define('FR_FIRM_ADDRESS',   '5 Brayford Square, London, E1 0SG');
-define('FR_FIRM_WEBSITE',   'https://practice.finaccord.pro');
-define('FR_ICO_NUMBER',     'ZC112776');
+define('FR_FIRM_NAME', 'The Practice');
+define('FR_FIRM_EMAIL', 'info@kafs-ltd.com');
+define('FR_FIRM_PHONE', '+44 7939 823988');
+define('FR_FIRM_ADDRESS', '5 Brayford Square, London, E1 0SG');
+define('FR_FIRM_WEBSITE', 'https://practice.finaccord.pro');
+define('FR_ICO_NUMBER', 'ZC112776');
 
 // Dashboard password
-define('FR_PASSWORD_HASH',  '$2b$10$DjoqR9L/H4ueq3gLGh2tP.YMDoUrC9JfQDCcAHgwcYpxJmMgQmO.W');
+define('FR_PASSWORD_HASH', '$2y$10$fjuF9qoPdg1N2BAbkSnL1OnRW.tsXLFGpCZ1Y6vXsIMWsTfkFCBaG');
 
 // Admin dashboard password (for /admin/ — owner only)
 define('FR_ADMIN_PASSWORD', '$2b$10$TC3pCenHhcZSulKgeIbE3uT/d.8RFheG8itgVT7S2.Ff.TMhRYgDm');
 
 // Base URL — no trailing slash
-define('FR_BASE_URL',       'https://practice.finaccord.pro');
+define('FR_BASE_URL', 'https://practice.finaccord.pro');
 
 // From email for outgoing messages (must match your Hostinger domain)
-define('FR_FROM_EMAIL',     'info@kafs-ltd.com');
+define('FR_FROM_EMAIL', 'info@kafs-ltd.com');
 
 // Data storage directory
-define('FR_DATA_DIR',       __DIR__ . '/fr_data/');
+define('FR_DATA_DIR', __DIR__ . '/fr_data/');
 
 // ============================================================
 // STRIPE CONFIGURATION — Phase 3 Billing
@@ -36,9 +36,9 @@ define('FR_DATA_DIR',       __DIR__ . '/fr_data/');
 if (file_exists(__DIR__ . '/config.stripe.php')) {
     require_once __DIR__ . '/config.stripe.php';
 } else {
-    define('FR_STRIPE_SECRET_KEY',     'sk_live_YOUR_SECRET_KEY_HERE');
-    define('FR_STRIPE_PUBLIC_KEY',     'pk_live_YOUR_PUBLIC_KEY_HERE');
-    define('FR_STRIPE_PRICE_ID',       'price_YOUR_PRICE_ID_HERE');
+    define('FR_STRIPE_SECRET_KEY', 'sk_live_YOUR_SECRET_KEY_HERE');
+    define('FR_STRIPE_PUBLIC_KEY', 'pk_live_YOUR_PUBLIC_KEY_HERE');
+    define('FR_STRIPE_PRICE_ID', 'price_YOUR_PRICE_ID_HERE');
     define('FR_STRIPE_WEBHOOK_SECRET', 'whsec_YOUR_WEBHOOK_SECRET_HERE');
 }
 
