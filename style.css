@@ -199,3 +199,17 @@ footer{border-top:1px solid var(--border);padding:18px 28px;text-align:center;fo
 .btn-save-sig{background:var(--navy);color:#fff;border:none;border-radius:4px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Segoe UI',Georgia,sans-serif;margin-top:8px}
 .btn-save-sig:hover{background:var(--navy-dark)}
 .sig-saved-ok{font-size:12px;color:var(--success);font-weight:600;margin-left:8px;display:none}
+
+/* KANBAN BOARD */
+.kanban-board { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 20px; align-items: flex-start; min-height: 400px; }
+.kanban-col { background: #f8fafc; border-radius: 8px; width: 300px; min-width: 300px; padding: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; }
+.kanban-col-head { font-size: 13px; font-weight: 700; color: var(--navy-dark); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.kanban-col-count { background: #e2e8f0; color: var(--muted); font-size: 11px; padding: 2px 8px; border-radius: 12px; }
+.kanban-dropzone { min-height: 50px; border: 2px dashed transparent; border-radius: 6px; transition: all 0.2s; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+.kanban-dropzone.drag-over { border-color: rgba(201,168,76, 0.5); background: rgba(201,168,76, 0.05); }
+.kanban-card { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); cursor: grab; transition: transform 0.1s; }
+.kanban-card:active { cursor: grabbing; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: scale(1.02); }
+.kanban-card h4 { font-size: 13px; font-weight: 700; color: var(--navy-dark); margin-bottom: 4px; }
+.kanban-card p { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+.kanban-card-ft { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0ece6; padding-top: 8px; font-size: 10px; }
+.k-tag { background: #e8edf5; color: var(--navy); padding: 2px 6px; border-radius: 4px; font-weight: 600; }

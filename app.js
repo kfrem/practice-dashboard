@@ -131,7 +131,7 @@ function switchTab(tab, el) {
   if (el) el.classList.add('active');
   const titles = {all:'All Clients', pending:'Awaiting Signature', signed:'Signed Clients', overdue:'âš ï¸ Overdue â€” Action Required', mtd:'ðŸ“Š MTD Tracker', archive:'ðŸ“ Signed Document Archive'};
   // Hide all views
-  ['viewClients','viewAml','viewMtd','viewDeadlines','viewArchive'].forEach(id => {
+  ['viewClients','viewAml','viewMtd','viewDeadlines','viewArchive','viewKanban'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
@@ -144,6 +144,11 @@ function switchTab(tab, el) {
     document.getElementById('viewDeadlines').style.display = 'block';
     renderDeadlines('all');
   } else if (tab === 'archive') {
+    document.getElementById('viewArchive').style.display = 'block';
+    renderArchive();
+  } else if (tab === 'kanban') {
+    document.getElementById('viewKanban').style.display = 'block';
+    renderKanban();
     document.getElementById('viewArchive').style.display = 'block';
     renderArchive();
   } else {
@@ -1070,4 +1075,60 @@ function renderArchive() {
     <td><div class="hash-short" title="${e(c.doc_hash||'')}">${c.doc_hash?c.doc_hash.substring(0,16)+'â€¦':'â€”'}</div></td>
     <td><a class="btn btn-navy" href="api.php?action=download_pdf&id=${c.id}" target="_blank">â¬‡ PDF</a></td>
   </tr>`).join('');
+}
+// â”€â”€ Kanban Board â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const KANBAN_STAGES = [
+  { id: 'awaiting_info', name: 'Awaiting Info' },
+  { id: 'in_progress', name: 'In Progress' },
+  { id: 'awaiting_approval', name: 'Awaiting Approval' },
+  { id: 'filed', name: 'Filed / Done' }
+];
+
+function renderKanban() {
+  const board = document.getElementById('kanbanBoard');
+  if (!board) return;
+  clients.forEach(c => {
+    if (!c.workflow_stage) c.workflow_stage = 'awaiting_info';
+  });
+
+  let html = '';
+  KANBAN_STAGES.forEach(st => {
+    const stageClients = clients.filter(c => c.workflow_stage === st.id);
+    html += 
+      <div class="kanban-col">
+        <div class="kanban-col-head">
+          <span>+ st.name + </span> <span class="kanban-col-count">+ stageClients.length + </span>
+        </div>
+        <div class="kanban-dropzone" ondragover="allowDrop(event)" ondrop="dropKanban(event, ' + st.id + ')">
+           + stageClients.map(c => 
+            <div class="kanban-card" draggable="true" ondragstart="dragKanban(event, '')">
+              <h4></h4>
+              <p></p>
+              <div class="kanban-card-ft">
+                <span class="k-tag"></span>
+                <span></span>
+              </div>
+            </div>
+          ).join('') + 
+        </div>
+      </div>
+    ;
+  });
+  board.innerHTML = html;
+}
+
+function dragKanban(e, id) { e.dataTransfer.setData('text/plain', id); }
+function allowDrop(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+async function dropKanban(e, stageId) {
+  e.preventDefault();
+  document.querySelectorAll('.kanban-dropzone').forEach(d => d.classList.remove('drag-over'));
+  const id = e.dataTransfer.getData('text/plain');
+  if (!id) return;
+  const c = clients.find(x => x.id === id);
+  if (c && c.workflow_stage !== stageId) {
+    c.workflow_stage = stageId;
+    renderKanban();
+    const res = await api('update_workflow', { id, stage: stageId });
+    if (!res.success) { toast('Failed to move client', true); loadClients(); }
+  }
 }

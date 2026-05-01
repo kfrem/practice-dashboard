@@ -497,6 +497,18 @@ switch ($action) {
         respond(['success' => true]);
         break;
 
+    // UPDATE WORKFLOW
+    case 'update_workflow':
+        require_auth();
+        $id = clean($input['id'] ?? '');
+        $stage = clean($input['stage'] ?? 'awaiting_info');
+        $clients = load_clients();
+        if (!isset($clients[$id])) error('Client not found');
+        $clients[$id]['workflow_stage'] = $stage;
+        save_clients($clients);
+        respond(['success' => true]);
+        break;
+
     // SAVE NOTES
     case 'save_notes':
         require_auth();
