@@ -1,4 +1,4 @@
-
+﻿
 
 
 
@@ -57,7 +57,7 @@ function isOverdue(c) {
   return new Date(c.deadline_at) < new Date();
 }
 
-// â”€â”€ Monthly stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Monthly stats ──────────────────────────────────────
 function renderMonthlyStats() {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -101,10 +101,10 @@ function renderAll() {
   if (overdue.length > 0) {
     bar.classList.add('show');
     document.getElementById('overdueCount').textContent = overdue.length;
-    document.getElementById('tabOverdue').textContent = 'âš ï¸ Overdue (' + overdue.length + ')';
+    document.getElementById('tabOverdue').textContent = '⚠️ Overdue (' + overdue.length + ')';
   } else {
     bar.classList.remove('show');
-    document.getElementById('tabOverdue').textContent = 'âš ï¸ Overdue';
+    document.getElementById('tabOverdue').textContent = '⚠️ Overdue';
   }
   renderMonthlyStats();
   renderTable();
@@ -114,14 +114,14 @@ function renderAll() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const overdueCount = allDl.filter(d => d.status !== 'filed' && d.status !== 'paid' && d.dueDate < today).length;
   const dlTab = document.getElementById('tabDeadlines');
-  if (dlTab) dlTab.textContent = overdueCount > 0 ? `ðŸ“… Deadlines (${overdueCount})` : 'ðŸ“… Deadlines';
+  if (dlTab) dlTab.textContent = overdueCount > 0 ? `📅 Deadlines (${overdueCount})` : '📅 Deadlines';
 }
 
 function switchTab(tab, el) {
   curTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   if (el) el.classList.add('active');
-  const titles = { all: 'All Clients', pending: 'Awaiting Signature', signed: 'Signed Clients', overdue: 'âš ï¸ Overdue â€” Action Required', mtd: 'ðŸ“Š MTD Tracker', archive: 'ðŸ“ Signed Document Archive' };
+  const titles = { all: 'All Clients', pending: 'Awaiting Signature', signed: 'Signed Clients', overdue: '⚠️ Overdue — Action Required', mtd: '📊 MTD Tracker', archive: '📁 Signed Document Archive' };
   // Hide all views
   ['viewClients', 'viewAml', 'viewMtd', 'viewDeadlines', 'viewArchive', 'viewKanban'].forEach(id => {
     const el = document.getElementById(id);
@@ -161,17 +161,17 @@ function renderTable() {
 
   const tbody = document.getElementById('clientTbody');
   if (!list.length) {
-    const icon = curTab === 'overdue' ? 'âœ…' : 'ðŸ“‹';
-    const msg = curTab === 'overdue' ? 'No overdue clients â€” everything is on track' : 'No clients found. Click "+ Add New Client" to get started.';
+    const icon = curTab === 'overdue' ? '✅' : '📋';
+    const msg = curTab === 'overdue' ? 'No overdue clients — everything is on track' : 'No clients found. Click "+ Add New Client" to get started.';
     tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">${icon}</div><div class="empty-lbl">${msg}</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML = list.map(c => `<tr ${isOverdue(c) ? 'style="background:#fff8f8;"' : ''}>
     <td>
       <div class="c-name">${e(c.name)}
-        <button class="notes-pill ${c.notes ? 'has-notes' : ''}" onclick="openNotes('${c.id}')" title="Internal notes">${c.notes ? 'ðŸ“ Notes' : '+ Note'}</button>
+        <button class="notes-pill ${c.notes ? 'has-notes' : ''}" onclick="openNotes('${c.id}')" title="Internal notes">${c.notes ? '📝 Notes' : '+ Note'}</button>
       </div>
-      <div class="c-info">${e(c.email)}${c.company ? ' Â· ' + e(c.company) : ''}${c.fee ? ' Â· <strong>' + e(c.fee) + '</strong>' : ''}</div>
+      <div class="c-info">${e(c.email)}${c.company ? ' · ' + e(c.company) : ''}${c.fee ? ' · <strong>' + e(c.fee) + '</strong>' : ''}</div>
     </td>
     <td style="font-size:12px">${e(c.type)}</td>
     <td style="font-size:12px">${renderServices(c.service)}</td>
@@ -185,59 +185,59 @@ function renderTable() {
 function renderAml() {
   const tbody = document.getElementById('amlTbody');
   if (!clients.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">ðŸ”</div><div class="empty-lbl">No clients yet.</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🔐</div><div class="empty-lbl">No clients yet.</div></div></td></tr>';
     return;
   }
   tbody.innerHTML = clients.map(c => `<tr>
     <td><div class="c-name">${e(c.name)}</div><div class="c-info">${e(c.company || '')}</div></td>
-    <td style="font-size:12px">${e(c.aml_id_type) || 'â€”'}</td>
-    <td style="font-family:monospace;font-size:11px">${e(c.aml_id_ref) || 'â€”'}</td>
-    <td><span class="badge ${c.aml_risk === 'High' ? 'b-pending' : c.aml_risk === 'Medium' ? 'b-sent' : 'b-signed'}">${e(c.aml_risk) || 'â€”'}</span></td>
-    <td style="font-size:12px">${c.aml_verified_date ? new Date(c.aml_verified_date).toLocaleDateString('en-GB') : 'â€”'}</td>
+    <td style="font-size:12px">${e(c.aml_id_type) || '—'}</td>
+    <td style="font-family:monospace;font-size:11px">${e(c.aml_id_ref) || '—'}</td>
+    <td><span class="badge ${c.aml_risk === 'High' ? 'b-pending' : c.aml_risk === 'Medium' ? 'b-sent' : 'b-signed'}">${e(c.aml_risk) || '—'}</span></td>
+    <td style="font-size:12px">${c.aml_verified_date ? new Date(c.aml_verified_date).toLocaleDateString('en-GB') : '—'}</td>
     <td>${amlBadge(c.aml_status)}</td>
     <td><button class="btn btn-outline" onclick="openAml('${c.id}')">${c.aml_status === 'complete' ? 'Edit' : 'Complete'}</button></td>
   </tr>`).join('');
 }
 
 function sigBadge(c) {
-  if (c.status === 'signed') return `<span class="badge b-signed">âœ“ Signed<br><span style="font-weight:400;font-size:10px">${new Date(c.signed_at).toLocaleDateString('en-GB')}</span></span>`;
+  if (c.status === 'signed') return `<span class="badge b-signed">✓ Signed<br><span style="font-weight:400;font-size:10px">${new Date(c.signed_at).toLocaleDateString('en-GB')}</span></span>`;
   if (c.status === 'sent') return `<span class="badge b-sent">Link Sent<br><span style="font-weight:400;font-size:10px">${new Date(c.sent_at).toLocaleDateString('en-GB')}</span></span>`;
   return '<span class="badge b-pending">Not Sent</span>';
 }
 function deadlineBadge(c) {
-  if (c.status === 'signed' || !c.deadline_at) return '<span style="color:var(--muted);font-size:11px;">â€”</span>';
+  if (c.status === 'signed' || !c.deadline_at) return '<span style="color:var(--muted);font-size:11px;">—</span>';
   const dl = new Date(c.deadline_at), diff = dl - new Date();
   if (diff < 0) { const h = Math.round(Math.abs(diff) / 3600000); return `<span class="badge b-overdue">Overdue<br><span style="font-weight:400;font-size:10px">${h > 48 ? Math.round(h / 24) + 'd ago' : h + 'h ago'}</span></span>`; }
   if (diff < 6 * 3600000) return `<span class="badge b-due-soon">Due soon<br><span style="font-weight:400;font-size:10px">${dl.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span></span>`;
   return `<span style="font-size:11px;color:var(--muted)">${dl.toLocaleDateString('en-GB')}<br>${dl.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>`;
 }
 function amlBadge(s) {
-  return s === 'complete' ? '<span class="badge b-aml-ok">âœ“ Complete</span>' : '<span class="badge b-aml-p">Pending</span>';
+  return s === 'complete' ? '<span class="badge b-aml-ok">✓ Complete</span>' : '<span class="badge b-aml-p">Pending</span>';
 }
 function actions(c) {
   let a = '';
   if (c.status === 'signed') {
-    a += `<a class="btn btn-navy" href="api.php?action=download_pdf&id=${c.id}" target="_blank" style="margin-right:4px">â¬‡ PDF</a>`;
+    a += `<a class="btn btn-navy" href="api.php?action=download_pdf&id=${c.id}" target="_blank" style="margin-right:4px">⬇ PDF</a>`;
   } else {
     a += `<button class="btn btn-gold" onclick="openLink('${c.id}')" style="margin-right:4px">Send Link</button>`;
     if (c.status === 'sent') {
       const n = parseInt(c.reminders_sent || 0);
-      const label = n > 0 ? `ðŸ”” Reminder ${n + 1}` : 'ðŸ”” Remind';
+      const label = n > 0 ? `🔔 Reminder ${n + 1}` : '🔔 Remind';
       a += `<button class="btn ${isOverdue(c) ? 'btn-red' : 'btn-outline'}" onclick="sendReminder('${c.id}')" style="margin-right:4px">${label}</button>`;
       // WhatsApp button if phone exists
       if (c.phone) {
         const phone = c.phone.replace(/\D/g, '');
         const waPhone = phone.startsWith('0') ? '44' + phone.slice(1) : phone;
         const waMsg = encodeURIComponent(`Dear ${c.name}, this is a reminder from The Practice. Could you please sign your engagement letter at your earliest convenience? Thank you.`);
-        a += `<a class="btn btn-outline" href="https://wa.me/${waPhone}?text=${waMsg}" target="_blank" style="margin-right:4px" title="WhatsApp reminder">ðŸ’¬</a>`;
+        a += `<a class="btn btn-outline" href="https://wa.me/${waPhone}?text=${waMsg}" target="_blank" style="margin-right:4px" title="WhatsApp reminder">💬</a>`;
       }
     }
   }
   a += `<button class="btn btn-outline" onclick="openAml('${c.id}')" style="margin-right:4px">AML</button>`;
-  a += `<button class="btn btn-outline" onclick="openDeadlines('${c.id}')" style="margin-right:4px" title="Deadline tracker">ðŸ“…</button>`;
+  a += `<button class="btn btn-outline" onclick="openDeadlines('${c.id}')" style="margin-right:4px" title="Deadline tracker">📅</button>`;
   // DPA button
   if (c.dpa_status === 'signed') {
-    a += `<span class="badge" style="background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;margin-right:4px;font-size:10px">âœ“ DPA</span>`;
+    a += `<span class="badge" style="background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;margin-right:4px;font-size:10px">✓ DPA</span>`;
   } else if (c.dpa_status === 'sent') {
     a += `<span class="badge" style="background:#fef9c3;color:#92400e;border:1px solid #fde68a;margin-right:4px;font-size:10px">DPA Sent</span>`;
   } else {
@@ -245,9 +245,9 @@ function actions(c) {
   }
   // Activate onboarding
   if (c.status === 'onboarded') {
-    a += `<button class="btn btn-gold" onclick="activateOnboard('${c.id}')" style="margin-right:4px;font-size:11px">âœ“ Activate</button>`;
+    a += `<button class="btn btn-gold" onclick="activateOnboard('${c.id}')" style="margin-right:4px;font-size:11px">✓ Activate</button>`;
   }
-  a += `<button class="btn btn-red" onclick="delClient('${c.id}')">âœ•</button>`;
+  a += `<button class="btn btn-red" onclick="delClient('${c.id}')">✕</button>`;
   return a;
 }
 function e(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
@@ -255,7 +255,7 @@ function e(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').re
 function openM(id) { document.getElementById(id).classList.add('open'); }
 function closeM(id) { document.getElementById(id).classList.remove('open'); }
 
-// â”€â”€ Add Client â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Add Client ──────────────────────────────────
 let customSvcs = [];
 
 function addCustomSvc() {
@@ -267,7 +267,7 @@ function addCustomSvc() {
 }
 function renderSvcTags() {
   document.getElementById('addSvcTags').innerHTML = customSvcs.map((s, i) =>
-    `<span class="svc-tag">${e(s)}<button class="svc-tag-x" onclick="customSvcs.splice(${i},1);renderSvcTags()">Ã—</button></span>`
+    `<span class="svc-tag">${e(s)}<button class="svc-tag-x" onclick="customSvcs.splice(${i},1);renderSvcTags()">×</button></span>`
   ).join('');
 }
 function getSelectedServices() {
@@ -275,9 +275,9 @@ function getSelectedServices() {
   return [...checked, ...customSvcs];
 }
 function renderServices(svc) {
-  if (!svc) return 'â€”';
+  if (!svc) return '—';
   const parts = svc.split('\n').filter(s => s.trim());
-  if (!parts.length) return 'â€”';
+  if (!parts.length) return '—';
   if (parts.length === 1) return e(parts[0]);
   return e(parts[0]) + `<span style="color:var(--muted);font-size:11px"> +${parts.length - 1} more</span>`;
 }
@@ -311,16 +311,16 @@ async function addClient() {
   else document.getElementById('addAlert').innerHTML = `<div class="alert a-err">${d.error}</div>`;
 }
 
-// â”€â”€ Send Link with letter editor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Send Link with letter editor ─────────────────
 function buildDefaultLetter(c) {
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const feeLine = c.fee ? `\n\nFEES\nOur agreed fee for the above services is: ${c.fee}\n` : '\n\nFEES\nOur fees will be agreed and confirmed separately in writing.\n';
   const svcParts = (c.service || '').split('\n').filter(s => s.trim());
-  const serviceBullets = svcParts.length ? svcParts.map(s => 'â€¢ ' + s).join('\n') : 'â€¢ Services to be confirmed';
+  const serviceBullets = svcParts.length ? svcParts.map(s => '• ' + s).join('\n') : '• Services to be confirmed';
   const svcSummary = svcParts.length ? svcParts.join(', ') : 'Accountancy Services';
   const clientBlock = [c.name, c.company || '', c.type].filter(Boolean).join('\n');
   return `CLIENT ENGAGEMENT LETTER
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+────────────────────────────────────────────────────────────────────
 
 ${FIRM_NAME}
 ${FIRM_ADDR}
@@ -331,16 +331,16 @@ ICO Reg: ${FIRM_ICO}
 
                                                         ${today}
 
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+────────────────────────────────────────────────────────────────────
 
 ${clientBlock}
-[Client Address â€” please complete before sending]
+[Client Address — please complete before sending]
 
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+────────────────────────────────────────────────────────────────────
 
 Dear ${c.name.split(' ')[0]},
 
-Re: Letter of Engagement â€” ${svcSummary}
+Re: Letter of Engagement — ${svcSummary}
 
 Thank you for choosing ${FIRM_NAME}. We are pleased to confirm our appointment as your accountants. This letter sets out the basis on which we will act for you.
 
@@ -375,7 +375,7 @@ ${FIRM_EMAIL} | ${FIRM_PHONE}
 ${FIRM_WEBSITE}`;
 }
 
-// â”€â”€ Firm Signature â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Firm Signature ────────────────────────────────
 let savedFirmSig = '', fsigCtx = null, fsigDrawing = false, fsigLx = 0, fsigLy = 0, fsigUploadData = '';
 
 function switchFSigTab(tab) {
@@ -416,7 +416,7 @@ async function saveFirmSig(source) {
   const sigData = source === 'draw'
     ? document.getElementById('fsigCanvas').toDataURL('image/png')
     : fsigUploadData;
-  if (!sigData || sigData === 'data:,') { toast('Nothing to save â€” please draw or upload first'); return; }
+  if (!sigData || sigData === 'data:,') { toast('Nothing to save — please draw or upload first'); return; }
   const d = await api('save_firm_sig', { sig: sigData });
   if (d.success) {
     savedFirmSig = sigData;
@@ -428,7 +428,7 @@ async function saveFirmSig(source) {
     ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
     switchFSigTab('saved');
     toast('Firm signature saved');
-  } else { toast('Save failed â€” ' + (d.error || 'unknown error')); }
+  } else { toast('Save failed — ' + (d.error || 'unknown error')); }
 }
 
 function openLink(id) {
@@ -448,7 +448,7 @@ function openLink(id) {
   document.getElementById('linkStep2').style.display = 'none';
   document.getElementById('linkFoot').style.display = 'flex';
   document.getElementById('sendBtn').disabled = false;
-  document.getElementById('sendBtn').textContent = 'ðŸ“§ Save Letter & Send â†’';
+  document.getElementById('sendBtn').textContent = '📧 Save Letter & Send →';
   // Load firm signature
   switchFSigTab('saved');
   fsigCtx = null; // reset so canvas re-inits on next Draw tab open
@@ -464,7 +464,7 @@ function openLink(id) {
 
 async function sendLink() {
   document.getElementById('sendBtn').disabled = true;
-  document.getElementById('sendBtn').textContent = 'Saving & Sendingâ€¦';
+  document.getElementById('sendBtn').textContent = 'Saving & Sending…';
   const deadlineHours = parseInt(document.getElementById('linkDeadline').value);
   const customLetter = document.getElementById('letterEditor').value.trim();
   const fee = document.getElementById('linkFee').value.trim();
@@ -494,7 +494,7 @@ async function sendLink() {
   } else {
     document.getElementById('linkAlert').innerHTML = `<div class="alert a-err">${d.error || 'Email failed. Check your config.php email settings.'}</div>`;
     document.getElementById('sendBtn').disabled = false;
-    document.getElementById('sendBtn').textContent = 'ðŸ“§ Save Letter & Send â†’';
+    document.getElementById('sendBtn').textContent = '📧 Save Letter & Send →';
   }
 }
 
@@ -506,12 +506,12 @@ function copyLink() {
   });
 }
 
-// â”€â”€ Remind All Overdue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Remind All Overdue ──────────────────────────
 async function remindAll() {
   const overdue = clients.filter(c => isOverdue(c));
   if (!overdue.length) { toast('No overdue clients'); return; }
   if (!confirm(`Send reminders to all ${overdue.length} overdue client(s)?`)) return;
-  toast('Sending remindersâ€¦');
+  toast('Sending reminders…');
   const d = await api('remind_all');
   if (d.success) {
     await loadClients();
@@ -519,7 +519,7 @@ async function remindAll() {
   } else toast('Error sending reminders', true);
 }
 
-// â”€â”€ Send individual reminder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Send individual reminder ─────────────────────
 async function sendReminder(id) {
   const c = clients.find(x => x.id === id);
   const n = parseInt(c.reminders_sent || 0) + 1;
@@ -534,7 +534,7 @@ async function sendReminder(id) {
   } else toast(d.error || 'Could not send reminder', true);
 }
 
-// â”€â”€ Notes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Notes ───────────────────────────────────────
 function openNotes(id) {
   curNotesId = id;
   const c = clients.find(x => x.id === id);
@@ -555,11 +555,11 @@ async function saveNotes() {
   } else document.getElementById('notesAlert').innerHTML = `<div class="alert a-err">${d.error}</div>`;
 }
 
-// â”€â”€ AML â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── AML ─────────────────────────────────────────
 function openAml(id) {
   curAmlId = id;
   const c = clients.find(x => x.id === id);
-  document.getElementById('amlName').textContent = c.name + (c.company ? ' â€” ' + c.company : '');
+  document.getElementById('amlName').textContent = c.name + (c.company ? ' — ' + c.company : '');
   document.getElementById('amlIdType').value = c.aml_id_type || 'UK Passport';
   document.getElementById('amlIdRef').value = c.aml_id_ref || '';
   document.getElementById('amlDate').value = c.aml_verified_date || new Date().toISOString().split('T')[0];
@@ -591,14 +591,14 @@ async function saveAml() {
   } else document.getElementById('amlAlert').innerHTML = `<div class="alert a-err">${d.error}</div>`;
 }
 
-// â”€â”€ Delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Delete ──────────────────────────────────────
 async function delClient(id) {
   if (!confirm('Delete this client? This cannot be undone.')) return;
   const d = await api('delete_client', { id });
   if (d.success) { clients = clients.filter(c => c.id !== id); renderAll(); toast('Client removed'); }
 }
 
-// â”€â”€ MTD Tracker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── MTD Tracker ─────────────────────────────────
 let curMtdId = '';
 
 function mtdStatusBadge(s, threshold) {
@@ -606,39 +606,39 @@ function mtdStatusBadge(s, threshold) {
   const live = threshold === 'over50k';
   const soon27 = threshold === '30k-50k';
   const soon28 = threshold === '20k-30k';
-  if (s === 'compliant') return '<span class="badge b-mtd-ok">âœ“ Compliant</span>';
+  if (s === 'compliant') return '<span class="badge b-mtd-ok">✓ Compliant</span>';
   if (s === 'enrolled') return '<span class="badge b-mtd-ok">Enrolled</span>';
   if (s === 'exempt') return '<span class="badge b-mtd-na">Exempt</span>';
   if (s === 'in_progress') return '<span class="badge b-mtd-soon">In Progress</span>';
-  if (live) return '<span class="badge b-mtd-live">âš ï¸ Action Required</span>';
+  if (live) return '<span class="badge b-mtd-live">⚠️ Action Required</span>';
   if (soon27 || soon28) return '<span class="badge b-mtd-soon">Coming Soon</span>';
   return '<span class="badge b-mtd-na">Not in scope</span>';
 }
 
 function mtdThresholdLabel(t) {
   const map = {
-    'over50k': 'Over Â£50k â€” In scope NOW',
-    '30k-50k': 'Â£30kâ€“Â£50k â€” April 2027',
-    '20k-30k': 'Â£20kâ€“Â£30k â€” April 2028',
-    'under20k': 'Under Â£20k â€” Not in scope'
+    'over50k': 'Over £50k — In scope NOW',
+    '30k-50k': '£30k–£50k — April 2027',
+    '20k-30k': '£20k–£30k — April 2028',
+    'under20k': 'Under £20k — Not in scope'
   };
-  return map[t] || 'â€”';
+  return map[t] || '—';
 }
 
 function renderMtd() {
   const tbody = document.getElementById('mtdTbody');
   if (!clients.length) {
-    tbody.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">ðŸ“Š</div><div class="empty-lbl">No clients yet.</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📊</div><div class="empty-lbl">No clients yet.</div></div></td></tr>';
     return;
   }
   tbody.innerHTML = clients.map(c => `<tr>
-    <td><div class="c-name">${e(c.name)}</div><div class="c-info">${e(c.company || '')} Â· ${e(c.type)}</div></td>
+    <td><div class="c-name">${e(c.name)}</div><div class="c-info">${e(c.company || '')} · ${e(c.type)}</div></td>
     <td style="font-size:12px">${e(mtdThresholdLabel(c.mtd_threshold || ''))}</td>
     <td>${mtdStatusBadge(c.mtd_status || 'not_started', c.mtd_threshold || '')}</td>
-    <td style="font-size:12px">${e(c.mtd_software || 'â€”')}</td>
-    <td style="font-size:12px">${c.mtd_enrol_date ? new Date(c.mtd_enrol_date).toLocaleDateString('en-GB') : 'â€”'}</td>
-    <td style="font-size:12px">${c.mtd_next_sub ? '<strong>' + new Date(c.mtd_next_sub).toLocaleDateString('en-GB') + '</strong>' : 'â€”'}</td>
-    <td style="font-size:11px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e(c.mtd_notes || '')}">${e(c.mtd_notes || 'â€”')}</td>
+    <td style="font-size:12px">${e(c.mtd_software || '—')}</td>
+    <td style="font-size:12px">${c.mtd_enrol_date ? new Date(c.mtd_enrol_date).toLocaleDateString('en-GB') : '—'}</td>
+    <td style="font-size:12px">${c.mtd_next_sub ? '<strong>' + new Date(c.mtd_next_sub).toLocaleDateString('en-GB') + '</strong>' : '—'}</td>
+    <td style="font-size:11px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e(c.mtd_notes || '')}">${e(c.mtd_notes || '—')}</td>
     <td><button class="btn btn-outline" onclick="openMtd('${c.id}')">Update</button></td>
   </tr>`).join('');
 }
@@ -699,7 +699,7 @@ async function saveMtd() {
   }
 }
 
-// â”€â”€ Deadline Tracker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Deadline Tracker ─────────────────────────────
 let curDlId = null;
 let dlActiveFilter = 'all';
 
@@ -787,7 +787,7 @@ function computeClientDeadlines(c) {
     const ctReturn = addMonths(ye, 12);
     const ctPayment = addDays(addMonths(ye, 9), 1);
     const chAccounts = addMonths(ye, 9);
-    deadlines.push(entry('ct_return', 'CT600 â€” Corporation Tax Return', ctReturn));
+    deadlines.push(entry('ct_return', 'CT600 — Corporation Tax Return', ctReturn));
     deadlines.push(entry('ct_payment', 'Corporation Tax Payment', ctPayment));
     deadlines.push(entry('ch_accounts', 'Companies House Annual Accounts', chAccounts));
   }
@@ -822,7 +822,7 @@ function computeClientDeadlines(c) {
   // Self Assessment
   if (c.dl_self_assessment) {
     saDueDates().forEach((d, i) => {
-      const label = (d.getMonth() === 0) ? 'Self Assessment Return + Payment on Account' : 'SA â€” Second Payment on Account';
+      const label = (d.getMonth() === 0) ? 'Self Assessment Return + Payment on Account' : 'SA — Second Payment on Account';
       deadlines.push(entry('sa', label, d));
     });
   }
@@ -887,7 +887,7 @@ function renderDeadlines(filter) {
 
   const tbody = document.getElementById('dlTbody');
   if (!all.length) {
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-icon">ðŸ“…</div><div class="empty-lbl">${filter === 'all' ? 'No deadlines set up yet. Click ðŸ“… on any client row to configure.' : 'No deadlines match this filter.'}</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-icon">📅</div><div class="empty-lbl">${filter === 'all' ? 'No deadlines set up yet. Click 📅 on any client row to configure.' : 'No deadlines match this filter.'}</div></div></td></tr>`;
     return;
   }
 
@@ -895,20 +895,20 @@ function renderDeadlines(filter) {
     const days = dlDaysLeft(d.dueDate);
     const rc = dlRowClass(d);
     const done = d.status === 'filed' || d.status === 'paid';
-    const daysLabel = done ? 'â€”'
+    const daysLabel = done ? '—'
       : days < 0 ? `<strong style="color:#991b1b">${Math.abs(days)}d overdue</strong>`
         : days === 0 ? '<strong style="color:#991b1b">Today!</strong>'
           : days === 1 ? '<strong style="color:#c2410c">Tomorrow</strong>'
             : `${days} days`;
 
-    const statusLabel = d.status === 'filed' ? 'âœ“ Filed'
-      : d.status === 'paid' ? 'âœ“ Paid'
-        : days < 0 ? 'âš ï¸ Overdue' : 'Pending';
+    const statusLabel = d.status === 'filed' ? '✓ Filed'
+      : d.status === 'paid' ? '✓ Paid'
+        : days < 0 ? '⚠️ Overdue' : 'Pending';
 
     const actionBtns = done
-      ? `<button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markDl('${d.clientId}','${d.key}','pending')">â†© Reopen</button>`
-      : `<button class="btn btn-outline" style="font-size:11px;padding:4px 10px;margin-right:4px" onclick="markDl('${d.clientId}','${d.key}','filed')">âœ“ Filed</button>
-         <button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markDl('${d.clientId}','${d.key}','paid')">Â£ Paid</button>`;
+      ? `<button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markDl('${d.clientId}','${d.key}','pending')">↩ Reopen</button>`
+      : `<button class="btn btn-outline" style="font-size:11px;padding:4px 10px;margin-right:4px" onclick="markDl('${d.clientId}','${d.key}','filed')">✓ Filed</button>
+         <button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="markDl('${d.clientId}','${d.key}','paid')">£ Paid</button>`;
 
     return `<tr class="${rc}">
       <td style="font-weight:600">${e(d.clientName)}</td>
@@ -967,17 +967,17 @@ async function markDl(clientId, key, status) {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const oc = allDl.filter(x => x.status !== 'filed' && x.status !== 'paid' && x.dueDate < today).length;
     const dlTab = document.getElementById('tabDeadlines');
-    if (dlTab) dlTab.textContent = oc > 0 ? `ðŸ“… Deadlines (${oc})` : 'ðŸ“… Deadlines';
+    if (dlTab) dlTab.textContent = oc > 0 ? `📅 Deadlines (${oc})` : '📅 Deadlines';
   }
 }
 
-// â”€â”€ Companies House Lookup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Companies House Lookup ───────────────────────
 async function chLookup() {
   const q = document.getElementById('addCompany').value.trim();
   if (q.length < 2) { alert('Enter at least 2 characters to search.'); return; }
   const res = document.getElementById('chResults');
   res.style.display = 'block';
-  res.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px">Searching Companies Houseâ€¦</div>';
+  res.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px">Searching Companies House…</div>';
   const d = await api('ch_lookup', { query: q });
   if (!d.ok || !d.results.length) {
     res.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--muted)">' + (d.error || 'No active companies found.') + '</div>';
@@ -1006,13 +1006,13 @@ function chSelect(r) {
   document.getElementById('chResults').style.display = 'none';
 }
 
-// â”€â”€ Onboarding â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Onboarding ────────────────────────────────────
 async function sendOnboard() {
   const name = document.getElementById('obName').value.trim();
   const email = document.getElementById('obEmail').value.trim();
   if (!name || !email) { document.getElementById('onboardAlert').innerHTML = '<div class="alert a-err">Name and email are required.</div>'; return; }
   document.getElementById('obSendBtn').disabled = true;
-  document.getElementById('obSendBtn').textContent = 'Sendingâ€¦';
+  document.getElementById('obSendBtn').textContent = 'Sending…';
   const d = await api('create_onboard', { name, email });
   document.getElementById('obSendBtn').disabled = false;
   document.getElementById('obSendBtn').textContent = 'Send Onboarding Link';
@@ -1036,7 +1036,7 @@ async function activateOnboard(id) {
   else alert(d.error);
 }
 
-// â”€â”€ DPA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── DPA ───────────────────────────────────────────
 async function sendDpa(id) {
   const c = clients.find(x => x.id === id);
   if (!confirm(`Send a GDPR Data Processing Agreement to ${c.name} (${c.email}) for e-signature?`)) return;
@@ -1051,27 +1051,27 @@ async function sendDpa(id) {
   }
 }
 
-// â”€â”€ Document Archive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Document Archive ─────────────────────────────
 function renderArchive() {
   const tbody = document.getElementById('archiveTbody');
   const signed = clients.filter(c => c.status === 'signed');
   if (!signed.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">ðŸ“</div><div class="empty-lbl">No signed documents yet. Documents will appear here after clients sign.</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">📁</div><div class="empty-lbl">No signed documents yet. Documents will appear here after clients sign.</div></div></td></tr>';
     return;
   }
   tbody.innerHTML = signed
     .sort((a, b) => new Date(b.signed_at) - new Date(a.signed_at))
     .map(c => `<tr>
-    <td><div class="c-name">${e(c.name)}</div><div class="c-info">${e(c.email)}${c.company ? ' Â· ' + e(c.company) : ''}</div></td>
+    <td><div class="c-name">${e(c.name)}</div><div class="c-info">${e(c.email)}${c.company ? ' · ' + e(c.company) : ''}</div></td>
     <td style="font-size:12px">${renderServices(c.service)}</td>
     <td style="font-size:12px">${new Date(c.signed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-    <td><span class="badge b-signed">${c.sig_method === 'draw' ? 'âœï¸ Drawn' : 'Aa Typed'}</span></td>
-    <td style="font-size:11px;color:var(--muted)">${e(c.signed_ip || 'â€”')}</td>
-    <td><div class="hash-short" title="${e(c.doc_hash || '')}">${c.doc_hash ? c.doc_hash.substring(0, 16) + 'â€¦' : 'â€”'}</div></td>
-    <td><a class="btn btn-navy" href="api.php?action=download_pdf&id=${c.id}" target="_blank">â¬‡ PDF</a></td>
+    <td><span class="badge b-signed">${c.sig_method === 'draw' ? '✍️ Drawn' : 'Aa Typed'}</span></td>
+    <td style="font-size:11px;color:var(--muted)">${e(c.signed_ip || '—')}</td>
+    <td><div class="hash-short" title="${e(c.doc_hash || '')}">${c.doc_hash ? c.doc_hash.substring(0, 16) + '…' : '—'}</div></td>
+    <td><a class="btn btn-navy" href="api.php?action=download_pdf&id=${c.id}" target="_blank">⬇ PDF</a></td>
   </tr>`).join('');
 }
-// â”€â”€ Kanban Board â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Kanban Board ────────────────────────────────────
 const KANBAN_STAGES = [
   { id: 'awaiting_info', name: 'Awaiting Info' },
   { id: 'in_progress', name: 'In Progress' },

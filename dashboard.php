@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/config.php';
 
-// â”€â”€ Subscription guard (only for provisioned firm instances) â”€â”€
+// ── Subscription guard (only for provisioned firm instances) ──
 $_sub_file = FR_DATA_DIR . 'subscription.json';
 if (file_exists($_sub_file)) {
   $_sub = json_decode(file_get_contents($_sub_file), true) ?: [];
@@ -21,7 +21,7 @@ unset($_sub_file, $_sub, $_grace);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Client Dashboard — The Practice</title>
+  <title>Client Dashboard � The Practice</title>
   <link rel="stylesheet" href="style.css?v=1.1">
 </head>
 
@@ -31,10 +31,10 @@ unset($_sub_file, $_sub, $_grace);
   <div id="loginScreen">
     <div class="login-box">
       <div class="login-logo">The <span>Practice</span></div>
-      <div class="login-sub">Client Dashboard â€” Secure Access</div>
+      <div class="login-sub">Client Dashboard — Secure Access</div>
       <input type="password" id="pwdInput" placeholder="Enter your password"
         onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="btn-login" onclick="doLogin()">Sign In â†’</button>
+      <button class="btn-login" onclick="doLogin()">Sign In →</button>
       <div id="loginErr">Incorrect password. Please try again.</div>
     </div>
   </div>
@@ -51,16 +51,16 @@ unset($_sub_file, $_sub, $_grace);
         <a href="scorecard.html">Practice Scorecard</a>
         <a href="portal.html">Client Portal Demo</a>
         <a href="resources.html">Free Resources</a>
-        <a href="pricing.html#partnership" class="partner">â˜… Partner Programme</a>
+        <a href="pricing.html#partnership" class="partner">★ Partner Programme</a>
         <a href="dashboard.php" class="active">Client Dashboard</a>
-        <a href="letters.php">âœ‰ Correspondence</a>
-        <a href="setup.php">âš™ Settings</a>
-        <a href="help.php">â“ Help</a>
+        <a href="letters.php">✉ Correspondence</a>
+        <a href="setup.php">⚙ Settings</a>
+        <a href="help.php">❓ Help</a>
       </div>
       <div class="nav-right">
         <span id="clientCountBadge" style="font-size:12px;color:#64748b;display:none"></span>
         <button class="logout-btn" onclick="doLogout()">Log out</button>
-        <button class="btn btn-outline" style="font-size:13px;padding:8px 16px" onclick="openM('onboardModal')">ðŸ“‹
+        <button class="btn btn-outline" style="font-size:13px;padding:8px 16px" onclick="openM('onboardModal')">📋
           Send Onboarding Link</button>
         <button class="nav-cta" onclick="openAddClient()">+ Add Client</button>
       </div>
@@ -79,14 +79,14 @@ unset($_sub_file, $_sub, $_grace);
       <!-- OVERDUE ALERT BAR -->
       <div class="overdue-bar" id="overdueBar">
         <div>
-          <div class="overdue-bar-text">âš ï¸ <span id="overdueCount">0</span> client(s) have not signed past their
+          <div class="overdue-bar-text">⚠️ <span id="overdueCount">0</span> client(s) have not signed past their
             deadline</div>
           <div class="overdue-bar-sub">Send reminders individually or use Remind All to chase everyone at once</div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-red" onclick="remindAll()">ðŸ”” Remind All Overdue</button>
+          <button class="btn btn-red" onclick="remindAll()">🔔 Remind All Overdue</button>
           <button class="btn btn-outline" style="color:#991b1b;border-color:#fca5a5"
-            onclick="switchTab('overdue', document.getElementById('tabOverdue'))">View Overdue â†’</button>
+            onclick="switchTab('overdue', document.getElementById('tabOverdue'))">View Overdue →</button>
         </div>
       </div>
 
@@ -116,14 +116,14 @@ unset($_sub_file, $_sub, $_grace);
       <!-- TABS -->
       <div class="tabs">
         <div class="tab active" onclick="switchTab('all',this)">All Clients</div>
-        <div class="tab" id="tabKanban" onclick="switchTab('kanban',this)">📋 Workflow Board</div>
+        <div class="tab" id="tabKanban" onclick="switchTab('kanban',this)">?? Workflow Board</div>
         <div class="tab" onclick="switchTab('pending',this)">Awaiting Signature</div>
-        <div class="tab" id="tabOverdue" onclick="switchTab('overdue',this)">âš ï¸ Overdue</div>
+        <div class="tab" id="tabOverdue" onclick="switchTab('overdue',this)">⚠️ Overdue</div>
         <div class="tab" onclick="switchTab('signed',this)">Signed</div>
         <div class="tab" onclick="switchTab('aml',this)">AML Records</div>
-        <div class="tab" onclick="switchTab('mtd',this)">ðŸ“Š MTD Tracker</div>
-        <div class="tab" id="tabDeadlines" onclick="switchTab('deadlines',this)">ðŸ“… Deadlines</div>
-        <div class="tab" onclick="switchTab('archive',this)">ðŸ“ Archive</div>
+        <div class="tab" onclick="switchTab('mtd',this)">📊 MTD Tracker</div>
+        <div class="tab" id="tabDeadlines" onclick="switchTab('deadlines',this)">📅 Deadlines</div>
+        <div class="tab" onclick="switchTab('archive',this)">📁 Archive</div>
       </div>
 
       <!-- KANBAN BOARD -->
@@ -142,10 +142,10 @@ unset($_sub_file, $_sub, $_grace);
           <div class="table-top">
             <div class="table-ttl" id="tabTitle">All Clients</div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <input type="text" id="searchBox" placeholder="Searchâ€¦"
+              <input type="text" id="searchBox" placeholder="Search…"
                 style="padding:7px 12px;border:1px solid var(--border);border-radius:4px;font-size:13px;outline:none;width:180px"
                 oninput="renderTable()">
-              <a href="api.php?action=export_csv" class="btn btn-outline" title="Export to Excel/CSV">â¬‡ CSV</a>
+              <a href="api.php?action=export_csv" class="btn btn-outline" title="Export to Excel/CSV">⬇ CSV</a>
             </div>
           </div>
           <table>
@@ -192,15 +192,15 @@ unset($_sub_file, $_sub, $_grace);
       <div id="viewMtd" style="display:none">
         <div class="table-wrap">
           <div class="table-top">
-            <div class="table-ttl">ðŸ“Š Making Tax Digital â€” Client Tracker</div>
+            <div class="table-ttl">📊 Making Tax Digital — Client Tracker</div>
             <div style="font-size:12px;color:var(--muted)">MTD for Income Tax mandatory from April 2026 for income over
-              Â£50,000</div>
+              £50,000</div>
           </div>
           <div style="padding:16px 20px;background:#fffbeb;border-bottom:1px solid var(--border)">
-            <div style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:4px">âš ï¸ MTD for Income Tax is now
-              live â€” 6 April 2026</div>
-            <div style="font-size:12px;color:#b45309">Clients earning over Â£50,000 from self-employment or property
-              must now keep digital records and submit quarterly updates. Threshold drops to Â£30,000 in April 2027.
+            <div style="font-size:13px;color:#92400e;font-weight:600;margin-bottom:4px">⚠️ MTD for Income Tax is now
+              live — 6 April 2026</div>
+            <div style="font-size:12px;color:#b45309">Clients earning over £50,000 from self-employment or property
+              must now keep digital records and submit quarterly updates. Threshold drops to £30,000 in April 2027.
             </div>
           </div>
           <table>
@@ -225,19 +225,19 @@ unset($_sub_file, $_sub, $_grace);
       <div id="viewDeadlines" style="display:none">
         <div class="table-wrap">
           <div class="table-top">
-            <div class="table-ttl">ðŸ“… Statutory Deadline Tracker</div>
+            <div class="table-ttl">📅 Statutory Deadline Tracker</div>
             <div class="dl-filters">
               <button class="dl-filter active" onclick="dlFilter('all',this)">All</button>
-              <button class="dl-filter" onclick="dlFilter('overdue',this)">ðŸ”´ Overdue <span id="dlCountOverdue"
+              <button class="dl-filter" onclick="dlFilter('overdue',this)">🔴 Overdue <span id="dlCountOverdue"
                   class="dl-count" style="display:none"></span></button>
-              <button class="dl-filter" onclick="dlFilter('soon',this)">ðŸŸ¡ Due Soon</button>
-              <button class="dl-filter" onclick="dlFilter('upcoming',this)">ðŸŸ¢ Upcoming</button>
-              <button class="dl-filter" onclick="dlFilter('done',this)">âœ“ Completed</button>
+              <button class="dl-filter" onclick="dlFilter('soon',this)">🟡 Due Soon</button>
+              <button class="dl-filter" onclick="dlFilter('upcoming',this)">🟢 Upcoming</button>
+              <button class="dl-filter" onclick="dlFilter('done',this)">✓ Completed</button>
             </div>
           </div>
           <div
             style="padding:12px 20px;background:#eff6ff;border-bottom:1px solid #bfdbfe;font-size:12px;color:#1e40af">
-            â„¹ï¸ Set up deadline tracking per client using the <strong>ðŸ“…</strong> button on any client row.
+            ℹ️ Set up deadline tracking per client using the <strong>📅</strong> button on any client row.
             Deadlines auto-calculate from year end dates.
           </div>
           <table>
@@ -260,7 +260,7 @@ unset($_sub_file, $_sub, $_grace);
       <div id="viewArchive" style="display:none">
         <div class="table-wrap">
           <div class="table-top">
-            <div class="table-ttl">ðŸ“ Signed Document Archive</div>
+            <div class="table-ttl">📁 Signed Document Archive</div>
             <div style="font-size:12px;color:var(--muted)">All signed engagement letters with audit trails</div>
           </div>
           <table>
@@ -283,8 +283,8 @@ unset($_sub_file, $_sub, $_grace);
     </div>
 
     <footer>
-      <strong>The Practice</strong> Â· practice.finaccord.pro Â· info@kafs-ltd.com Â· GDPR-compliant Â· UK-hosted Â·
-      Strictly confidential &nbsp;|&nbsp; Â© 2026 A Finaccord Professional Services Programme
+      <strong>The Practice</strong> · practice.finaccord.pro · info@kafs-ltd.com · GDPR-compliant · UK-hosted ·
+      Strictly confidential &nbsp;|&nbsp; © 2026 A Finaccord Professional Services Programme
     </footer>
   </div>
 
@@ -292,7 +292,7 @@ unset($_sub_file, $_sub, $_grace);
   <div class="overlay" id="addModal">
     <div class="modal">
       <div class="m-head">
-        <div class="m-title">Add New Client</div><button class="m-close" onclick="closeM('addModal')">Ã—</button>
+        <div class="m-title">Add New Client</div><button class="m-close" onclick="closeM('addModal')">×</button>
       </div>
       <div class="m-body">
         <div id="addAlert"></div>
@@ -303,13 +303,13 @@ unset($_sub_file, $_sub, $_grace);
         </div>
         <div class="fg">
           <label>Company / Trading Name
-            <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--muted)"> â€”
+            <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--muted)"> —
               type name then click Lookup to auto-fill from Companies House</span>
           </label>
           <div style="display:flex;gap:8px">
             <input type="text" id="addCompany" placeholder="Smith Ltd" style="flex:1">
             <button type="button" class="btn btn-outline" onclick="chLookup()"
-              style="white-space:nowrap;padding:8px 14px;font-size:13px">ðŸ” CH Lookup</button>
+              style="white-space:nowrap;padding:8px 14px;font-size:13px">🔍 CH Lookup</button>
           </div>
           <div id="chResults"
             style="display:none;border:1px solid var(--border);border-radius:4px;margin-top:4px;max-height:200px;overflow-y:auto;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.1)">
@@ -337,7 +337,7 @@ unset($_sub_file, $_sub, $_grace);
         </div>
         <div class="fg">
           <label>Services <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">(tick
-              all that apply â€” add custom below)</span></label>
+              all that apply — add custom below)</span></label>
           <div class="svc-picker">
             <div class="svc-presets">
               <label class="svc-cb"><input type="checkbox" name="svc" value="Self Assessment Tax Return"> Self
@@ -355,7 +355,7 @@ unset($_sub_file, $_sub, $_grace);
                 Package</label>
             </div>
             <div class="svc-custom-row">
-              <input type="text" id="addCustomSvc" placeholder="Add a custom service not listed aboveâ€¦"
+              <input type="text" id="addCustomSvc" placeholder="Add a custom service not listed above…"
                 onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSvc()}">
               <button type="button" class="btn-add-svc" onclick="addCustomSvc()">+ Add</button>
             </div>
@@ -374,12 +374,12 @@ unset($_sub_file, $_sub, $_grace);
     </div>
   </div>
 
-  <!-- SEND LINK MODAL â€” with letter editor -->
+  <!-- SEND LINK MODAL — with letter editor -->
   <div class="overlay" id="linkModal">
     <div class="modal modal-wide">
       <div class="m-head">
         <div class="m-title" id="linkModalTitle">Review &amp; Send Engagement Letter</div>
-        <button class="m-close" onclick="closeM('linkModal')">Ã—</button>
+        <button class="m-close" onclick="closeM('linkModal')">×</button>
       </div>
       <div class="m-body">
         <div id="linkAlert"></div>
@@ -387,11 +387,11 @@ unset($_sub_file, $_sub, $_grace);
         <!-- STEP 1: EDIT LETTER -->
         <div id="linkStep1">
           <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Sending to: <strong id="linkEmail"></strong>
-            â€” Edit the letter below before sending. The client will see exactly this.</p>
+            — Edit the letter below before sending. The client will see exactly this.</p>
           <div class="fg-row" style="margin-bottom:16px">
             <div class="fg">
               <label>Agreed Fee (appears in letter)</label>
-              <input type="text" id="linkFee" placeholder="e.g. Â£350 per annum + VAT">
+              <input type="text" id="linkFee" placeholder="e.g. £350 per annum + VAT">
             </div>
             <div class="fg">
               <label>Signing Deadline</label>
@@ -405,7 +405,7 @@ unset($_sub_file, $_sub, $_grace);
             </div>
           </div>
           <div class="fg">
-            <label>Engagement Letter â€” Edit as needed</label>
+            <label>Engagement Letter — Edit as needed</label>
             <textarea class="letter-editor" id="letterEditor"></textarea>
             <p style="font-size:11px;color:var(--muted);margin-top:5px">You can edit any part of this letter. The client
               will sign exactly what you see here.</p>
@@ -425,7 +425,7 @@ unset($_sub_file, $_sub, $_grace);
               </div>
               <div class="fsig-panel" id="fsigPanelSaved">
                 <div class="fsig-preview-box">
-                  <span id="fsigNoSig" style="font-size:12px;color:var(--muted)">No signature saved yet â€” use Draw or
+                  <span id="fsigNoSig" style="font-size:12px;color:var(--muted)">No signature saved yet — use Draw or
                     Upload to add one.</span>
                   <img id="fsigPreview" src="" alt="Firm signature" style="max-height:70px;max-width:100%;display:none">
                 </div>
@@ -437,9 +437,9 @@ unset($_sub_file, $_sub, $_grace);
                   <button type="button" onclick="clearFSig()"
                     style="position:absolute;top:6px;right:8px;background:#fff;border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;color:var(--muted);cursor:pointer">Clear</button>
                 </div>
-                <button type="button" class="btn-save-sig" onclick="saveFirmSig('draw')">ðŸ’¾ Save &amp; Use This
+                <button type="button" class="btn-save-sig" onclick="saveFirmSig('draw')">💾 Save &amp; Use This
                   Signature</button>
-                <span class="sig-saved-ok" id="drawSavedOk">âœ“ Saved</span>
+                <span class="sig-saved-ok" id="drawSavedOk">✓ Saved</span>
               </div>
               <div class="fsig-panel" id="fsigPanelUpload" style="display:none">
                 <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Upload a PNG or JPG of your signature
@@ -448,9 +448,9 @@ unset($_sub_file, $_sub, $_grace);
                   style="font-size:12px;margin-bottom:8px;display:block">
                 <img id="fsigUploadPreview" src="" alt=""
                   style="max-height:70px;display:none;border:1px solid var(--border);border-radius:4px;padding:4px;margin-bottom:8px">
-                <button type="button" class="btn-save-sig" onclick="saveFirmSig('upload')">ðŸ’¾ Save &amp; Use This
+                <button type="button" class="btn-save-sig" onclick="saveFirmSig('upload')">💾 Save &amp; Use This
                   Signature</button>
-                <span class="sig-saved-ok" id="uploadSavedOk">âœ“ Saved</span>
+                <span class="sig-saved-ok" id="uploadSavedOk">✓ Saved</span>
               </div>
             </div>
           </div>
@@ -458,7 +458,7 @@ unset($_sub_file, $_sub, $_grace);
 
         <!-- STEP 2: SENT CONFIRMATION -->
         <div id="linkStep2" style="display:none">
-          <div class="alert a-ok" style="font-size:14px;padding:14px">âœ“ Email sent successfully. The client will
+          <div class="alert a-ok" style="font-size:14px;padding:14px">✓ Email sent successfully. The client will
             receive their signing link shortly.</div>
           <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Signing deadline set to: <strong
               id="linkDeadlineConfirm"></strong></p>
@@ -471,7 +471,7 @@ unset($_sub_file, $_sub, $_grace);
       </div>
       <div class="m-foot" id="linkFoot">
         <button class="btn btn-outline" onclick="closeM('linkModal')">Cancel</button>
-        <button class="btn btn-gold" id="sendBtn" onclick="sendLink()">ðŸ“§ Save Letter &amp; Send â†’</button>
+        <button class="btn btn-gold" id="sendBtn" onclick="sendLink()">📧 Save Letter &amp; Send →</button>
       </div>
     </div>
   </div>
@@ -480,18 +480,18 @@ unset($_sub_file, $_sub, $_grace);
   <div class="overlay" id="mtdModal">
     <div class="modal">
       <div class="m-head">
-        <div class="m-title">MTD Record â€” <span id="mtdClientName"></span></div><button class="m-close"
-          onclick="closeM('mtdModal')">Ã—</button>
+        <div class="m-title">MTD Record — <span id="mtdClientName"></span></div><button class="m-close"
+          onclick="closeM('mtdModal')">×</button>
       </div>
       <div class="m-body">
         <div id="mtdAlert"></div>
         <div class="fg-row">
           <div class="fg"><label>Annual Income Threshold</label>
             <select id="mtdThreshold">
-              <option value="under20k">Under Â£20,000 â€” not yet in scope</option>
-              <option value="20k-30k">Â£20,000â€“Â£30,000 â€” in scope April 2028</option>
-              <option value="30k-50k">Â£30,000â€“Â£50,000 â€” in scope April 2027</option>
-              <option value="over50k">Over Â£50,000 â€” in scope NOW (April 2026)</option>
+              <option value="under20k">Under £20,000 — not yet in scope</option>
+              <option value="20k-30k">£20,000–£30,000 — in scope April 2028</option>
+              <option value="30k-50k">£30,000–£50,000 — in scope April 2027</option>
+              <option value="over50k">Over £50,000 — in scope NOW (April 2026)</option>
             </select>
           </div>
           <div class="fg"><label>MTD Status</label>
@@ -527,7 +527,7 @@ unset($_sub_file, $_sub, $_grace);
 
         <!-- REMINDER PREFERENCES -->
         <div class="fg" style="border:1px solid var(--border);border-radius:6px;padding:14px 16px;background:#fafaf8;">
-          <label style="display:block;margin-bottom:10px;font-weight:700;color:var(--navy-dark)">ðŸ”” Automatic
+          <label style="display:block;margin-bottom:10px;font-weight:700;color:var(--navy-dark)">🔔 Automatic
             Submission Reminders</label>
           <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Select when reminders are sent before the
             submission date. Reminders go to both the client and the accountant.</div>
@@ -551,7 +551,7 @@ unset($_sub_file, $_sub, $_grace);
               <input type="checkbox" id="mtdRem0" value="0"> On the day
             </label>
           </div>
-          <div style="font-size:12px;color:var(--muted)">ðŸ’¡ Requires cron job to be active on the server â€” see setup
+          <div style="font-size:12px;color:var(--muted)">💡 Requires cron job to be active on the server — see setup
             guide.</div>
         </div>
 
@@ -560,7 +560,7 @@ unset($_sub_file, $_sub, $_grace);
             placeholder="e.g. Client signed up to Xero on 1 April. First quarterly submission due July. Bank feed connected."></textarea>
         </div>
         <div class="alert a-warn" style="font-size:12px">
-          MTD for Income Tax requires clients earning over Â£50,000 from self-employment or property to keep digital
+          MTD for Income Tax requires clients earning over £50,000 from self-employment or property to keep digital
           records and submit quarterly updates to HMRC using compatible software from 6 April 2026.
         </div>
       </div>
@@ -575,8 +575,8 @@ unset($_sub_file, $_sub, $_grace);
   <div class="overlay" id="onboardModal">
     <div class="modal">
       <div class="m-head">
-        <div class="m-title">ðŸ“‹ Send Client Onboarding Link</div><button class="m-close"
-          onclick="closeM('onboardModal')">Ã—</button>
+        <div class="m-title">📋 Send Client Onboarding Link</div><button class="m-close"
+          onclick="closeM('onboardModal')">×</button>
       </div>
       <div class="m-body">
         <div id="onboardAlert"></div>
@@ -591,7 +591,7 @@ unset($_sub_file, $_sub, $_grace);
         <div id="onboardLink" style="display:none;margin-top:12px">
           <div class="alert"
             style="background:#d1fae5;border:1px solid #a7f3d0;border-radius:4px;padding:14px;font-size:13px">
-            âœ… Onboarding link sent to <span id="obSentEmail"></span><br>
+            ✅ Onboarding link sent to <span id="obSentEmail"></span><br>
             <span style="font-size:11px;color:var(--muted)">You can also copy the link below:</span><br>
             <input type="text" id="obLinkCopy" readonly
               style="margin-top:6px;width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:4px;font-size:12px;background:#f8f7f4">
@@ -609,8 +609,8 @@ unset($_sub_file, $_sub, $_grace);
   <div class="overlay" id="dlModal">
     <div class="modal">
       <div class="m-head">
-        <div class="m-title">ðŸ“… Deadline Setup â€” <span id="dlClientName"></span></div><button class="m-close"
-          onclick="closeM('dlModal')">Ã—</button>
+        <div class="m-title">📅 Deadline Setup — <span id="dlClientName"></span></div><button class="m-close"
+          onclick="closeM('dlModal')">×</button>
       </div>
       <div class="m-body">
         <div id="dlAlert"></div>
@@ -687,12 +687,12 @@ unset($_sub_file, $_sub, $_grace);
   <div class="overlay" id="notesModal">
     <div class="modal">
       <div class="m-head">
-        <div class="m-title">Internal Notes</div><button class="m-close" onclick="closeM('notesModal')">Ã—</button>
+        <div class="m-title">Internal Notes</div><button class="m-close" onclick="closeM('notesModal')">×</button>
       </div>
       <div class="m-body">
         <div id="notesAlert"></div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Notes for: <strong
-            id="notesClientName"></strong><br><span style="font-size:11px">Internal only â€” not visible to
+            id="notesClientName"></strong><br><span style="font-size:11px">Internal only — not visible to
             client</span></p>
         <div class="fg">
           <label>Notes</label>
@@ -711,8 +711,8 @@ unset($_sub_file, $_sub, $_grace);
   <div class="overlay" id="amlModal">
     <div class="modal">
       <div class="m-head">
-        <div class="m-title">AML â€” Customer Due Diligence</div><button class="m-close"
-          onclick="closeM('amlModal')">Ã—</button>
+        <div class="m-title">AML — Customer Due Diligence</div><button class="m-close"
+          onclick="closeM('amlModal')">×</button>
       </div>
       <div class="m-body">
         <div id="amlAlert"></div>
@@ -743,11 +743,11 @@ unset($_sub_file, $_sub, $_grace);
         </div>
         <div class="fg"><label>CDD Notes</label>
           <textarea id="amlNotes"
-            placeholder="Record how identity was verified, any enhanced due diligence conducted, and any concerns notedâ€¦"></textarea>
+            placeholder="Record how identity was verified, any enhanced due diligence conducted, and any concerns noted…"></textarea>
         </div>
         <div class="alert a-warn">
-          âš ï¸ You remain legally responsible for client identity verification under the Money Laundering Regulations
-          2017. This record assists your compliance recordkeeping â€” it does not constitute verification itself.
+          ⚠️ You remain legally responsible for client identity verification under the Money Laundering Regulations
+          2017. This record assists your compliance recordkeeping — it does not constitute verification itself.
         </div>
       </div>
       <div class="m-foot">
